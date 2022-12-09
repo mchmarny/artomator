@@ -17,6 +17,11 @@ const (
 	testSubscription = "test"
 )
 
+var (
+	projectID = os.Getenv("PROJECT_ID")
+	signKey   = os.Getenv("SIGN_KEY")
+)
+
 type pubsubMessage struct {
 	Message      message `json:"message"`
 	Subscription string  `json:"subscription"`
@@ -79,7 +84,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cmd := exec.CommandContext(r.Context(), "/bin/bash", commandName, e.Digest) //nolint:gosec
+	cmd := exec.CommandContext(r.Context(), "/bin/bash",
+		commandName, e.Digest, projectID, signKey) //nolint:gosec
 	cmd.Stderr = os.Stderr
 	out, err := cmd.Output()
 	if err != nil {
@@ -93,6 +99,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/", handler)
+
+	if projectID == "" || signKey == "" {
+		panic("either PROJECT_ID or SIGN_KEY env vars aren't set")
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = portDefault

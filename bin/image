@@ -6,6 +6,11 @@ DIR="$(dirname "$0")"
 set -o errexit
 set -o pipefail
 
+# creates the Artifact Registry repo
+gcloud artifacts repositories create $ROOT_NAME \
+  --location $REGION \
+  --repository-format=docker
+
 # generating key-pair
 cosign generate-key-pair --kms $SIGN_KEY
 

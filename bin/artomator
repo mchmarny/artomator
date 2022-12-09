@@ -2,46 +2,46 @@
 
 set -o errexit
 
-# image URI (registry/image@sha:*** or ar/registry/image@sha:***)
-IMAGE=$1
+# image (registry/image@sha:*** or ar/registry/image@sha:***)
+IMAGE_SHA=$1
+PROJECT_ID=$2
+SIGN_KEY=$3
 
 # check required input parameters
-[ -z "$IMAGE" ] && echo "image URI env var not set\n" && exit 1
-[ -z "$PROJECT" ] && echo "env var PROJECT env var not set\n" && exit 1
-[ -z "$KEY" ] && echo "env var KEY env var not set\n" && exit 1
-[ -z "$VERSION" ] && echo "env var VERSION env var not set\n" && exit 1
-[ -z "$COMMIT" ] && echo "env var COMMIT env var not set\n" && exit 1
+[ -z "$IMAGE_SHA" ] && echo "arg IMAGE_SHA not provided\n" && exit 1
+[ -z "$PROJECT_ID" ] && echo "env var PROJECT_ID env var not set\n" && exit 1
+[ -z "$SIGN_KEY" ] && echo "env var SIGN_KEY env var not set\n" && exit 1
 
 # parse registry from image 
-REGISTRY=$(echo $IMAGE | cut -d'/' -f 1)
+REGISTRY=$(echo $IMAGE_SHA | cut -d'/' -f 1)
 
 # print run variables 
-echo "PROJECT:  $PROJECT"
-echo "REGISTRY: $REGISTRY"
-echo "IMAGE:    $IMAGE"
-echo "KEY:      $KEY"
-echo "VERSION:  $VERSION"
-echo "COMMIT:   $COMMIT"
+echo "PROJECT_ID: $PROJECT_ID"
+echo "REGISTRY:   $REGISTRY"
+echo "IMAGE_SHA:  $IMAGE_SHA"
+echo "SIGN_KEY:   $SIGN_KEY"
 
 # confgure gcloud 
 gcloud auth configure-docker $REGISTRY --quiet
-gcloud config set project $PROJECT
+gcloud config set project $PROJECT_ID
 
-# ensure local public key 
-KEY="gcpkms://${KEY}"
-cosign generate-key-pair --kms $KEY
+# generating key-pair
+cosign generate-key-pair --kms $SIGN_KEY
 
-# sign and verify image 
-cosign sign --key $KEY -a "version=${VERSION}" -a "commit=${COMMIT}" $IMAGE
-cosign verify --key $KEY $IMAGE
+# Sign and verify image
+cosign sign --key $SIGN_KEY $IMAGE_SHA
+cosign verify --key $SIGN_KEY $IMAGE_SHA
 
-# generate SBOM from image and attach it as attestation to the image
-syft --scope all-layers -o spdx-json=sbom.spdx.json $IMAGE | jq --compact-output > sbom.spdx.json
-cosign attest --predicate sbom.spdx.json --key $KEY $IMAGE
+# Generate SBOM from image and attach it as attestation to the image
+syft packages -o spdx-json $IMAGE_SHA | jq --compact-output > sbom.spdx.json
+cosign attest --predicate sbom.spdx.json --type spdx --key $SIGN_KEY $IMAGE_SHA
 
-# scan packages in SBOM for vulnerabilities and attach report as attestation to the image
-grype --add-cpes-if-none sbom:sbom.spdx.json -o json | jq --compact-output > vulns.grype.json
-cosign attest --predicate vulns.grype.json --key $KEY $IMAGE
+# Verifying SPDX document attestation 
+cosign verify-attestation --type=spdx  --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType
 
-# verifying all image attestations but skip payload to avoid logging ton of JSON"
-cosign verify-attestation --key $KEY $IMAGE | jq '.payloadType'
+# Scan packages in SBOM for vulnerabilities and attach report as attestation to the image
+grype --add-cpes-if-none sbom:sbom.spdx.json -o json | jq --compact-output > sbom.vuln.json
+cosign attest --predicate sbom.vuln.json --type vuln --key $SIGN_KEY $IMAGE_SHA
+
+# Verifying vulnerability report attestation 
+cosign verify-attestation --type=vuln  --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType

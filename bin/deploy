@@ -6,14 +6,19 @@ DIR="$(dirname "$0")"
 set -o errexit
 set -o pipefail
 
+gcloud iam service-accounts create $SA_NAME \
+    --display-name "Service invoker for ${SA_NAME}"
+
 # cloud run 
 gcloud run deploy $ROOT_NAME \
 	--allow-unauthenticated \
+	--execution-environment=gen2 \
 	--image $IMAGE_URI \
 	--platform managed \
 	--timeout 15m \
 	--region $REGION \
-	--service-account $SA_EMAIL
+	--service-account $SA_EMAIL \
+	--set-env-vars=PROJECT_ID=$PROJECT_ID,SIGN_KEY=$SIGN_KEY
 
 gcloud run services add-iam-policy-binding $ROOT_NAME \
 	--member "serviceAccount:${SA_EMAIL}" \
