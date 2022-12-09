@@ -1,6 +1,6 @@
 # artomator (Artifact Registry Automator, naming is hard)
 
-[Artifact Registry (AR)](https://cloud.google.com/artifact-registry) `artomator`. When deployed, it creates Cloud Run services which subscribes to AR events. Whenever new image is published to any registry in this project, this service will:
+[Artifact Registry (AR)](https://cloud.google.com/artifact-registry) `artomator`. When deployed, it creates Cloud Run services which subscribes to AR events. Whenever new image is published to any registry in specified project, this service will:
 
 * Sign that image based on its SHA using a specific KMS key
 * Generate [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom) for that image in ([JSON SPDX format](https://github.com/spdx/spdx-spec/blob/v2.2/schemas/spdx-schema.json))
