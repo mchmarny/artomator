@@ -26,7 +26,7 @@ echo "$MSG_ID - SIGN_KEY:   $SIGN_KEY"
 gcloud auth configure-docker $REGISTRY --quiet
 gcloud config set project $PROJECT_ID
 
-# generating key-pair
+# generate key-pair 
 cosign generate-key-pair --kms $SIGN_KEY
 
 # Sign and verify image
