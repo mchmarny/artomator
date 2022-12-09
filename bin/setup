@@ -45,3 +45,7 @@ gcloud kms keys describe $KEY_NAME \
   --location $REGION \
   --keyring $ROOT_NAME \
   --format json | jq --raw-output '.name'
+
+gcloud iam service-accounts create $SA_NAME \
+    --display-name "Service invoker for ${SA_NAME}"
+    

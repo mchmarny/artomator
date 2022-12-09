@@ -22,13 +22,15 @@ fi;
 export PROJECT_NUMBER="$(gcloud projects describe "${PROJECT_ID}" --format='value(projectNumber)')"
 
 # used as a root for all things created by this app
-export ROOT_NAME="ar-automator"
+export ROOT_NAME="artomator"
 
 # derived values
 export VERSION=$(cat .version)
 export COMMIT=$(git rev-parse --short HEAD)
+export SA_NAME="${ROOT_NAME}-sa"
+export SA_EMAIL="${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 export KEY_NAME="${ROOT_NAME}-signer"
 export KEY_PATH="${ROOT_NAME}/cryptoKeys/${KEY_NAME}/cryptoKeyVersions/1"
 export SIGN_KEY="gcpkms://projects/${PROJECT_ID}/locations/${REGION}/keyRings/${KEY_PATH}"
-export IMAGE_REG="${REGION}-docker.pkg.dev/${PROJECT_ID}/${ROOT_NAME}/automator"
-export IMAGE_URI="${IMAGE_REG}:${VERSION}"
+export IMAGE_REG="${REGION}-docker.pkg.dev/${PROJECT_ID}/${ROOT_NAME}"
+export IMAGE_URI="${IMAGE_REG}/${ROOT_NAME}:${VERSION}"

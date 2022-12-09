@@ -1,0 +1,17 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+set -o errexit
+set -o pipefail
+
+TEST_IMAGE_URI="${IMAGE_REG}/tester:${VERSION}"
+echo $TEST_IMAGE_URI
+
+# Build and push image
+docker build -f test/Dockerfile -t $TEST_IMAGE_URI --platform linux/amd64 .
+docker push $TEST_IMAGE_URI
+
+IMAGE_SHA=$(docker inspect --format='{{index .RepoDigests 0}}' $TEST_IMAGE_URI)
+echo "IMAGE_SHA: ${IMAGE_SHA}"

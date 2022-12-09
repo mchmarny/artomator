@@ -30,30 +30,10 @@ run: ## Runs uncompiled app
 	go run main.go
 .PHONY: run
 
-post: ## Post event to local endpoint 
-	curl -s -H "Content-Type: application/json" \
-    	 -d @events/invalid.json \
-		 -X POST http://localhost:8080 | jq "."
-	curl -s -H "Content-Type: application/json" \
-    	 -d @events/tag.json \
-		 -X POST http://localhost:8080 | jq "."
-	curl -s -H "Content-Type: application/json" \
-    	 -d @events/valid.json \
-		 -X POST http://localhost:8080 | jq "."
-.PHONY: post
-
-image: ## Build local image using Docker
-	bin/image
-.PHONY: image
-
 tag: ## Creates release tag 
 	git tag -s -m "version bump to $(VERSION)" $(VERSION)
 	git push origin $(VERSION)
 .PHONY: tag
-
-setup:
-	bin/setup
-.PHONY: setup 
 
 help: ## Display available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk \

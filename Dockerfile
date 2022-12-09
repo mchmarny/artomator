@@ -23,7 +23,6 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath \
 FROM alpine:3.17
 
 COPY --from=builder /src/app /app/
-COPY --from=builder /src/app /app/
 WORKDIR /app
 
 # core packages + py for gcloud
@@ -45,9 +44,6 @@ RUN curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh \
 RUN curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh \
     | sh -s -- -b /usr/local/bin
 
-# crane
-RUN curl -L -o crane https://github.com/michaelsauter/crane/releases/download/v3.6.1/crane_linux_amd64 && chmod +x crane && mv crane /usr/local/bin/crane
-
 # copy automator
-COPY automator /usr/local/bin
+COPY bin/artomator /usr/local/bin
 ENTRYPOINT ["./app"]

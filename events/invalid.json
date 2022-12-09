@@ -1,4 +1,0 @@
-{
-    "action": "DELETE",
-    "tag": "us-east1-docker.pkg.dev/my-project/my-repo/hello-world:1.1"
-}
