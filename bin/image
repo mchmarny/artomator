@@ -1,0 +1,32 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+set -o errexit
+set -o pipefail
+
+# generating key-pair
+cosign generate-key-pair --kms $SIGN_KEY
+
+# Build and push image
+docker build --build-arg VERSION=$VERSION -t $IMAGE_URI --platform linux/amd64 .
+docker push $IMAGE_URI
+
+IMAGE_SHA=$(docker inspect --format='{{index .RepoDigests 0}}' $IMAGE_URI)
+echo "IMAGE_SHA: ${IMAGE_SHA}\n"
+
+# Sign and verify image
+cosign sign --key $SIGN_KEY -a version=$VERSION -a commit=$COMMIT $IMAGE_SHA
+cosign verify --key $SIGN_KEY $IMAGE_SHA
+
+# Generate SBOM from image and attach it as attestation to the image
+syft packages -o spdx-json $IMAGE_SHA | jq --compact-output > sbom.spdx
+cosign attest --predicate sbom.spdx --type spdxjson --key $SIGN_KEY $IMAGE_SHA
+
+# Scan packages in SBOM for vulnerabilities and attach report as attestation to the image
+grype --add-cpes-if-none sbom:sbom.spdx.json -o json | jq --compact-output > vuln.json
+cosign attest --predicate vuln.json --type vuln --key $SIGN_KEY $IMAGE_SHA
+
+# Verifying all image attestations
+cosign verify-attestation --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType

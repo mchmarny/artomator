@@ -1,0 +1,11 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+set -o errexit
+set -o pipefail
+
+gcloud pubsub subscriptions delete "${REGISTRY_NAME}-sub"
+gcloud pubsub topics delete gcr
+gcloud artifacts repositories delete $REGISTRY_NAME --location $REGION  

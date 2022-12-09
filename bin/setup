@@ -1,0 +1,47 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+set -o errexit
+set -o pipefail
+
+# configure defaults 
+gcloud config set project $PROJECT_ID
+gcloud config set artifacts/location $REGION
+gcloud config set deploy/region $REGION
+
+# enables APIs
+gcloud services enable \
+  artifactregistry.googleapis.com \
+  binaryauthorization.googleapis.com \
+  cloudkms.googleapis.com \
+  cloudresourcemanager.googleapis.com \
+  container.googleapis.com \
+  containerregistry.googleapis.com \
+  containerscanning.googleapis.com \
+  run.googleapis.com \
+  pubsub.googleapis.com
+
+# creates the Artifact Registry repo
+gcloud artifacts repositories create $ROOT_NAME \
+  --location $REGION \
+  --repository-format=docker
+
+# key to sign images
+gcloud kms keyrings create $ROOT_NAME \
+  --project $PROJECT_ID \
+  --location $REGION
+
+gcloud kms keys create $KEY_NAME \
+  --project $PROJECT_ID \
+  --location $REGION \
+  --keyring $ROOT_NAME \
+  --purpose asymmetric-signing \
+  --default-algorithm rsa-sign-pkcs1-4096-sha512
+
+gcloud kms keys describe $KEY_NAME \
+  --project $PROJECT_ID \
+  --location $REGION \
+  --keyring $ROOT_NAME \
+  --format json | jq --raw-output '.name'

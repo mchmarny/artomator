@@ -1,0 +1,73 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+set -o errexit
+set -o pipefail
+
+# configure defaults 
+gcloud config set project $PROJECT_ID
+gcloud config set artifacts/location $REGION
+gcloud config set deploy/region $REGION
+
+# enables APIs
+gcloud services enable \
+  artifactregistry.googleapis.com \
+  binaryauthorization.googleapis.com \
+  cloudkms.googleapis.com \
+  cloudresourcemanager.googleapis.com \
+  container.googleapis.com \
+  containerregistry.googleapis.com \
+  containerscanning.googleapis.com \
+  run.googleapis.com \
+  pubsub.googleapis.com
+
+# creates the Artifact Registry repo
+gcloud artifacts repositories create $ROOT_NAME \
+  --location $REGION \
+  --repository-format=docker
+
+# key to sign images
+gcloud kms keyrings create $ROOT_NAME \
+  --project $PROJECT_ID \
+  --location $REGION
+
+gcloud kms keys create "${ROOT_NAME}-signer" \
+  --project $PROJECT_ID \
+  --location $REGION \
+  --keyring builder \
+  --purpose asymmetric-signing \
+  --default-algorithm rsa-sign-pkcs1-4096-sha512
+
+gcloud kms keys describe builder-signer \
+  --project $PROJECT_ID \
+  --location $REGION \
+  --keyring builder \
+  --format json | jq --raw-output '.name'
+
+# pubsub topic (subscription once image is deployed)
+gcloud pubsub topics create gcr
+
+
+
+# cloud run 
+gcloud beta run deploy $SERVICE_NAME \
+	--allow-unauthenticated \
+	--image "gcr.io/cloudylabs-public/pubsub-to-bigquery-pump:${SERVICE_IMAGE_VERSION}" \
+	--platform managed \
+	--timeout 15m \
+	--region $SERVICE_REGION \
+	--set-env-vars $CR_VAR \
+	--service-account "${SA_NAME}@${PROJECT}.iam.gserviceaccount.com"
+
+
+gcloud beta run services add-iam-policy-binding $SERVICE_NAME \
+    --member "serviceAccount:${SA_NAME}@${PROJECT}.iam.gserviceaccount.com" \
+    --role roles/run.invoker
+
+# create a subscription after the image was deployed
+gcloud pubsub subscriptions create "${REGISTRY_NAME}-sub" --topic gcr
+
+# manually pull message
+# gcloud pubsub subscriptions pull "${REGISTRY_NAME}-sub" --auto-ack
