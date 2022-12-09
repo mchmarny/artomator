@@ -77,13 +77,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("%s - event action: %s, digest: %s, tag: %s\n", mID, e.Action, e.Digest, e.Tag)
 
 	if e.Action != actionInsert {
-		writeMessage(w, http.StatusAlreadyReported, fmt.Sprintf("unsupported event type: %s", e.Action))
+		writeMessage(w, http.StatusOK, fmt.Sprintf("unsupported event type: %s", e.Action))
 		return
 	}
 
 	if m.Subscription == testSubscription {
 		fmt.Printf("%s - skipping executing command during test", mID)
-		writeMessage(w, http.StatusAccepted, "ok")
+		writeMessage(w, http.StatusOK, "ok")
 		return
 	}
 
