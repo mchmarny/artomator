@@ -64,5 +64,10 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 gcloud pubsub subscriptions create gcr-sub \
   --topic gcr \
   --ack-deadline 600 \
+  --expiration-period "24h" \ 
+  --message-retention-duration "24h" \
+  --max-retry-delay "600s" \
+  --min-retry-delay "10s" \
   --push-endpoint "${SERVICE_URL}/" \
   --push-auth-service-account $SA_EMAIL
+  

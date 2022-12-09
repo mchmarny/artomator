@@ -57,7 +57,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mID := fmt.Sprintf("mid:%s", m.Message.MessageId)
+	mID := fmt.Sprintf("mid:%s - %v", m.Message.MessageId, m)
 
 	log.Printf("%s - message data: %s\n", mID, m.Message.Data)
 
