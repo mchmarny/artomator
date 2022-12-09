@@ -1,5 +1,4 @@
 VERSION     ?=$(shell cat .version)
-COMMIT      ?=$(shell git rev-parse --short HEAD)
 
 all: help
 
@@ -25,10 +24,6 @@ test: tidy ## Runs unit tests
 lint: ## Lints the entire project 
 	golangci-lint -c .golangci.yaml run
 .PHONY: lint
-
-run: ## Runs uncompiled app 
-	go run main.go
-.PHONY: run
 
 tag: ## Creates release tag 
 	git tag -s -m "version bump to $(VERSION)" $(VERSION)

@@ -62,7 +62,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("message data: %s\n", d)
 
 	var e event
-	if err := json.Unmarshal(d, &e); err != nil {
+	if err = json.Unmarshal(d, &e); err != nil {
 		writeMessage(w, http.StatusBadRequest, fmt.Sprintf("error parsing event: %v", err))
 		return
 	}
