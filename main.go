@@ -87,6 +87,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//TODO: Add registry/image excludes to avoid processing itself
+
 	cmd := exec.CommandContext(r.Context(), "/bin/bash",
 		commandName, e.Digest, projectID, signKey, mID) //nolint:gosec
 	cmd.Stderr = os.Stderr

@@ -6,6 +6,49 @@ DIR="$(dirname "$0")"
 set -o errexit
 set -o pipefail
 
+# override the config one with the latest valid static image
+IMAGE_URI=us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:f514089ea3f8cfef67bf8dd58b54ee14b4a07e9f849936c18f772f8d1afbdf19
+
+# configure defaults 
+gcloud config set project $PROJECT_ID
+gcloud config set artifacts/location $REGION
+gcloud config set deploy/region $REGION
+
+# enables APIs
+gcloud services enable \
+  artifactregistry.googleapis.com \
+  binaryauthorization.googleapis.com \
+  cloudkms.googleapis.com \
+  cloudresourcemanager.googleapis.com \
+  container.googleapis.com \
+  containerregistry.googleapis.com \
+  containerscanning.googleapis.com \
+  run.googleapis.com \
+  pubsub.googleapis.com
+
+# key to sign images
+gcloud kms keyrings create $ROOT_NAME \
+  --project $PROJECT_ID \
+  --location $REGION
+
+gcloud kms keys create $KEY_NAME \
+  --project $PROJECT_ID \
+  --location $REGION \
+  --keyring $ROOT_NAME \
+  --purpose asymmetric-signing \
+  --default-algorithm rsa-sign-pkcs1-4096-sha512
+
+gcloud kms keys describe $KEY_NAME \
+  --project $PROJECT_ID \
+  --location $REGION \
+  --keyring $ROOT_NAME \
+  --format json | jq --raw-output '.name'
+
+# creates the Artifact Registry repo
+gcloud artifacts repositories create $ROOT_NAME \
+  --location $REGION \
+  --repository-format=docker
+
 gcloud iam service-accounts create $SA_NAME \
     --display-name "Service invoker for ${SA_NAME}"
 

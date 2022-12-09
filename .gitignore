@@ -19,4 +19,6 @@ cosign.*
 digest.txt
 
 # generated files
-sbom.*
+sbom.spdx.json
+sbom.vuln.json
+
