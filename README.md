@@ -1,11 +1,13 @@
-# artomator
+# artomator (Artifact Registry Automator, naming is hard)
 
-[Artifact Registry](https://cloud.google.com/artifact-registry) `artomator`. When deployed, it creates Cloud Run services which subscribes to registry events. When the event indicates a new image has been pushed (`INSERT`) to the registry, the service will:
+[Artifact Registry (AR)](https://cloud.google.com/artifact-registry) `artomator`. When deployed, it creates Cloud Run services which subscribes to AR events. Whenever new image is published to any registry in this project, this service will:
 
-* Sign that image based on its SHA using KMS key
-* Generate Software Bill of Materials (SBOM) for that image in JSON format ([SPDX schema ](https://github.com/spdx/spdx-spec/blob/v2.2/schemas/spdx-schema.json))
-* Scan that image for vulnerabilities 
-* and, create attestations for both the SBOM and vulnerability report on the image
+* Sign that image based on its SHA using a specific KMS key
+* Generate [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom) for that image in ([JSON SPDX format](https://github.com/spdx/spdx-spec/blob/v2.2/schemas/spdx-schema.json))
+* Scan that image for vulnerabilities using the extracted SBOM
+* and, create a verifiable attestations for both the SBOM and vulnerability report on that image
+
+![](images/reg.png)
 
 ## setup
 
@@ -21,7 +23,9 @@ Create `artomator` image, sign it, generate its own SBOM, create its vulnerabili
 bin/image
 ```
 
-Finally, create the PubSub topic, subscription, and Cloud Run service to process the registry events: 
+Finally, create the PubSub topic, subscription to that topic, and Cloud Run service to process the registry events: 
+
+> Note, the created Cloud Run service requires `roles/run.invoker` roles so only the PubSub push subscription will be allowed to invoke that service. 
 
 ```shell
 bin/deploy

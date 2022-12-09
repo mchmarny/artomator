@@ -6,6 +6,7 @@ set -o errexit
 IMAGE_SHA=$1
 PROJECT_ID=$2
 SIGN_KEY=$3
+MSG_ID=$4
 
 # check required input parameters
 [ -z "$IMAGE_SHA" ] && echo "arg IMAGE_SHA not provided\n" && exit 1
@@ -16,10 +17,10 @@ SIGN_KEY=$3
 REGISTRY=$(echo $IMAGE_SHA | cut -d'/' -f 1)
 
 # print run variables 
-echo "PROJECT_ID: $PROJECT_ID"
-echo "REGISTRY:   $REGISTRY"
-echo "IMAGE_SHA:  $IMAGE_SHA"
-echo "SIGN_KEY:   $SIGN_KEY"
+echo "$MSG_ID - PROJECT_ID: $PROJECT_ID"
+echo "$MSG_ID - REGISTRY:   $REGISTRY"
+echo "$MSG_ID - IMAGE_SHA:  $IMAGE_SHA"
+echo "$MSG_ID - SIGN_KEY:   $SIGN_KEY"
 
 # confgure gcloud 
 gcloud auth configure-docker $REGISTRY --quiet
@@ -33,6 +34,7 @@ cosign sign --key $SIGN_KEY $IMAGE_SHA
 cosign verify --key $SIGN_KEY $IMAGE_SHA
 
 # Generate SBOM from image and attach it as attestation to the image
+echo "$MSG_ID - Processing SBOM"
 syft packages -o spdx-json $IMAGE_SHA | jq --compact-output > sbom.spdx.json
 cosign attest --predicate sbom.spdx.json --type spdx --key $SIGN_KEY $IMAGE_SHA
 
@@ -40,8 +42,10 @@ cosign attest --predicate sbom.spdx.json --type spdx --key $SIGN_KEY $IMAGE_SHA
 cosign verify-attestation --type=spdx  --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType
 
 # Scan packages in SBOM for vulnerabilities and attach report as attestation to the image
+echo "$MSG_ID - Processing Vulnerabilities"
 grype --add-cpes-if-none sbom:sbom.spdx.json -o json | jq --compact-output > sbom.vuln.json
 cosign attest --predicate sbom.vuln.json --type vuln --key $SIGN_KEY $IMAGE_SHA
 
 # Verifying vulnerability report attestation 
-cosign verify-attestation --type=vuln  --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType
+echo "$MSG_ID - Verifying Attestation"
+cosign verify-attestation --type=vuln --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType

@@ -40,4 +40,8 @@ gcloud kms keys describe $KEY_NAME \
   --location $REGION \
   --keyring $ROOT_NAME \
   --format json | jq --raw-output '.name'
-    
+
+# creates the Artifact Registry repo
+gcloud artifacts repositories create $ROOT_NAME \
+  --location $REGION \
+  --repository-format=docker

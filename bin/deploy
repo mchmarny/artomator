@@ -9,11 +9,33 @@ set -o pipefail
 gcloud iam service-accounts create $SA_NAME \
     --display-name "Service invoker for ${SA_NAME}"
 
+# roles 
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+     --member "serviceAccount:${SA_EMAIL}" \
+     --role roles/storage.objectCreator
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+     --member "serviceAccount:${SA_EMAIL}" \
+     --role roles/storage.objectViewer
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+     --member "serviceAccount:${SA_EMAIL}" \
+     --role roles/artifactregistry.writer
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+     --member "serviceAccount:${SA_EMAIL}" \
+     --role roles/cloudkms.viewer
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+     --member "serviceAccount:${SA_EMAIL}" \
+     --role roles/cloudkms.signerVerifier
+	 
 # cloud run 
 gcloud run deploy $ROOT_NAME \
-	--allow-unauthenticated \
+	--no-allow-unauthenticated \
 	--execution-environment=gen2 \
 	--image $IMAGE_URI \
+     --memory=2Gi \
 	--platform managed \
 	--timeout 15m \
 	--region $REGION \
@@ -23,7 +45,7 @@ gcloud run deploy $ROOT_NAME \
 gcloud run services add-iam-policy-binding $ROOT_NAME \
 	--member "serviceAccount:${SA_EMAIL}" \
 	--region $REGION \
-	--role=roles/run.invoker
+	--role roles/run.invoker
 
 SERVICE_URL=$(gcloud run services describe $ROOT_NAME \
   --region $REGION --format="value(status.url)")
@@ -34,8 +56,8 @@ echo $SERVICE_URL
 gcloud pubsub topics create gcr
 
 gcloud projects add-iam-policy-binding $PROJECT_ID \
-     --member="serviceAccount:service-${PROJECT_NUMBER}@gcp-sa-pubsub.iam.gserviceaccount.com" \
-     --role=roles/iam.serviceAccountTokenCreator
+     --member "serviceAccount:service-${PROJECT_NUMBER}@gcp-sa-pubsub.iam.gserviceaccount.com" \
+     --role roles/iam.serviceAccountTokenCreator
 
 gcloud pubsub subscriptions create gcr-sub \
   --topic gcr \

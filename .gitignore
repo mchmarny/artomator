@@ -18,4 +18,7 @@ cosign.*
 # docker 
 digest.txt
 
+# generated files
+sbom.*
+
 

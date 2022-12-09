@@ -1,5 +1,8 @@
+ARG BUILD_BASE=golang:1.19.4
+ARG FINAL_BASE=alpine:3.17
+
 # BUILD
-FROM golang:1.19.4 as builder
+FROM $BUILD_BASE as builder
 
 WORKDIR /src/
 
@@ -20,7 +23,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath \
     -a -mod readonly -v -o app
 
 # RUN
-FROM alpine:3.17
+FROM $FINAL_BASE
 
 COPY --from=builder /src/app /app/
 WORKDIR /app

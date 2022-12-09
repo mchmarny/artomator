@@ -2,4 +2,4 @@
 
 set -o errexit
 
-echo "hello"
+echo "hello 1670620105"

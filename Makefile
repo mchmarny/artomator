@@ -25,6 +25,11 @@ lint: ## Lints the entire project
 	golangci-lint -c .golangci.yaml run
 .PHONY: lint
 
+update: ## Post event to local endpoint 
+	bin/image
+	bin/update
+.PHONY: update
+
 tag: ## Creates release tag 
 	git tag -s -m "version bump to $(VERSION)" $(VERSION)
 	git push origin $(VERSION)

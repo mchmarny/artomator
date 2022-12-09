@@ -1,12 +1,16 @@
 #!/bin/bash
 
-DIR="$(dirname "$0")"
-. "${DIR}/config"
+. "bin/config"
 
 set -o errexit
 set -o pipefail
 
-TEST_IMAGE_URI="${IMAGE_REG}/tester:${VERSION}"
+NOW=$(date +%s)
+
+# update the script as to ensure new image sha 
+sed -e "s/REPLACE/${NOW}/" test/hello-template > test/hello
+
+TEST_IMAGE_URI="${IMAGE_REG}/tester:v1.2.${NOW}"
 echo $TEST_IMAGE_URI
 
 # Build and push image

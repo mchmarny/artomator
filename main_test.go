@@ -9,6 +9,8 @@ import (
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"google.golang.org/api/pubsub/v1"
 )
 
 const (
@@ -31,9 +33,9 @@ func getPubSubMessage(content string) *pubsubMessage {
 	d := base64.StdEncoding.EncodeToString([]byte(content))
 	return &pubsubMessage{
 		Subscription: testSubscription,
-		Message: message{
-			ID:   fmt.Sprintf("id-%d", time.Now().UnixNano()),
-			Data: []byte(d),
+		Message: pubsub.PubsubMessage{
+			MessageId: fmt.Sprintf("id-%d", time.Now().UnixNano()),
+			Data:      d,
 		},
 	}
 }

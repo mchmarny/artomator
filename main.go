@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+
+	"google.golang.org/api/pubsub/v1"
 )
 
 const (
@@ -23,13 +25,8 @@ var (
 )
 
 type pubsubMessage struct {
-	Message      message `json:"message"`
-	Subscription string  `json:"subscription"`
-}
-
-type message struct {
-	Data []byte `json:"data,omitempty"`
-	ID   string `json:"id"`
+	Message      pubsub.PubsubMessage `json:"message"`
+	Subscription string               `json:"subscription"`
 }
 
 type event struct {
@@ -52,6 +49,7 @@ func writeMessage(w http.ResponseWriter, s int, m string) {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	log.Println("processing event...")
 
 	var m pubsubMessage
 	if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
@@ -59,33 +57,38 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	d, err := base64.StdEncoding.DecodeString(string(m.Message.Data))
+	mID := fmt.Sprintf("mid:%s", m.Message.MessageId)
+
+	log.Printf("%s - message data: %s\n", mID, m.Message.Data)
+
+	d, err := base64.StdEncoding.DecodeString(m.Message.Data)
 	if err != nil {
 		writeMessage(w, http.StatusBadRequest, fmt.Sprintf("error decoding message data: %v", err))
 		return
 	}
-	fmt.Printf("message data: %s\n", d)
+
+	log.Printf("%s - event data: %s\n", mID, d)
 
 	var e event
 	if err = json.Unmarshal(d, &e); err != nil {
 		writeMessage(w, http.StatusBadRequest, fmt.Sprintf("error parsing event: %v", err))
 		return
 	}
-	fmt.Printf("event action: %s, digest: %s, tag: %s\n", e.Action, e.Digest, e.Tag)
+	fmt.Printf("%s - event action: %s, digest: %s, tag: %s\n", mID, e.Action, e.Digest, e.Tag)
 
-	if e.Action != actionInsert || e.Tag != "" {
-		writeMessage(w, http.StatusNoContent, fmt.Sprintf("unsupported event type: %s", e.Action))
+	if e.Action != actionInsert {
+		writeMessage(w, http.StatusAlreadyReported, fmt.Sprintf("unsupported event type: %s", e.Action))
 		return
 	}
 
 	if m.Subscription == testSubscription {
-		fmt.Println("skipping executing command during test")
+		fmt.Printf("%s - skipping executing command during test", mID)
 		writeMessage(w, http.StatusAccepted, "ok")
 		return
 	}
 
 	cmd := exec.CommandContext(r.Context(), "/bin/bash",
-		commandName, e.Digest, projectID, signKey) //nolint:gosec
+		commandName, e.Digest, projectID, signKey, mID) //nolint:gosec
 	cmd.Stderr = os.Stderr
 	out, err := cmd.Output()
 	if err != nil {
@@ -93,7 +96,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("command output: %s\n", out)
+	fmt.Printf("mid:%s - command output: %s\n", m.Message.MessageId, out)
 	writeMessage(w, http.StatusOK, "ok")
 }
 
