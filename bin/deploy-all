@@ -106,7 +106,7 @@ gcloud run deploy $ROOT_NAME \
 	--execution-environment=gen2 \
   --image $PUB_IMAGE_URI \
   --memory=2Gi \
-	--max-instances=5 \
+	--max-instances=3 \
 	--platform managed \
 	--timeout 15m \
 	--region $REGION \
