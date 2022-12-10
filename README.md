@@ -49,10 +49,10 @@ bin/cleanup
 
 ## todo
 
-* Persist sha to prevent processing the same one multiple times 
-* Check for public key presence before invoking KMS API to workaround quota limitations
-* Save SBOM and vulnerability reports to GCS bucket 
-* Add UI to query images metadata (e.g. list packages, vulns over time, base images)
+1. Persist sha to prevent processing the same one multiple times 
+1. Check for public key presence before invoking KMS API to workaround quota limitations
+1. Save SBOM and vulnerability reports to GCS bucket 
+1. Add UI to query images metadata (e.g. list packages, vulns over time, base images)
 
 ## Disclaimer
 
