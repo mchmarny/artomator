@@ -1,5 +1,0 @@
-#!/bin/bash
-
-set -o errexit
-
-echo "hello 1670709076"
