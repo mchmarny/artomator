@@ -9,8 +9,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	testCommandName = "echo"
+)
+
 func execCmd(ctx context.Context, digest string) ([]byte, error) {
-	if commandName == "test" {
+	if commandName == testCommandName {
 		return []byte(commandName), nil
 	}
 	cmd := exec.CommandContext(ctx, "/bin/bash", commandName, digest, projectID, signKey)

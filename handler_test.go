@@ -38,7 +38,7 @@ const (
 func getPubSubMessage(content string) *pubsubMessage {
 	d := base64.StdEncoding.EncodeToString([]byte(content))
 	return &pubsubMessage{
-		Subscription: "test",
+		Subscription: testCommandName,
 		Message: pubsub.PubsubMessage{
 			MessageId: fmt.Sprintf("id-%d", time.Now().UnixNano()),
 			Data:      d,
@@ -47,7 +47,7 @@ func getPubSubMessage(content string) *pubsubMessage {
 }
 
 func runTest(event string, expectedStatus int, t *testing.T) {
-	commandName = "test"
+	commandName = testCommandName
 	b, err := json.Marshal(getPubSubMessage(event))
 	if err != nil {
 		t.Fatal(err)

@@ -17,7 +17,7 @@ type result struct {
 func writeError(w http.ResponseWriter, s int, err error) {
 	log.Println(err)
 	w.WriteHeader(s)
-	if err := json.NewEncoder(w).Encode(result{Status: s, Error: err.Error()}); err != nil {
+	if err = json.NewEncoder(w).Encode(result{Status: s, Error: err.Error()}); err != nil {
 		log.Printf("error encoding message: %s (%d) - %v", err.Error(), s, err)
 	}
 }
