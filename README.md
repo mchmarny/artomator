@@ -69,6 +69,58 @@ To test `artomator`, use the provided test with ["hello" Dockerfile](tests/Docke
 tests/run
 ```
 
+## verify 
+
+To verify the attestation for `artomator` processed images you will need the KMS key name that was used to sign that image. You retrieve it using the following command:
+
+```shell
+export SIGN_KEY=$(gcloud kms keys describe artomator-signer \
+  --project $PROJECT_ID \
+  --location $REGION \
+  --keyring artomator \
+  --format json | jq --raw-output '.name')
+```
+
+You can check the key like this: 
+
+```shell
+echo $SIGN_KEY
+```
+
+It should look something like this
+
+```shell
+projects/$PROJECT_ID/locations/$REGION/keyRings/artomator/cryptoKeys/artomator-signer/cryptoKeyVersions/1
+```
+
+Once have the signing key, you can verify any image that was processed by `artomator` like this:
+
+> Note, the `$IMAGE_SHA` has to be the fully qualified image URI with the SHA. For example `us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:59d5b8eb5525307dde52aa51382676e74240bb79eb92a67a1f2a760382a21d78`
+
+```shell
+cosign verify-attestation --type=spdx  --key "gcpkms://${SIGN_KEY}" $IMAGE_SHA \
+    | jq -r .payload | base64 -d | jq -r .predicateType
+```
+
+> Note, you can check the attestation for either of the two types that `artomator` creates by changing the `--type` flag in the above command to either `spdx` (SBOM), `vuln` which is the vulnerability report
+
+The result should look something like this: 
+
+```shell
+Verification for us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:59d5b8eb5525307dde52aa51382676e74240bb79eb92a67a1f2a760382a21d78 --
+The following checks were performed on each of these signatures:
+  - The cosign claims were validated
+  - The signatures were verified against the specified public key
+https://spdx.dev/Document
+```
+
+To save any of these artifacts locally: 
+
+```shell
+cosign verify-attestation --type=spdx  --key "gcpkms://${SIGN_KEY}" $IMAGE_SHA \
+    | jq -r .payload | base64 -d > sbom.spdx.json
+```
+
 ## cleanup
 
 To delete all created resources run: 
@@ -79,10 +131,8 @@ bin/cleanup
 
 ## todo
 
-1. Persist sha to prevent processing the same one multiple times (in project context)
-1. Check for public key presence before invoking KMS API to workaround quota limitations
 1. Save SBOM and vulnerability reports to GCS bucket 
-1. Add UI to query images metadata (e.g. list packages, vulns over time, base images)
+1. Add UI to query images metadata (e.g. list packages, base images, or vulnerabilities over time)
 
 ## Disclaimer
 
