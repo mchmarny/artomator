@@ -47,6 +47,13 @@ To delete all created resources run:
 bin/cleanup
 ```
 
+## todo
+
+* Persist sha to prevent processing the same one multiple times 
+* Check for public key presence before invoking KMS API to workaround quota limitations
+* Save SBOM and vulnerability reports to GCS bucket 
+* Add UI to query images metadata (e.g. list packages, vulns over time, base images)
+
 ## Disclaimer
 
 This is my personal project and it does not represent my employer. While I do my best to ensure that everything works, I take no responsibility for issues caused by this code.
