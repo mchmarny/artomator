@@ -1,6 +1,6 @@
 # artomator (Artifact Registry Automator, naming is hard)
 
-[Artifact Registry (AR)](https://cloud.google.com/artifact-registry) `artomator` automates the image signing, creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom), and vulnerability scanning. Using image labels, you can indicate to `artomator` the type of processing you want it to perform on that image. For example:
+[Artifact Registry (AR)](https://cloud.google.com/artifact-registry) `artomator` automates the image signing, creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom), and vulnerability scanning. Using [image labels](https://docs.docker.com/config/labels-custom-metadata/), you can indicate to `artomator` the type of processing you want it to perform on that image. For example:
 
 ```shell
 docker build -t $IMAGE_TAG --label sbom=true --label vuln=true .
