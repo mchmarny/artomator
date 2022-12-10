@@ -1,0 +1,10 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+set -o errexit
+set -o pipefail
+
+# Build and push image
+docker build --build-arg VERSION=$VERSION -t $IMAGE_URI --platform linux/amd64 .
