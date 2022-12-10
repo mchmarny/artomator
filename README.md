@@ -33,10 +33,10 @@ bin/deploy
 
 ## test 
 
-To test `artomator`, use the provided test with ["hello" Dockerfile](test/Dockerfile): 
+To test `artomator`, use the provided test with ["hello" Dockerfile](tests/Dockerfile): 
 
 ```shell
-test/run
+tests/run
 ```
 
 ## cleanup
@@ -49,7 +49,7 @@ bin/cleanup
 
 ## todo
 
-1. Persist sha to prevent processing the same one multiple times 
+1. Persist sha to prevent processing the same one multiple times (in project context)
 1. Check for public key presence before invoking KMS API to workaround quota limitations
 1. Save SBOM and vulnerability reports to GCS bucket 
 1. Add UI to query images metadata (e.g. list packages, vulns over time, base images)

@@ -1,3 +1,3 @@
 FROM scratch
-COPY test/hello /
+COPY tests/hello /
 CMD ["/hello"]
