@@ -25,8 +25,11 @@ lint: ## Lints the entire project
 	golangci-lint -c .golangci.yaml run
 .PHONY: lint
 
-update: ## Post event to local endpoint 
+image: ## Builds new image, signs it, gens SBOM, vlun report, and pushes it
 	bin/image
+.PHONY: image
+
+update: ## Deploys latest image to Cloud Run
 	bin/update
 .PHONY: update
 

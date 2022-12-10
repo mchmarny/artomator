@@ -30,6 +30,26 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
      --member "serviceAccount:${SA_EMAIL}" \
      --role roles/cloudkms.signerVerifier
 	 
+# redis 
+gcloud redis instances create $ROOT_NAME --region $REGION
+
+REDIS_IP=$(gcloud redis instances describe $ROOT_NAME \
+     --region $REGION \
+     --format="value(host)")
+
+REDIS_PORT=$(gcloud redis instances describe $ROOT_NAME \
+     --region $REGION \
+     --format="value(port)")
+
+echo "Redis: $REDIS_IP:$REDIS_PORT"
+
+# vpc
+gcloud compute networks vpc-access connectors create \
+     "${ROOT_NAME}-connector" \
+     --network default \
+     --region $REGION \
+     --range 10.10.0.0/28
+
 # cloud run 
 gcloud run deploy $ROOT_NAME \
 	--no-allow-unauthenticated \
@@ -40,8 +60,9 @@ gcloud run deploy $ROOT_NAME \
 	--platform managed \
 	--timeout 15m \
 	--region $REGION \
+     --vpc-connector "${ROOT_NAME}-connector" \
 	--service-account $SA_EMAIL \
-	--set-env-vars=PROJECT_ID=$PROJECT_ID,SIGN_KEY=$SIGN_KEY
+	--set-env-vars=PROJECT_ID=$PROJECT_ID,SIGN_KEY=$SIGN_KEY,REDIS_IP=$REDIS_IP,REDIS_PORT=$REDIS_PORT
 
 gcloud run services add-iam-policy-binding $ROOT_NAME \
 	--member "serviceAccount:${SA_EMAIL}" \
@@ -51,7 +72,7 @@ gcloud run services add-iam-policy-binding $ROOT_NAME \
 SERVICE_URL=$(gcloud run services describe $ROOT_NAME \
   --region $REGION --format="value(status.url)")
 
-echo $SERVICE_URL
+echo "Cloud Run Service: ${SERVICE_URL}"
 
 # pubsub
 gcloud pubsub topics create gcr

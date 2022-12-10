@@ -4,6 +4,7 @@
 # Test binaries
 *.test
 tmp
+tests/hello
 
 # Coverage
 *.out

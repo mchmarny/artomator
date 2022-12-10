@@ -1,0 +1,11 @@
+bin
+examples
+images
+README.md
+*.json
+*.pub
+*.out
+Makefile
+.codecov.yaml
+.golangci.yaml
+*_test.go
