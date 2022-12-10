@@ -6,11 +6,11 @@
 docker build -t $IMAGE_TAG --label sbom=true --label vuln=true .
 ```
 
-When the image is pushed to AR, `artomator` will automatically generate both signed SBOM and vulnerability report and add these as attestations to the image.
-
-> The `artomator` service in Cloud Run scales to 0 so there is no additional cost when no new images are bing published. 
+When that image is pushed to AR, `artomator` will automatically generate both signed SBOM and vulnerability report and add these as attestations to the image.
 
 ![](images/reg.png)
+
+> The `artomator` service in Cloud Run scales to 0 so there is no additional cost when no new images are bing published. 
 
 ## how it works
 
