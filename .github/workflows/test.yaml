@@ -1,0 +1,66 @@
+name: test
+
+on:
+  workflow_call:
+    secrets:
+      token:
+        required: true
+    inputs:
+      go_version:
+        description: 'Version of Go to use for tests'
+        default: '1.19.4'
+        required: false
+        type: string
+    
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - name: Setup Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: ${{ inputs.go_version }}
+    - run: go version
+
+    - name: Cache Go Modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 2
+
+    - name: Tidy Modules
+      run: |
+        make tidy
+    - name: Config Lint
+      id: golangci_config
+      uses: andstor/file-existence-action@v2
+      with:
+        files: .golangci.yaml
+
+    - name: Lint Code
+      if: steps.golangci_config.outputs.files_exists == 'true'
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: latest
+
+    - name: Unit Test
+      run: |
+        make test
+
+    - name: Scan for Vulnerabilities
+      uses: snyk/actions/golang@master
+      env:
+        SNYK_TOKEN: ${{ secrets.token }}
+      with:
+        args: --severity-threshold=medium

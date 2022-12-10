@@ -1,0 +1,21 @@
+name: push
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# Duplicating inputs due to limitation in GitHub Actions
+# where you can't use env or inputs to pass to multiple reusable jobs.
+# Context: https://github.com/community/community/discussions/17554.
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yaml
+    secrets:
+      token: ${{ secrets.SNYK_TOKEN }}
+    with:
+      go_version: "1.19.4"

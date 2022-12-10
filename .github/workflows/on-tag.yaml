@@ -1,0 +1,40 @@
+name: publish
+
+on:  
+  push:
+    tags:
+      - 'v*.*.*'
+
+# Duplicating inputs due to limitation in GitHub Actions
+# where you can't use env or inputs to pass to multiple reusable jobs.
+# Context: https://github.com/community/community/discussions/17554.
+  
+jobs:
+
+  test:
+    uses: ./.github/workflows/test.yaml
+    secrets:
+      token: ${{ secrets.SNYK_TOKEN }}
+    with:
+      go_version: "1.19.4"
+
+  image:
+    uses: ./.github/workflows/image.yaml
+    needs: test
+    with:
+      go_version: "1.19.4"
+      registry: us-west1-docker.pkg.dev
+      image: us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator
+      id_provider: projects/799736955886/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+      service_account: github-actions-user@cloudy-demos.iam.gserviceaccount.com
+
+  sign:
+    uses: ./.github/workflows/sign.yaml
+    needs: image
+    with:
+      registry: us-west1-docker.pkg.dev
+      id_provider: projects/799736955886/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+      service_account: github-actions-user@cloudy-demos.iam.gserviceaccount.com
+      key: gcpkms://projects/cloudy-demos/locations/us-west1/keyRings/github-actions/cryptoKeys/signer/cryptoKeyVersions/1
+      digest: ${{ needs.image.outputs.digest }}
+      vuln_severity_cutoff: high

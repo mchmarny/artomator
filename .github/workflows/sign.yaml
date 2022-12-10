@@ -1,0 +1,114 @@
+name: sign
+
+on:
+  workflow_call:
+    inputs:
+      registry:
+        description: 'Registry URI'
+        required: true
+        type: string
+      id_provider:
+        description: 'Fully qualified path of the OIDC provider'
+        required: true
+        type: string
+      service_account:
+        description: 'Service account email to use to auth to the provider'
+        required: true
+        type: string
+      digest:
+        description: 'Image name with the SHA digest of the published image'
+        required: true
+        type: string
+      key:
+        description: 'Fully qualified path of the KMS key'
+        required: true
+        type: string
+      cosign_version:
+        description: 'Version of Cosign to use for signing'
+        default: v1.13.1
+        required: false
+        type: string
+      vuln_severity_cutoff:
+        description: 'Minimum vulnerability severity to trigger a failure'
+        default: medium
+        required: false
+        type: string
+
+jobs:
+
+  sign:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+    
+    - name: Input Digest
+      run: |
+        echo "${{ inputs.digest }}"
+    
+    - id: auth
+      name: Get GCP token
+      uses: google-github-actions/auth@v1
+      with:
+          token_format: "access_token"
+          workload_identity_provider: ${{ inputs.id_provider }}
+          service_account: ${{ inputs.service_account }}
+    
+    - name: Install Cosign
+      uses: sigstore/cosign-installer@main
+      with:
+        cosign-release: ${{ inputs.cosign_version }}
+    
+    - name: Auth Cosign
+      run: |
+        cosign version
+        cosign login ${{ inputs.registry }} --username=oauth2accesstoken --password=${{ steps.auth.outputs.access_token }}
+    
+    - name: Get KMS Key
+      run: |
+        cosign generate-key-pair --kms ${{ inputs.key }}
+    
+    - name: Sign Image
+      run: |
+        cosign sign --force --key ${{ inputs.key }} ${{ inputs.digest }}
+      env:
+        COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
+
+    - name: Gen SBOM
+      uses: anchore/sbom-action@v0
+      with:
+        image: ${{ inputs.digest }}
+        registry-username: oauth2accesstoken
+        registry-password: ${{ steps.auth.outputs.access_token }}
+        artifact-name: sbom.spdx.json
+        output-file: ./sbom.spdx.json
+        format: spdx-json
+
+    - name: List Dir
+      run: ls
+
+    - name: Download Vulnerability Scanner
+      uses: anchore/scan-action/download-grype@v3
+      id: grype
+
+    - name: Scan SBOM
+      run: |
+        # Add -f ${{ inputs.vuln_severity_cutoff }}
+        ${{steps.grype.outputs.cmd}} sbom:sbom.spdx.json --file vulns.grype.json
+
+    - name: Print Vulnerability Report
+      run: |
+        cat vulns.grype.json
+
+    - name: Attest Vulnerability
+      run: |
+        cosign attest --predicate vulns.grype.json --type vuln --key ${{ inputs.key }} ${{ inputs.digest }}
+      env:
+        COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
+      
+    - name: Verify Image
+      run: |
+        cosign verify-attestation --type=vuln --key ${{ inputs.key }} ${{ inputs.digest }}
+      env:
+        COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
