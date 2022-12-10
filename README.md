@@ -1,5 +1,8 @@
 # artomator (Artifact Registry Automator, naming is hard)
 
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/mchmarny/artomator)](https://goreportcard.com/report/github.com/mchmarny/artomator) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/mchmarny/artomator) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/gojp/goreportcard/blob/master/LICENSE)
+
 [Artifact Registry (AR)](https://cloud.google.com/artifact-registry) `artomator` automates the image signing, creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom), and vulnerability scanning. Using [image labels](https://docs.docker.com/config/labels-custom-metadata/), you can indicate to `artomator` the type of processing you want it to perform on that image. For example:
 
 ```shell
