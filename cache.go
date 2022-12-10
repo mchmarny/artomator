@@ -3,13 +3,18 @@ package main
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 
 	redis "github.com/go-redis/redis/v8"
 )
 
-const expectedURIParts = 2
+const (
+	expectedURIParts = 2
+	// TODO: Externalize to allow deployment time configuration
+	cacheExpireHrs = 168 // week
+)
 
 func getSHA(uri string) string {
 	parts := strings.Split(uri, ":")
@@ -25,7 +30,7 @@ func keyBeenProcessed(ctx context.Context, k, v string) (bool, error) {
 	}
 	_, err := client.Get(ctx, k).Result()
 	if err == redis.Nil {
-		err = client.Set(ctx, k, v, 0).Err()
+		err = client.Set(ctx, k, v, cacheExpireHrs*time.Hour).Err()
 		if err != nil {
 			return false, errors.Wrapf(err, "error setting key: %s - %v", k, err)
 		}
