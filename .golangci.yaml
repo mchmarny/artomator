@@ -45,7 +45,6 @@ linters-settings:
 linters:
   disable-all: true
   enable:
-    - deadcode
     - depguard
     - dogsled
     - dupl
@@ -65,16 +64,13 @@ linters:
     - nakedret
     - nolintlint
     - exportloopref
-    # - structcheck
     - typecheck
     - unconvert
-    - varcheck
     - whitespace
 
 issues:
   exclude:
-    - G404
-    - G112
+  - G2649
 
 run:
   concurrency: 4

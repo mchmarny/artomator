@@ -3,21 +3,31 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"net"
 	"net/http"
 	"os"
+	"time"
 
 	redis "github.com/go-redis/redis/v8"
+	"github.com/pkg/errors"
 )
 
 const (
-	actionInsert   = "INSERT"
-	commandDefault = "artomator"
-	portDefault    = "8080"
-	sigTagSuffix   = ".sig"
-	attTagSuffix   = ".att"
+	actionInsert      = "INSERT"
+	commandDefault    = "artomator"
+	addressDefault    = ":8080"
+	sigTagSuffix      = ".sig"
+	attTagSuffix      = ".att"
+	shutdownTimeout   = 3
+	readWriteTimeout  = 1
+	readHeaderTimeout = 3
+	idleServerTimeout = 60
 )
 
 var (
+	version = "v0.0.1-default"
+
 	projectID = os.Getenv("PROJECT_ID")
 	signKey   = os.Getenv("SIGN_KEY")
 	redisIP   = os.Getenv("REDIS_IP")
@@ -25,12 +35,14 @@ var (
 
 	commandName = commandDefault
 
-	client *redis.Client
+	requestKey key
+	client     *redis.Client
 )
 
-func main() {
-	http.HandleFunc("/", handler)
+type key int
 
+func main() {
+	fmt.Printf("starting artomator server %s\n", version)
 	if projectID == "" || signKey == "" {
 		panic("either PROJECT_ID or SIGN_KEY env vars aren't set")
 	}
@@ -47,14 +59,32 @@ func main() {
 		panic(err)
 	}
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = portDefault
-		fmt.Printf("using default port %s\n", port)
+	address := addressDefault
+	if val, ok := os.LookupEnv("PORT"); ok {
+		address = fmt.Sprintf(":%s", val)
 	}
-	address := fmt.Sprintf(":%s", port)
-	fmt.Printf("starting server %s\n", address)
-	if err := http.ListenAndServe(address, nil); err != nil {
-		panic(err)
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", handler)
+
+	ctx := context.Background()
+	server := &http.Server{
+		Addr:              address,
+		Handler:           mux,
+		ReadTimeout:       readWriteTimeout * time.Second,
+		WriteTimeout:      readWriteTimeout * time.Second,
+		IdleTimeout:       idleServerTimeout * time.Second,
+		ReadHeaderTimeout: readHeaderTimeout * time.Second,
+		BaseContext: func(l net.Listener) context.Context {
+			ctx = context.WithValue(ctx, requestKey, l.Addr().String())
+			return ctx
+		},
+	}
+
+	err = server.ListenAndServe()
+	if errors.Is(err, http.ErrServerClosed) {
+		log.Println("server closed")
+	} else if err != nil {
+		log.Printf("error listening for server: %s\n", err)
 	}
 }
