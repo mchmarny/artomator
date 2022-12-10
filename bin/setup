@@ -10,6 +10,7 @@ set -o pipefail
 gcloud config set project $PROJECT_ID
 gcloud config set artifacts/location $REGION
 gcloud config set deploy/region $REGION
+gcloud config set run/region $REGION
 
 # enables APIs
 gcloud services enable \

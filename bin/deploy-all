@@ -6,16 +6,13 @@ DIR="$(dirname "$0")"
 set -o errexit
 set -o pipefail
 
-# override the config one with the latest valid static image
-IMAGE_URI=us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:8347ceb0a6f07192468e170144c5dee305718449c6c7d46ac47fba2c5a6e382c
-
 # configure defaults 
 gcloud config set project $PROJECT_ID
 gcloud config set artifacts/location $REGION
 gcloud config set deploy/region $REGION
 
 # enables APIs
-gcloud services enable \
+gcloud services enable --quiet \
   artifactregistry.googleapis.com \
   binaryauthorization.googleapis.com \
   cloudkms.googleapis.com \
@@ -29,14 +26,16 @@ gcloud services enable \
 # key to sign images
 gcloud kms keyrings create $ROOT_NAME \
   --project $PROJECT_ID \
-  --location $REGION
+  --location $REGION \
+  --quiet
 
 gcloud kms keys create $KEY_NAME \
   --project $PROJECT_ID \
   --location $REGION \
   --keyring $ROOT_NAME \
   --purpose asymmetric-signing \
-  --default-algorithm rsa-sign-pkcs1-4096-sha512
+  --default-algorithm rsa-sign-pkcs1-4096-sha512 \
+  --quiet
 
 gcloud kms keys describe $KEY_NAME \
   --project $PROJECT_ID \
@@ -47,49 +46,58 @@ gcloud kms keys describe $KEY_NAME \
 # creates the Artifact Registry repo
 gcloud artifacts repositories create $ROOT_NAME \
   --location $REGION \
-  --repository-format=docker
+  --repository-format=docker \
+  --quiet
 
 gcloud iam service-accounts create $SA_NAME \
-    --display-name "Service invoker for ${SA_NAME}"
+  --display-name "Service invoker for ${SA_NAME}" \
+  --quiet
 
 # roles 
 gcloud projects add-iam-policy-binding $PROJECT_ID \
-     --member "serviceAccount:${SA_EMAIL}" \
-     --role roles/storage.objectCreator
+  --member "serviceAccount:${SA_EMAIL}" \
+  --role roles/storage.objectCreator \
+  --quiet
 
 gcloud projects add-iam-policy-binding $PROJECT_ID \
-     --member "serviceAccount:${SA_EMAIL}" \
-     --role roles/storage.objectViewer
+  --member "serviceAccount:${SA_EMAIL}" \
+  --role roles/storage.objectViewer \
+  --quiet
 
 gcloud projects add-iam-policy-binding $PROJECT_ID \
-     --member "serviceAccount:${SA_EMAIL}" \
-     --role roles/artifactregistry.writer
+  --member "serviceAccount:${SA_EMAIL}" \
+  --role roles/artifactregistry.writer \
+  --quiet
 
 gcloud projects add-iam-policy-binding $PROJECT_ID \
-     --member "serviceAccount:${SA_EMAIL}" \
-     --role roles/cloudkms.viewer
+  --member "serviceAccount:${SA_EMAIL}" \
+  --role roles/cloudkms.viewer \
+  --quiet
 
 gcloud projects add-iam-policy-binding $PROJECT_ID \
-     --member "serviceAccount:${SA_EMAIL}" \
-     --role roles/cloudkms.signerVerifier
+  --member "serviceAccount:${SA_EMAIL}" \
+  --role roles/cloudkms.signerVerifier \
+  --quiet
 	 
 # cloud run 
 gcloud run deploy $ROOT_NAME \
-	--no-allow-unauthenticated \
-	--execution-environment=gen2 \
-	--image $IMAGE_URI \
-     --memory=2Gi \
-	--max-instances=5 \
-	--platform managed \
-	--timeout 15m \
-	--region $REGION \
-	--service-account $SA_EMAIL \
-	--set-env-vars=PROJECT_ID=$PROJECT_ID,SIGN_KEY=$SIGN_KEY
+  --no-allow-unauthenticated \
+  --execution-environment=gen2 \
+  --image $PUB_IMAGE_URI \
+  --memory=2Gi \
+  --max-instances=5 \
+  --platform managed \
+  --timeout 15m \
+  --region $REGION \
+  --service-account $SA_EMAIL \
+  --set-env-vars=PROJECT_ID=$PROJECT_ID,SIGN_KEY=$SIGN_KEY \
+  --quiet
 
 gcloud run services add-iam-policy-binding $ROOT_NAME \
-	--member "serviceAccount:${SA_EMAIL}" \
-	--region $REGION \
-	--role roles/run.invoker
+  --member "serviceAccount:${SA_EMAIL}" \
+  --region $REGION \
+  --role roles/run.invoker \
+  --quiet
 
 SERVICE_URL=$(gcloud run services describe $ROOT_NAME \
   --region $REGION --format="value(status.url)")
@@ -97,15 +105,17 @@ SERVICE_URL=$(gcloud run services describe $ROOT_NAME \
 echo $SERVICE_URL
 
 # pubsub
-gcloud pubsub topics create gcr
+gcloud pubsub topics create gcr --quiet
 
 gcloud projects add-iam-policy-binding $PROJECT_ID \
-     --member "serviceAccount:service-${PROJECT_NUMBER}@gcp-sa-pubsub.iam.gserviceaccount.com" \
-     --role roles/iam.serviceAccountTokenCreator
+  --member "serviceAccount:service-${PROJECT_NUMBER}@gcp-sa-pubsub.iam.gserviceaccount.com" \
+  --role roles/iam.serviceAccountTokenCreator \
+  --quiet
 
 gcloud pubsub subscriptions create gcr-sub \
   --topic gcr \
   --ack-deadline 600 \
   --push-endpoint "${SERVICE_URL}/" \
-  --push-auth-service-account $SA_EMAIL
+  --push-auth-service-account $SA_EMAIL \
+  --quiet
   

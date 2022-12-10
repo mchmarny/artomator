@@ -7,4 +7,4 @@ set -o errexit
 set -o pipefail
 
 # cloud run 
-gcloud run deploy $ROOT_NAME --image $IMAGE_URI
+gcloud run deploy $ROOT_NAME --image $IMAGE_URI --region $REGION

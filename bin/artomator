@@ -28,8 +28,7 @@ gcloud auth configure-docker $REGISTRY --quiet
 gcloud config set project $PROJECT_ID
 
 # this is ephemeral but if dir for that sha already exists exit 
-if [ -d "$SHA" ] 
-then
+if [ -d "./$SHA" ] ; then
     echo "SHA ${SHA} already processed"
     exit 0
 fi
