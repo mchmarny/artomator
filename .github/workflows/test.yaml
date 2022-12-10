@@ -23,6 +23,7 @@ jobs:
       uses: actions/setup-go@v3
       with:
         go-version: ${{ inputs.go_version }}
+        check-latest: true
     - run: go version
 
     - name: Cache Go Modules
