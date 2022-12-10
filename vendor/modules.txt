@@ -46,6 +46,9 @@ github.com/googleapis/gax-go/v2/apierror/internal/proto
 github.com/googleapis/gax-go/v2/internal
 # github.com/onsi/gomega v1.24.1
 ## explicit; go 1.18
+# github.com/pkg/errors v0.9.1
+## explicit
+github.com/pkg/errors
 # go.opencensus.io v0.24.0
 ## explicit; go 1.13
 go.opencensus.io

@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -16,11 +17,6 @@ import (
 const (
 	invalidEvent = `{
 		"action": "DELETE",
-		"tag": "us-east1-docker.pkg.dev/my-project/my-repo/hello-world:1.1"
-	}`
-	tagEvent = `{
-		"action": "INSERT",
-		"digest": "us-east1-docker.pkg.dev/my-project/my-repo/hello-world@sha256:6ec128e26cd5",
 		"tag": "us-east1-docker.pkg.dev/my-project/my-repo/hello-world:1.1"
 	}`
 	validEvent = `{
@@ -51,6 +47,7 @@ func getPubSubMessage(content string) *pubsubMessage {
 }
 
 func runTest(event string, expectedStatus int, t *testing.T) {
+	commandName = "test"
 	b, err := json.Marshal(getPubSubMessage(event))
 	if err != nil {
 		t.Fatal(err)
@@ -61,33 +58,29 @@ func runTest(event string, expectedStatus int, t *testing.T) {
 		t.Fatal(err)
 	}
 
-	rr := httptest.NewRecorder()
+	r := httptest.NewRecorder()
 	handler := http.HandlerFunc(handler)
-	handler.ServeHTTP(rr, req)
-	if status := rr.Code; status != expectedStatus {
+	handler.ServeHTTP(r, req)
+	if status := r.Code; status != expectedStatus {
 		t.Errorf("handler returned wrong status: (got %v want %v)", status, expectedStatus)
 	}
+
+	d, err := io.ReadAll(r.Body)
+	if err != nil {
+		t.Errorf("error reading body %v", err)
+	}
+	t.Log(string(d))
 }
 
-func TestHandler(t *testing.T) {
+func TestHandlerWithInvalidEvent(t *testing.T) {
 	runTest(invalidEvent, http.StatusOK, t)
-	runTest(tagEvent, http.StatusPartialContent, t)
-	runTest(validEvent, http.StatusPartialContent, t)
-	runTest(sigEvent, http.StatusOK, t)
-	runTest(attEvent, http.StatusOK, t)
 }
-
-func TestSHAParser(t *testing.T) {
-	t1 := getSHA("us-west1-docker.pkg.dev/test/test/tester@sha256:123")
-	if t1 != "123" {
-		t.Errorf("failed to properly parse SHA from registry URI: (got %s want 123)", t1)
-	}
-	t2 := getSHA("us-west1-docker.pkg.dev/test/test/tester:v1.2.3")
-	if t2 != "v1.2.3" {
-		t.Errorf("failed to properly parse label from registry URI: (got %s want v1.2.3)", t2)
-	}
-	t3 := getSHA("us-west1-docker.pkg.dev/test/test/tester")
-	if t3 != "" {
-		t.Errorf("failed to properly parse label from registry URI: (got %s want '')", t3)
-	}
+func TestHandlerWithValidEvent(t *testing.T) {
+	runTest(validEvent, http.StatusOK, t)
+}
+func TestHandlerWithSignatureEvent(t *testing.T) {
+	runTest(sigEvent, http.StatusOK, t)
+}
+func TestHandlerWithAttestationEvent(t *testing.T) {
+	runTest(attEvent, http.StatusOK, t)
 }

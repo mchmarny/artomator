@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/pkg/errors v0.9.1
 	google.golang.org/api v0.104.0
 )
 
