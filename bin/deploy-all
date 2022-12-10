@@ -7,7 +7,7 @@ set -o errexit
 set -o pipefail
 
 # override the config one with the latest valid static image
-IMAGE_URI=us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:f514089ea3f8cfef67bf8dd58b54ee14b4a07e9f849936c18f772f8d1afbdf19
+IMAGE_URI=us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:8347ceb0a6f07192468e170144c5dee305718449c6c7d46ac47fba2c5a6e382c
 
 # configure defaults 
 gcloud config set project $PROJECT_ID
@@ -79,7 +79,6 @@ gcloud run deploy $ROOT_NAME \
 	--execution-environment=gen2 \
 	--image $IMAGE_URI \
      --memory=2Gi \
-	--min-instances=1 \
 	--max-instances=5 \
 	--platform managed \
 	--timeout 15m \

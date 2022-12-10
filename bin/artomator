@@ -6,7 +6,6 @@ set -o errexit
 IMAGE_SHA=$1
 PROJECT_ID=$2
 SIGN_KEY=$3
-MSG_ID=$4
 
 # check required input parameters
 [ -z "$IMAGE_SHA" ] && echo "arg IMAGE_SHA not provided\n" && exit 1
@@ -15,37 +14,69 @@ MSG_ID=$4
 
 # parse registry from image 
 REGISTRY=$(echo $IMAGE_SHA | cut -d'/' -f 1)
+SHA=$(echo $IMAGE_SHA | cut -d':' -f 2)
 
 # print run variables 
-echo "$MSG_ID - PROJECT_ID: $PROJECT_ID"
-echo "$MSG_ID - REGISTRY:   $REGISTRY"
-echo "$MSG_ID - IMAGE_SHA:  $IMAGE_SHA"
-echo "$MSG_ID - SIGN_KEY:   $SIGN_KEY"
+echo "IMAGE_URI:  $IMAGE_SHA"
+echo "PROJECT_ID: $PROJECT_ID"
+echo "SIGN_KEY:   $SIGN_KEY"
+echo "REGISTRY:   $REGISTRY"
+echo "IMAGE_SHA:  $SHA"
 
 # confgure gcloud 
 gcloud auth configure-docker $REGISTRY --quiet
 gcloud config set project $PROJECT_ID
 
-# generate key-pair 
-cosign generate-key-pair --kms $SIGN_KEY
+# this is ephemeral but if dir for that sha already exists exit 
+if [ -d "$SHA" ] 
+then
+    echo "SHA ${SHA} already processed"
+    exit 0
+fi
+
+mkdir -p $SHA
+
+# get image metadata
+docker inspect $IMAGE_SHA > "${SHA}/meta.json"
+
+# check if image has the sbom and vuln labels 
+DO_SBOM=$(cat "${SHA}/meta.json" | jq -r '.[0].Config.Labels.sbom')
+DO_VULN=$(cat "${SHA}/meta.json" | jq -r '.[0].Config.Labels.vuln')
+
+echo "DO_SBOM: $DO_SBOM"
+echo "DO_VULN: $DO_VULN"
+
+# if neither set then exit
+if [ "$DO_SBOM" != true ] && [ "$DO_VULN" != true ] ; then
+    echo "SHA ${SHA} not labeled for either SBOM or vulnerability processing"
+    exit 0
+fi
+
+# generate public key-pair from KMS if one does not exist 
+if [ ! -f cosign.pub ]; then
+    cosign generate-key-pair --kms $SIGN_KEY
+fi
 
 # Sign and verify image
 cosign sign --key $SIGN_KEY $IMAGE_SHA
 cosign verify --key $SIGN_KEY $IMAGE_SHA
 
 # Generate SBOM from image and attach it as attestation to the image
-echo "$MSG_ID - Processing SBOM"
-syft packages -o spdx-json $IMAGE_SHA | jq --compact-output > sbom.spdx.json
-cosign attest --predicate sbom.spdx.json --type spdx --key $SIGN_KEY $IMAGE_SHA
+if [ "$DO_SBOM" == true ] ; then
+    echo "Processing SBOM for ${SHA}"
+    syft packages -o spdx-json $IMAGE_SHA | jq --compact-output > sbom.spdx.json
+    cosign attest --predicate sbom.spdx.json --type spdx --key $SIGN_KEY $IMAGE_SHA
 
-# Verifying SPDX document attestation 
-cosign verify-attestation --type=spdx  --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType
+    # Verifying SPDX document attestation 
+    cosign verify-attestation --type=spdx  --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType
+fi
 
 # Scan packages in SBOM for vulnerabilities and attach report as attestation to the image
-echo "$MSG_ID - Processing Vulnerabilities"
-grype --add-cpes-if-none sbom:sbom.spdx.json -o json | jq --compact-output > sbom.vuln.json
-cosign attest --predicate sbom.vuln.json --type vuln --key $SIGN_KEY $IMAGE_SHA
+if [ "$DO_VULN" == true ] ; then
+    echo "Processing Vulnerabilities for ${SHA}"
+    grype --add-cpes-if-none sbom:sbom.spdx.json -o json | jq --compact-output > sbom.vuln.json
+    cosign attest --predicate sbom.vuln.json --type vuln --key $SIGN_KEY $IMAGE_SHA
 
-# Verifying vulnerability report attestation 
-echo "$MSG_ID - Verifying Attestation"
-cosign verify-attestation --type=vuln --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType
+    # Verifying vulnerability report attestation 
+    cosign verify-attestation --type=vuln --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType
+fi

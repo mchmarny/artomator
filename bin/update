@@ -7,15 +7,4 @@ set -o errexit
 set -o pipefail
 
 # cloud run 
-gcloud run deploy $ROOT_NAME \
-	--no-allow-unauthenticated \
-	--execution-environment=gen2 \
-	--image $IMAGE_URI \
-	--memory=2Gi \
-	--min-instances=1 \
-	--max-instances=5 \
-	--platform managed \
-	--timeout 15m \
-	--region $REGION \
-	--service-account $SA_EMAIL \
-	--set-env-vars=PROJECT_ID=$PROJECT_ID,SIGN_KEY=$SIGN_KEY
+gcloud run deploy $ROOT_NAME --image $IMAGE_URI

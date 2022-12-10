@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 
 	"google.golang.org/api/pubsub/v1"
 )
@@ -17,6 +18,8 @@ const (
 	commandName      = "artomator"
 	portDefault      = "8080"
 	testSubscription = "test"
+	sigTagSuffix     = ".sig"
+	attTagSuffix     = ".att"
 )
 
 var (
@@ -56,10 +59,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		writeMessage(w, http.StatusBadRequest, fmt.Sprintf("error parsing pubsub message: %v", err))
 		return
 	}
-
-	mID := fmt.Sprintf("mid:%s - %v", m.Message.MessageId, m)
-
-	log.Printf("%s - message data: %s\n", mID, m.Message.Data)
+	log.Printf("message %s data: %s\n", m.Message.MessageId, m.Message.Data)
 
 	d, err := base64.StdEncoding.DecodeString(m.Message.Data)
 	if err != nil {
@@ -67,22 +67,27 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("%s - event data: %s\n", mID, d)
+	log.Printf("event data: %s\n", string(d))
 
 	var e event
 	if err = json.Unmarshal(d, &e); err != nil {
 		writeMessage(w, http.StatusBadRequest, fmt.Sprintf("error parsing event: %v", err))
 		return
 	}
-	fmt.Printf("%s - event action: %s, digest: %s, tag: %s\n", mID, e.Action, e.Digest, e.Tag)
+	fmt.Printf("event action: %s, digest: %s, tag: %s\n", e.Action, e.Digest, e.Tag)
 
 	if e.Action != actionInsert {
 		writeMessage(w, http.StatusOK, fmt.Sprintf("unsupported event type: %s", e.Action))
 		return
 	}
 
+	if strings.HasSuffix(e.Tag, sigTagSuffix) || strings.HasSuffix(e.Tag, attTagSuffix) {
+		writeMessage(w, http.StatusOK, fmt.Sprintf("signature or attestation event: %s", e.Tag))
+		return
+	}
+
 	if m.Subscription == testSubscription {
-		fmt.Printf("%s - skipping executing command during test", mID)
+		fmt.Println("skipping executing command during test")
 		writeMessage(w, http.StatusOK, "ok")
 		return
 	}
@@ -90,7 +95,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	//TODO: Add registry/image excludes to avoid processing itself
 
 	cmd := exec.CommandContext(r.Context(), "/bin/bash",
-		commandName, e.Digest, projectID, signKey, mID) //nolint:gosec
+		commandName, e.Digest, projectID, signKey) //nolint:gosec
 	cmd.Stderr = os.Stderr
 	out, err := cmd.Output()
 	if err != nil {
@@ -98,7 +103,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("mid:%s - command output: %s\n", m.Message.MessageId, out)
+	log.Printf("message %s done: %s\n", m.Message.MessageId, string(out))
 	writeMessage(w, http.StatusOK, "ok")
 }
 

@@ -45,3 +45,8 @@ gcloud kms keys describe $KEY_NAME \
 gcloud artifacts repositories create $ROOT_NAME \
   --location $REGION \
   --repository-format=docker
+
+# creates the Artifact Registry repo
+gcloud artifacts repositories create $ROOT_NAME \
+  --location $REGION \
+  --repository-format=docker

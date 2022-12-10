@@ -27,6 +27,16 @@ const (
 		"action": "INSERT",
 		"digest": "us-east1-docker.pkg.dev/my-project/my-repo/hello-world@sha256:6ec128e26cd5"
 	}`
+	sigEvent = `{
+		"action": "INSERT",
+		"digest": "us-east1-docker.pkg.dev/my-project/my-repo/hello-world@sha256:6ec128e26cd5",
+		"tag": "us-west1-docker.pkg.dev/cloudy-demos/artomator/tester:sha256-59d78.sig"
+	}`
+	attEvent = `{
+		"action": "INSERT",
+		"digest": "us-east1-docker.pkg.dev/my-project/my-repo/hello-world@sha256:6ec128e26cd5",
+		"tag": "us-west1-docker.pkg.dev/cloudy-demos/artomator/tester:sha256-59d78.att"
+	}`
 )
 
 func getPubSubMessage(content string) *pubsubMessage {
@@ -60,7 +70,10 @@ func runTest(event string, expectedStatus int, t *testing.T) {
 }
 
 func TestHandler(t *testing.T) {
-	runTest(invalidEvent, http.StatusNoContent, t)
-	runTest(tagEvent, http.StatusNoContent, t)
-	runTest(validEvent, http.StatusAccepted, t)
+	runTest(invalidEvent, http.StatusOK, t)
+	runTest(tagEvent, http.StatusOK, t)
+	runTest(validEvent, http.StatusOK, t)
+	runTest(validEvent, http.StatusOK, t)
+	runTest(sigEvent, http.StatusOK, t)
+	runTest(attEvent, http.StatusOK, t)
 }

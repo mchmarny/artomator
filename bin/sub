@@ -1,0 +1,17 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+set -o errexit
+set -o pipefail
+
+
+gcloud pubsub subscriptions pull gcr-sub-test \
+     --auto-ack \
+     --limit 10 \
+     --format="json(message.attributes, message.data.decode(\"base64\").decode(\"utf-8\"), message.messageId, message.publishTime)"
+
+
+
+
