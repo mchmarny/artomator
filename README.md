@@ -16,6 +16,8 @@ When that image is pushed to AR, `artomator` will automatically generate both si
 
 Artifact Registry will automatically published [registry events](https://cloud.google.com/artifact-registry/docs/configure-notifications) if there is a [PubSub](https://cloud.google.com/pubsub/docs/overview) topic named `gcr` in the same project. `artomator` creates [Cloud Run](https://cloud.google.com/run) services which subscribes to that topic and processes any image that has at least one of the `sbom=true` or `vuln=true` labels based on the image digest.
 
+> To prevent reprocessing the same images multiple times, `artomator` uses redis store to cache the processed image hashes.
+
 `artomator` uses following OSS technologies: 
 
 * [cosign](https://github.com/sigstore/cosign) with [GCP KMS](https://cloud.google.com/security-key-management) for image signing and verification
