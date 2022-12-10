@@ -33,8 +33,8 @@ mkdir -p "./$SHA"
 docker inspect $IMAGE_SHA > "${SHA}/meta.json"
 
 # check if image has the sbom and vuln labels 
-DO_SBOM=$(cat "${SHA}/meta.json" | jq -r '.[0].Config.Labels.sbom')
-DO_VULN=$(cat "${SHA}/meta.json" | jq -r '.[0].Config.Labels.vuln')
+DO_SBOM=$(cat "${SHA}/meta.json" | jq -r -e '( .[0].Config.Labels."artomator-sbom" // "false" )')
+DO_VULN=$(cat "${SHA}/meta.json" | jq -r -e '( .[0].Config.Labels."artomator-vuln" // "false" )')
 
 echo "DO_SBOM: $DO_SBOM"
 echo "DO_VULN: $DO_VULN"
@@ -57,18 +57,18 @@ cosign verify --key $SIGN_KEY $IMAGE_SHA
 # Generate SBOM from image and attach it as attestation to the image
 if [ "$DO_SBOM" == true ] ; then
     echo "Processing SBOM for ${SHA}"
-    syft packages -o spdx-json $IMAGE_SHA | jq --compact-output > sbom.spdx.json
-    cosign attest --predicate sbom.spdx.json --type spdx --key $SIGN_KEY $IMAGE_SHA
+    syft packages -o spdx-json $IMAGE_SHA | jq --compact-output > $SHA/sbom.spdx.json
+    cosign attest --predicate $SHA/sbom.spdx.json --type spdx --key $SIGN_KEY $IMAGE_SHA
 
     # Verifying SPDX document attestation 
-    cosign verify-attestation --type=spdx  --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType
+    cosign verify-attestation --type=spdx --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType
 fi
 
 # Scan packages in SBOM for vulnerabilities and attach report as attestation to the image
 if [ "$DO_VULN" == true ] ; then
     echo "Processing Vulnerabilities for ${SHA}"
-    grype --add-cpes-if-none sbom:sbom.spdx.json -o json | jq --compact-output > sbom.vuln.json
-    cosign attest --predicate sbom.vuln.json --type vuln --key $SIGN_KEY $IMAGE_SHA
+    grype --add-cpes-if-none sbom:$SHA/sbom.spdx.json -o json | jq --compact-output > $SHA/sbom.vuln.json
+    cosign attest --predicate $SHA/sbom.vuln.json --type vuln --key $SIGN_KEY $IMAGE_SHA
 
     # Verifying vulnerability report attestation 
     cosign verify-attestation --type=vuln --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType

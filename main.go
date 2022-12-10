@@ -10,12 +10,11 @@ import (
 )
 
 const (
-	actionInsert     = "INSERT"
-	commandDefault   = "artomator"
-	portDefault      = "8080"
-	testSubscription = "test"
-	sigTagSuffix     = ".sig"
-	attTagSuffix     = ".att"
+	actionInsert   = "INSERT"
+	commandDefault = "artomator"
+	portDefault    = "8080"
+	sigTagSuffix   = ".sig"
+	attTagSuffix   = ".att"
 )
 
 var (
@@ -36,6 +35,7 @@ func main() {
 		panic("either PROJECT_ID or SIGN_KEY env vars aren't set")
 	}
 
+	fmt.Printf("redis %s:%s\n", redisIP, redisPort)
 	client = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", redisIP, redisPort),
 		Password: "",

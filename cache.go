@@ -19,19 +19,19 @@ func getSHA(uri string) string {
 	return parts[1]
 }
 
-func getCachedKey(ctx context.Context, key, val string) (string, error) {
+func keyBeenProcessed(ctx context.Context, k, v string) (bool, error) {
 	if client == nil {
-		return val, nil
+		return true, nil
 	}
-	v, err := client.Get(ctx, key).Result()
+	_, err := client.Get(ctx, k).Result()
 	if err == redis.Nil {
-		err = client.Set(ctx, key, val, 0).Err()
+		err = client.Set(ctx, k, v, 0).Err()
 		if err != nil {
-			return "", errors.Wrapf(err, "error setting key: %s - %v", key, err)
+			return false, errors.Wrapf(err, "error setting key: %s - %v", k, err)
 		}
-		v = val
+		return false, nil
 	} else if err != nil {
-		return "", errors.Wrapf(err, "error getting key: %s - %v", key, err)
+		return false, errors.Wrapf(err, "error getting key: %s - %v", k, err)
 	}
-	return v, nil
+	return true, nil
 }

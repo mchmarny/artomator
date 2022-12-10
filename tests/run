@@ -16,8 +16,8 @@ echo $TEST_IMAGE_URI
 # Build and push image
 docker build -f tests/Dockerfile \
              -t $TEST_IMAGE_URI \
-             --label sbom=true \
-             --label vuln=true \
+             --label artomator-sbom=true \
+             --label artomator-vuln=true \
              --platform linux/amd64 .
 docker push $TEST_IMAGE_URI
 

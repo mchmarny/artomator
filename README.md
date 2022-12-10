@@ -3,7 +3,7 @@
 [Artifact Registry (AR)](https://cloud.google.com/artifact-registry) `artomator` automates the image signing, creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom), and vulnerability scanning. Using [image labels](https://docs.docker.com/config/labels-custom-metadata/), you can indicate to `artomator` the type of processing you want it to perform on that image. For example:
 
 ```shell
-docker build -t $IMAGE_TAG --label sbom=true --label vuln=true .
+docker build -t $IMAGE_TAG --label artomator-sbom=true --label artomator-vuln=true .
 ```
 
 When that image is pushed to AR, `artomator` will automatically generate both signed SBOM and vulnerability report and add these as attestations to the image.
@@ -14,7 +14,7 @@ When that image is pushed to AR, `artomator` will automatically generate both si
 
 ## how it works
 
-Artifact Registry will automatically published [registry events](https://cloud.google.com/artifact-registry/docs/configure-notifications) if there is a [PubSub](https://cloud.google.com/pubsub/docs/overview) topic named `gcr` in the same project. `artomator` creates [Cloud Run](https://cloud.google.com/run) services which subscribes to that topic and processes any image that has at least one of the `sbom=true` or `vuln=true` labels based on the image digest.
+Artifact Registry will automatically published [registry events](https://cloud.google.com/artifact-registry/docs/configure-notifications) if there is a [PubSub](https://cloud.google.com/pubsub/docs/overview) topic named `gcr` in the same project. `artomator` creates [Cloud Run](https://cloud.google.com/run) services which subscribes to that topic and processes any image that has at least one of the `artomator-sbom=true` or `artomator-vuln=true` labels based on the image digest.
 
 > To prevent reprocessing the same images multiple times, `artomator` uses redis store to cache the processed image hashes.
 

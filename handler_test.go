@@ -38,7 +38,7 @@ const (
 func getPubSubMessage(content string) *pubsubMessage {
 	d := base64.StdEncoding.EncodeToString([]byte(content))
 	return &pubsubMessage{
-		Subscription: testSubscription,
+		Subscription: "test",
 		Message: pubsub.PubsubMessage{
 			MessageId: fmt.Sprintf("id-%d", time.Now().UnixNano()),
 			Data:      d,

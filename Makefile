@@ -11,6 +11,22 @@ tidy: ## Updates the go modules and vendors all dependancies
 	go mod vendor
 .PHONY: tidy
 
+app: ## Builds local binary 
+	CGO_ENABLED=0 go build -trimpath \
+    -ldflags="-w -s -X main.version=${VERSION} -extldflags '-static'" \
+    -a -mod vendor -o app
+.PHONY: app
+
+run: ## Runs previsouly built binary
+	REDIS_IP=127.0.0.1 REDIS_PORT=6379 ./app 
+.PHONY: run
+
+post: ## Posts to local service
+	curl -H "Content-Type: application/json" \
+	     -X POST -s -d @tests/message.json \
+         http://127.0.0.1:8080/
+.PHONY: post
+
 upgrade: ## Upgrades all dependancies 
 	go get -d -u ./...
 	go mod tidy

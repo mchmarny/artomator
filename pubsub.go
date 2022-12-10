@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/base64"
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -22,11 +21,6 @@ type event struct {
 	Tag    string `json:"tag"`
 }
 
-type result struct {
-	Status  int    `json:"status"`
-	Message string `json:"message"`
-}
-
 func getEvent(r *http.Request) (*event, error) {
 	var m pubsubMessage
 	if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
@@ -37,7 +31,6 @@ func getEvent(r *http.Request) (*event, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "error decoding message data")
 	}
-	log.Printf("event data: %s\n", string(d))
 
 	var e event
 	if err = json.Unmarshal(d, &e); err != nil {
