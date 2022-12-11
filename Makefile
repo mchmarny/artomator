@@ -1,10 +1,14 @@
-VERSION     ?=$(shell cat .version)
+VERSION    ?=$(shell cat .version)
+IMG_URI    ?="us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator:$(shell cat .version)"
+REDIS_IP   ?=127.0.0.1
+REDIS_PORT ?=6379
 
 all: help
 
-version: ## Prints the current version
+info: ## Prints the current version
 	@echo $(VERSION)
-.PHONY: version
+	@echo $(IMG_URI)
+.PHONY: info
 
 tidy: ## Updates the go modules and vendors all dependancies 
 	go mod tidy
@@ -17,8 +21,12 @@ app: ## Builds local binary
     -a -mod vendor -o app
 .PHONY: app
 
+redis: ## Starts local redis 
+	docker run --name redis-5 -dp $(REDIS_IP):$(REDIS_PORT):$(REDIS_PORT) redis
+.PHONY: redis
+
 run: ## Runs previsouly built binary
-	REDIS_IP=127.0.0.1 REDIS_PORT=6379 ./app 
+	REDIS_IP=$(REDIS_IP) REDIS_PORT=$(REDIS_PORT) ./app 
 .PHONY: run
 
 post: ## Posts to local service
@@ -41,13 +49,23 @@ lint: ## Lints the entire project
 	golangci-lint -c .golangci.yaml run
 .PHONY: lint
 
-image: ## Builds new image, signs it, gens SBOM, vlun report, and pushes it
-	bin/image
-.PHONY: image
+build: ## Builds, signs and publishes new image
+	bin/build
+.PHONY: build
 
-update: ## Deploys latest image to Cloud Run
+update: ## Updates Cloud Run service with the latest image
 	bin/update
 .PHONY: update
+
+deploy: ## Configures all dependancies and deploys the prebuild image 
+	@echo "Deploying ${IMG_URI}"
+	bin/setup
+	bin/deploy $(IMG_URI)
+.PHONY: deploy
+
+clean: ## Deletes deployed resoruces 
+	bin/cleanup
+.PHONY: clean
 
 tag: ## Creates release tag 
 	git tag -s -m "version bump to $(VERSION)" $(VERSION)

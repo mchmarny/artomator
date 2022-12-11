@@ -11,12 +11,14 @@ set -o pipefail
 # --member "user:<user used for gcloud auth>" \
 # --region $REGION --role=roles/run.invoker
 
+SERVICE_URL=$(gcloud run services describe $ROOT_NAME \
+  --region $REGION --format="value(status.url)")
 
 curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
      -H "Content-Type: application/json" \
      -H "X-Goog-User-Project: ${PROJECT_ID}" \
      -X POST -s -d @tests/message.json \
-     https://artomator-pdznqybsqa-uw.a.run.app/
+     $SERVICE_URL
 
 
 

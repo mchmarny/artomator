@@ -32,8 +32,10 @@ Artifact Registry will automatically published [registry events](https://cloud.g
 
 To deploy the prebuilt `artomator` image with all the dependencies run:
 
+> Note, provisioning Redis service may take a few minutes
+
 ```shell
-bin/deploy-all
+make deploy
 ```
 
 This will:
@@ -55,7 +57,7 @@ bin/setup
 Then, build the `artomator` image locally, sign it, generate its own SBOM with vulnerability report, publish that image to your own registry (created in setup), and run attestation validation to make sure the image is ready for use:
 
 ```shell
-bin/image
+bin/build
 ```
 
 Finally, create the PubSub topic with push subscription, and deploy Cloud Run service to process the registry events: 
@@ -100,10 +102,10 @@ projects/$PROJECT_ID/locations/$REGION/keyRings/artomator/cryptoKeys/artomator-s
 
 Once have the signing key, you can verify any image that was processed by `artomator` like this:
 
-> Note, the `$IMAGE_SHA` has to be the fully qualified image URI with the SHA. For example `us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:59d5b8eb5525307dde52aa51382676e74240bb79eb92a67a1f2a760382a21d78`
+> Note, the `$IMAGE_DIGEST` has to be the fully qualified image URI with the SHA. For example `us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:59d5b8eb5525307dde52aa51382676e74240bb79eb92a67a1f2a760382a21d78`
 
 ```shell
-cosign verify-attestation --type=spdx  --key "gcpkms://${SIGN_KEY}" $IMAGE_SHA \
+cosign verify-attestation --type=spdx --key "gcpkms://${SIGN_KEY}" $IMAGE_DIGEST \
     | jq -r .payload | base64 -d | jq -r .predicateType
 ```
 
@@ -122,7 +124,7 @@ https://spdx.dev/Document
 To save any of these artifacts locally: 
 
 ```shell
-cosign verify-attestation --type=spdx  --key "gcpkms://${SIGN_KEY}" $IMAGE_SHA \
+cosign verify-attestation --type=spdx --key "gcpkms://${SIGN_KEY}" $IMAGE_DIGEST \
     | jq -r .payload | base64 -d > sbom.spdx.json
 ```
 
@@ -134,10 +136,7 @@ To delete all created resources run:
 bin/cleanup
 ```
 
-## todo
-
-1. Save SBOM and vulnerability reports to GCS bucket 
-1. Add UI to query images metadata (e.g. list packages, base images, or vulnerabilities over time)
+> Note, this does not remove the created KMS resources. 
 
 ## Disclaimer
 

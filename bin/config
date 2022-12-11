@@ -34,6 +34,3 @@ export KEY_PATH="${ROOT_NAME}/cryptoKeys/${KEY_NAME}/cryptoKeyVersions/1"
 export SIGN_KEY="gcpkms://projects/${PROJECT_ID}/locations/${REGION}/keyRings/${KEY_PATH}"
 export IMAGE_REG="${REGION}-docker.pkg.dev/${PROJECT_ID}/${ROOT_NAME}"
 export IMAGE_URI="${IMAGE_REG}/${ROOT_NAME}:${VERSION}"
-
-# manually updated 
-export PUB_IMAGE_URI="us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator:${VERSION}"

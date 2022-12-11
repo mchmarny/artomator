@@ -6,6 +6,13 @@ DIR="$(dirname "$0")"
 set -o errexit
 set -o pipefail
 
+# for when you want to deploy pre-build vesion of the image
+IMAGE_ARG=$1
+
+# if not provide use the derived one
+[ -z "$IMAGE_ARG" ] && IMAGE_ARG=IMAGE_URI
+echo "Deploying: ${IMAGE_ARG}"
+
 gcloud iam service-accounts create $SA_NAME \
     --display-name "Service invoker for ${SA_NAME}"
 
@@ -41,7 +48,7 @@ REDIS_PORT=$(gcloud redis instances describe $ROOT_NAME \
      --region $REGION \
      --format="value(port)")
 
-echo "Redis: $REDIS_IP:$REDIS_PORT"
+echo "Redis: ${REDIS_IP}:${REDIS_PORT}"
 
 # vpc
 gcloud compute networks vpc-access connectors create \
@@ -54,7 +61,7 @@ gcloud compute networks vpc-access connectors create \
 gcloud run deploy $ROOT_NAME \
 	--no-allow-unauthenticated \
 	--execution-environment=gen2 \
-	--image $IMAGE_URI \
+	--image $IMAGE_ARG \
      --memory=2Gi \
 	--max-instances=3 \
 	--platform managed \
@@ -86,5 +93,3 @@ gcloud pubsub subscriptions create gcr-sub \
   --ack-deadline 600 \
   --push-endpoint "${SERVICE_URL}/" \
   --push-auth-service-account $SA_EMAIL
-
-  
