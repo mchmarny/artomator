@@ -3,25 +3,27 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/mchmarny/artomator)](https://goreportcard.com/report/github.com/mchmarny/artomator) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/mchmarny/artomator) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/gojp/goreportcard/blob/master/LICENSE)
 
-[Artifact Registry (AR)](https://cloud.google.com/artifact-registry) `artomator` automates the image signing, creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom), and vulnerability scanning. Using [image labels](https://docs.docker.com/config/labels-custom-metadata/), you can indicate to `artomator` the type of processing you want it to perform on that image. For example:
+[Artifact Registry (AR)](https://cloud.google.com/artifact-registry) `artomator` automates signing, creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom), and vulnerability scanning of container images. When deployed in your project, `artomator` will automatically process any images [labeled](https://docs.docker.com/config/labels-custom-metadata/) expected by `artomator`.
 
 ```shell
 docker build -t $IMAGE_TAG --label artomator-sbom=true --label artomator-vuln=true .
 ```
 
-When that image is pushed to AR, `artomator` will automatically generate both signed SBOM and vulnerability report and add these as attestations to the image.
+For example, by adding the `artomator-sbom=true` and `artomator-vuln=true` label flags in the above Docker build commend will tell `artomator` to automatically generate both signed SBOM and vulnerability report and add these as attestations to that image.
 
 ![](images/reg.png)
 
-> The `artomator` service in Cloud Run scales to 0 so there is no additional cost when no new images are bing published. 
-
 ## how it works
 
-Artifact Registry will automatically published [registry events](https://cloud.google.com/artifact-registry/docs/configure-notifications) if there is a [PubSub](https://cloud.google.com/pubsub/docs/overview) topic named `gcr` in the same project. `artomator` creates [Cloud Run](https://cloud.google.com/run) services which subscribes to that topic and processes any image that has at least one of the `artomator-sbom=true` or `artomator-vuln=true` labels based on the image digest.
+![](images/flow.png)
 
-> To prevent reprocessing the same images multiple times due to operations on the original image re-triggering the yet another image processing on the same image, `artomator` uses redis store to persist the processed image hashes.
+1. Whenever an image is published to the Artifact Registry 
+2. A [registry event](https://cloud.google.com/artifact-registry/docs/configure-notifications) is automatically published if there is a [PubSub](https://cloud.google.com/pubsub/docs/overview) topic named `gcr` in the same project
+3. PubSub subscription pushes that event to `artomator` service in [Cloud Run](https://cloud.google.com/run) with the operation type (e.g. `INSERT`) and the image digest (SHA256)
+4. The `artomator` service retrieves metadata for that image from the registry, signs that image with KMS key, creates the requested artifacts (SBOM or vulnerability report) based on the labels, creates attestation for these artifacts on the original image using the KMS key, and pushes it all the registry
+5. The `artomator` service persists the processed image digests in Redis store to avoid processing the same artifact, since technically adding attestation to an image creates yet another event
 
-`artomator` uses following OSS technologies: 
+The `artomator` uses a number of OSS technologies: 
 
 * [cosign](https://github.com/sigstore/cosign) with [GCP KMS](https://cloud.google.com/security-key-management) for image signing and verification
 * [syft](https://github.com/anchore/syft) for SBOM generation 
