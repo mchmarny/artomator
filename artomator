@@ -31,6 +31,11 @@ gcloud config set project $PROJECT_ID
 
 mkdir -p "./$SHA"
 
+function cleanup {
+  rm -rf "./$SHA"
+}
+trap cleanup EXIT
+
 # config digest
 CONFIG_DIGEST=$(curl -s -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
     -H "Authorization: Bearer $(gcloud auth print-access-token)" \
