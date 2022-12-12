@@ -23,7 +23,7 @@ For example, by adding the `artomator-sbom=true` and `artomator-vuln=true` label
 4. The `artomator` service retrieves metadata for that image from the registry, signs that image with KMS key, creates the requested artifacts (SBOM or vulnerability report) based on the labels, creates attestation for these artifacts on the original image using the KMS key, and pushes it all the registry
 5. The `artomator` service persists the processed image digests in Redis store to avoid processing the same artifact, since technically adding attestation to an image creates yet another event
 
-### OSS tech
+To processes images, `artomator` uses:
 
 * [cosign](https://github.com/sigstore/cosign) for image signing and verification
 * [syft](https://github.com/anchore/syft) for SBOM generation 
