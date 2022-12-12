@@ -23,7 +23,7 @@ For example, by adding the `artomator-sbom=true` and `artomator-vuln=true` label
 4. The `artomator` service retrieves metadata for that image from the registry, signs that image with KMS key, creates the requested artifacts (SBOM or vulnerability report) based on the labels, creates attestation for these artifacts on the original image using the KMS key, and pushes it all the registry
 5. The `artomator` service persists the processed image digests in Redis store to avoid processing the same artifact, since technically adding attestation to an image creates yet another event
 
-`artomator` also uses a number of OSS technologies: 
+### OSS tech
 
 * [cosign](https://github.com/sigstore/cosign) for image signing and verification
 * [syft](https://github.com/anchore/syft) for SBOM generation 
@@ -70,15 +70,15 @@ Finally, create the PubSub topic with push subscription, and deploy Cloud Run se
 bin/deploy
 ```
 
-## test 
+## test deployment
 
-To test `artomator`, use the provided test with ["hello" Dockerfile](tests/Dockerfile): 
+To test the deployed `artomator`, use the provided ["hello" Dockerfile](tests/Dockerfile). To build it with both labels (`artomator-sbom=true` and `artomator-vuln=true`) and deploy it: 
 
 ```shell
 tests/run
 ```
 
-## verify 
+## verify processed image
 
 To verify the attestation for `artomator` processed images you will need the KMS key name that was used to sign that image. You retrieve it using the following command:
 
@@ -140,6 +140,6 @@ bin/cleanup
 
 > Note, this does not remove the created KMS resources. 
 
-## Disclaimer
+## disclaimer
 
 This is my personal project and it does not represent my employer. While I do my best to ensure that everything works, I take no responsibility for issues caused by this code.
