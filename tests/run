@@ -21,5 +21,14 @@ docker build -f tests/Dockerfile \
              --platform linux/amd64 .
 docker push $TEST_IMAGE_URI
 
-IMAGE_SHA=$(docker inspect --format='{{index .RepoDigests 0}}' $TEST_IMAGE_URI)
-echo "IMAGE_SHA: ${IMAGE_SHA}"
+TEST_IMAGE_SHA=$(docker inspect --format='{{index .RepoDigests 0}}' $TEST_IMAGE_URI)
+echo "IMAGE_SHA: ${TEST_IMAGE_SHA}"
+
+# parse new event data
+EVENT_DATA=$(sed -e "s=IMAGE_SHA=${TEST_IMAGE_SHA}=g" tests/event-template.json)
+EVENT_ENCODED_DAT=$(echo -ne ${EVENT_DATA} | base64)
+
+# update message 
+sed -e "s/EVENT_DATA/${EVENT_ENCODED_DAT}/g" tests/message-template.json > tests/message.json
+
+

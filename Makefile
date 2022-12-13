@@ -1,7 +1,9 @@
-VERSION    ?=$(shell cat .version)
-IMG_URI    ?="us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator:$(shell cat .version)"
-REDIS_IP   ?=127.0.0.1
-REDIS_PORT ?=6379
+VERSION  ?=$(shell cat .version)
+IMG_URI  ?="us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator:$(shell cat .version)"
+TEST_RIP ?=127.0.0.1
+TEST_RPT ?=6379
+TEST_PRJ ?=cloudy-demos
+TEST_KEY ?=gcpkms://projects/cloudy-demos/locations/us-west1/keyRings/artomator/cryptoKeys/artomator-signer/cryptoKeyVersions/1
 
 all: help
 
@@ -18,19 +20,21 @@ tidy: ## Updates the go modules and vendors all dependancies
 app: ## Builds local binary 
 	CGO_ENABLED=0 go build -trimpath \
     -ldflags="-w -s -X main.version=${VERSION} -extldflags '-static'" \
-    -a -mod vendor -o app
+    -a -mod vendor -o app cmd/server/main.go
 .PHONY: app
 
 redis: ## Starts local redis 
-	docker run --name redis-5 -dp $(REDIS_IP):$(REDIS_PORT):$(REDIS_PORT) redis
+	docker run --name redis-5 -dp $(TEST_RIP):$(TEST_RPT):$(TEST_RPT) redis
 .PHONY: redis
 
 run: ## Runs previsouly built binary
-	REDIS_IP=$(REDIS_IP) REDIS_PORT=$(REDIS_PORT) ./app 
+	PROJECT_ID=$(TEST_PRJ) SIGN_KEY=$(TEST_KEY) \
+	REDIS_IP=$(TEST_RIP) REDIS_PORT=$(TEST_RPT) \
+	./app 
 .PHONY: run
 
 post: ## Posts to local service
-	curl -H "Content-Type: application/json" \
+	curl -i -H "Content-Type: application/json" \
 	     -X POST -s -d @tests/message.json \
          http://127.0.0.1:8080/
 .PHONY: post
@@ -48,6 +52,10 @@ test: tidy ## Runs unit tests
 lint: ## Lints the entire project 
 	golangci-lint -c .golangci.yaml run
 .PHONY: lint
+
+image: ## Makes test image 
+	tests/run
+.PHONY: image
 
 build: ## Builds, signs and publishes new image
 	bin/build

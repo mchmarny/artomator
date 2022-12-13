@@ -2,10 +2,10 @@
 
 set -o errexit
 
-# image (registry/image@sha:*** or ar/registry/image@sha:***)
-IMAGE_SHA=$1
-PROJECT_ID=$2
-SIGN_KEY=$3
+PROJECT_ID=$1
+SIGN_KEY=$2
+IMAGE_SHA=$3 # image (registry/image@sha:*** or ar/registry/image@sha:***)
+CONTEXT=$4 # path
 
 # check required input parameters
 [ -z "$IMAGE_SHA" ] && echo "arg IMAGE_SHA not provided\n" && exit 1
@@ -14,7 +14,6 @@ SIGN_KEY=$3
 
 # parse registry from image 
 REGISTRY=$(echo $IMAGE_SHA | cut -d'/' -f 1)
-SHA=$(echo $IMAGE_SHA | cut -d':' -f 2)
 IMG_DIGEST=$(echo $IMAGE_SHA | cut -d'@' -f 2)
 
 # print run variables 
@@ -23,18 +22,11 @@ echo "PROJECT_ID: $PROJECT_ID"
 echo "SIGN_KEY:   $SIGN_KEY"
 echo "REGISTRY:   $REGISTRY"
 echo "IMG_DIGEST: $IMG_DIGEST"
-echo "IMAGE_SHA:  $SHA"
+echo "CONTEXT:    $CONTEXT"
 
 # confgure gcloud 
 gcloud auth configure-docker $REGISTRY --quiet
 gcloud config set project $PROJECT_ID
-
-mkdir -p "./$SHA"
-
-function cleanup {
-  rm -rf "./$SHA"
-}
-trap cleanup EXIT
 
 # config digest
 CONFIG_DIGEST=$(curl -s -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
@@ -46,18 +38,18 @@ echo "CONFIG_DIGEST: $CONFIG_DIGEST"
 
 curl -s -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
     -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-    "https://us-west1-docker.pkg.dev/v2/cloudy-demos/artomator/tester/blobs/${CONFIG_DIGEST}" > "${SHA}/meta.json"
+    "https://us-west1-docker.pkg.dev/v2/cloudy-demos/artomator/tester/blobs/${CONFIG_DIGEST}" > "${CONTEXT}/meta.json"
 
 # check if image has the sbom and vuln labels 
-DO_SBOM=$(cat "${SHA}/meta.json" | jq -r -e '( .config.Labels."artomator-sbom" // "false" )')
-DO_VULN=$(cat "${SHA}/meta.json" | jq -r -e '( .config.Labels."artomator-vuln" // "false" )')
+DO_SBOM=$(cat "${CONTEXT}/meta.json" | jq -r -e '( .config.Labels."artomator-sbom" // "false" )')
+DO_VULN=$(cat "${CONTEXT}/meta.json" | jq -r -e '( .config.Labels."artomator-vuln" // "false" )')
 
 echo "DO_SBOM: $DO_SBOM"
 echo "DO_VULN: $DO_VULN"
 
 # if neither set then exit
 if [ "$DO_SBOM" != true ] && [ "$DO_VULN" != true ] ; then
-    echo "SHA ${SHA} not labeled for either SBOM or vulnerability processing"
+    echo "image ${IMAGE_SHA} not labeled for either SBOM or vulnerability processing"
     exit 0
 fi
 
@@ -72,20 +64,16 @@ cosign verify --key $SIGN_KEY $IMAGE_SHA
 
 # Generate SBOM from image and attach it as attestation to the image
 if [ "$DO_SBOM" == true ] ; then
-    echo "Processing SBOM for ${SHA}"
-    syft packages -o spdx-json $IMAGE_SHA | jq --compact-output > $SHA/sbom.spdx.json
-    cosign attest --predicate $SHA/sbom.spdx.json --type spdx --key $SIGN_KEY $IMAGE_SHA
-
-    # Verifying SPDX document attestation 
+    echo "Processing SBOM for ${IMAGE_SHA}"
+    syft -q packages -o spdx-json $IMAGE_SHA | jq --compact-output > $CONTEXT/sbom.json
+    cosign attest --predicate $CONTEXT/sbom.json --type spdx --key $SIGN_KEY $IMAGE_SHA
     cosign verify-attestation --type=spdx --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType
 fi
 
 # Scan packages in SBOM for vulnerabilities and attach report as attestation to the image
 if [ "$DO_VULN" == true ] ; then
-    echo "Processing Vulnerabilities for ${SHA}"
-    grype --add-cpes-if-none sbom:$SHA/sbom.spdx.json -o json | jq --compact-output > $SHA/sbom.vuln.json
-    cosign attest --predicate $SHA/sbom.vuln.json --type vuln --key $SIGN_KEY $IMAGE_SHA
-
-    # Verifying vulnerability report attestation 
+    echo "Processing Vulnerabilities for ${IMAGE_SHA}"
+    grype -q --add-cpes-if-none sbom:$CONTEXT/sbom.json -o json | jq --compact-output > $CONTEXT/vuln.json
+    cosign attest --predicate $CONTEXT/vuln.json --type vuln --key $SIGN_KEY $IMAGE_SHA
     cosign verify-attestation --type=vuln --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType
 fi

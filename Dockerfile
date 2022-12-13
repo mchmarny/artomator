@@ -10,7 +10,7 @@ ARG VERSION=v0.0.1-default
 ENV VERSION=${VERSION} GO111MODULE=on
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath \
     -ldflags="-w -s -X main.version=${VERSION} -extldflags '-static'" \
-    -a -mod vendor -o app
+    -a -mod vendor -o app ./cmd/server/main.go
 
 # RUN
 FROM $FINAL_BASE
