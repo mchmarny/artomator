@@ -75,7 +75,7 @@ bin/deploy
 To test the deployed `artomator`, use the provided ["hello" Dockerfile](tests/Dockerfile). To build it with both labels (`artomator-sbom=true` and `artomator-vuln=true`) and deploy it: 
 
 ```shell
-tests/run
+make image
 ```
 
 ## verify processed image
@@ -135,7 +135,7 @@ cosign verify-attestation --type=spdx --key "gcpkms://${SIGN_KEY}" $IMAGE_DIGEST
 To delete all created resources run: 
 
 ```shell
-bin/cleanup
+make clean
 ```
 
 > Note, this does not remove the created KMS resources. 
