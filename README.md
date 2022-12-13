@@ -3,13 +3,13 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/mchmarny/artomator)](https://goreportcard.com/report/github.com/mchmarny/artomator) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/mchmarny/artomator) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/gojp/goreportcard/blob/master/LICENSE)
 
-[Artifact Registry (AR)](https://cloud.google.com/artifact-registry) `artomator` automates signing, creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom), and vulnerability scanning of container images. When deployed in your project, `artomator` will automatically process any images [labeled](https://docs.docker.com/config/labels-custom-metadata/) expected by `artomator`.
+[Artifact Registry (AR)](https://cloud.google.com/artifact-registry) `artomator` automates the signing, creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom), and vulnerability scanning of container images. When deployed in your GCP project, `artomator` will automatically process any images that have the expected [label](https://docs.docker.com/config/labels-custom-metadata/). For example:
 
 ```shell
 docker build -t $IMAGE_TAG --label artomator-sbom=true --label artomator-vuln=true .
 ```
 
-For example, by adding the `artomator-sbom=true` and `artomator-vuln=true` label flags in the above Docker build commend will tell `artomator` to automatically generate both signed SBOM and vulnerability report and add these as attestations to that image.
+Simply adding the `artomator-sbom=true` and `artomator-vuln=true` label flags in the above Docker build commend will tell `artomator` to generate both signed SBOM and vulnerability report for that image, and to add these as attestations to that image in registry.
 
 ![](images/reg.png)
 
@@ -20,8 +20,11 @@ For example, by adding the `artomator-sbom=true` and `artomator-vuln=true` label
 1. Whenever an image is published to the Artifact Registry 
 2. A [registry event](https://cloud.google.com/artifact-registry/docs/configure-notifications) is automatically published if there is a [PubSub](https://cloud.google.com/pubsub/docs/overview) topic named `gcr` in the same project
 3. PubSub subscription pushes that event to `artomator` service in [Cloud Run](https://cloud.google.com/run) with the operation type (e.g. `INSERT`) and the image digest (SHA256)
-4. The `artomator` service retrieves metadata for that image from the registry, signs that image with KMS key, creates the requested artifacts (SBOM or vulnerability report) based on the labels, creates attestation for these artifacts on the original image using the KMS key, and pushes it all the registry
-5. The `artomator` service persists the processed image digests in Redis store to avoid processing the same artifact, since technically adding attestation to an image creates yet another event
+4. The `artomator` service retrieves metadata for that image from the registry
+5. Signs that image using KMS key and creates the requested artifacts (SBOM or vulnerability report) based on the labels
+6. Creates attestation for these artifacts on the original image using the KMS key, and pushes it all the registry
+7. (optional) If GCS bucket is configured, `artomator` will persist the generated artifacts
+8. Store the processed image digests in Redis to avoid re-processing the same image (technically adding attestation to an image creates yet another event so this could cause recursion without that check)
 
 To processes images, `artomator` uses:
 
