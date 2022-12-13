@@ -33,6 +33,26 @@ To processes images, `artomator` uses:
 * [grype](https://github.com/anchore/grype) for vulnerability scans 
 * [jq](https://stedolan.github.io/jq/) for JSON operations 
 
+## artifacts 
+
+The artifacts saved in GCS are all prefixed with the SHA from the image digest. For example, if the image digest was:
+
+```shell
+us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:acaccb6c8f975ee7df7f46468fae28fb5014cf02c2835d2dc37bf6961e648838
+```
+
+then the list of artifacts in the registry for that image will be: 
+
+* acaccb6c8f975ee7df7f46468fae28fb5014cf02c2835d2dc37bf6961e648838-sbom.json
+* acaccb6c8f975ee7df7f46468fae28fb5014cf02c2835d2dc37bf6961e648838-vuln.json
+* acaccb6c8f975ee7df7f46468fae28fb5014cf02c2835d2dc37bf6961e648838-meta.json
+
+where:
+
+* `-sbom.json` is SPDX 2.3 formatted SBOM file
+* `-vuln.json` is the vulnerability report based on the SBOM based on `grype` DB
+* `-meta.json` is the image metadata in the registry as it was when the image was processed
+
 ## deployment 
 
 To deploy the prebuilt `artomator` image with all the dependencies run:
