@@ -124,8 +124,8 @@ func (h *EventHandler) HandleEvent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if h.bucketName != "" {
-		if err := object.Save(h.bucketName, c); err != nil {
-			log.Printf("error saving resulting artifacts from: %s", c)
+		if err := object.Save(r.Context(), sha, h.bucketName, c); err != nil {
+			log.Printf("error saving %s resulting artifacts from: %s", sha, c)
 		}
 	}
 

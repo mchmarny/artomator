@@ -4,6 +4,7 @@ TEST_RIP ?=127.0.0.1
 TEST_RPT ?=6379
 TEST_PRJ ?=cloudy-demos
 TEST_KEY ?=gcpkms://projects/cloudy-demos/locations/us-west1/keyRings/artomator/cryptoKeys/artomator-signer/cryptoKeyVersions/1
+TEST_BCT ?=cloudy-demos-artomator
 
 all: help
 
@@ -30,6 +31,7 @@ redis: ## Starts local redis
 run: ## Runs previsouly built binary
 	PROJECT_ID=$(TEST_PRJ) SIGN_KEY=$(TEST_KEY) \
 	REDIS_IP=$(TEST_RIP) REDIS_PORT=$(TEST_RPT) \
+	GCS_BUCKET=$(TEST_BCT) \
 	./app 
 .PHONY: run
 

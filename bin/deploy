@@ -42,6 +42,8 @@ gcloud storage buckets create "gs://${GCS_BUCKET}" \
      --location $REGION \
      --uniform-bucket-level-access
 
+gsutil iam ch "serviceAccount:${SA_EMAIL}:roles/storage.admin" "gs://${GCS_BUCKET}"
+
 # redis 
 gcloud redis instances create $ROOT_NAME --region $REGION
 

@@ -78,4 +78,4 @@ if [ "$DO_VULN" == true ] ; then
     cosign verify-attestation --type=vuln --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType
 fi
 
-echo "compledted:  $IMAGE_SHA"
+echo "IMAGE_URI:  $IMAGE_SHA"
