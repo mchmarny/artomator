@@ -37,6 +37,11 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
      --member "serviceAccount:${SA_EMAIL}" \
      --role roles/cloudkms.signerVerifier
 	 
+# gcs 
+gcloud storage buckets create "gs://${GCS_BUCKET}" \
+     --location $REGION \
+     --uniform-bucket-level-access
+
 # redis 
 gcloud redis instances create $ROOT_NAME --region $REGION
 
@@ -69,7 +74,7 @@ gcloud run deploy $ROOT_NAME \
 	--region $REGION \
      --vpc-connector "${ROOT_NAME}-connector" \
 	--service-account $SA_EMAIL \
-	--set-env-vars=PROJECT_ID=$PROJECT_ID,SIGN_KEY=$SIGN_KEY,REDIS_IP=$REDIS_IP,REDIS_PORT=$REDIS_PORT
+	--set-env-vars=PROJECT_ID=$PROJECT_ID,SIGN_KEY=$SIGN_KEY,REDIS_IP=$REDIS_IP,REDIS_PORT=$REDIS_PORT,GCS_BUCKET=$GCS_BUCKET
 
 gcloud run services add-iam-policy-binding $ROOT_NAME \
 	--member "serviceAccount:${SA_EMAIL}" \

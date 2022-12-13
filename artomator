@@ -77,3 +77,5 @@ if [ "$DO_VULN" == true ] ; then
     cosign attest --predicate $CONTEXT/vuln.json --type vuln --key $SIGN_KEY $IMAGE_SHA
     cosign verify-attestation --type=vuln --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType
 fi
+
+echo "compledted:  $IMAGE_SHA"
