@@ -10,25 +10,22 @@ ARG VERSION=v0.0.1-default
 ENV VERSION=${VERSION} GO111MODULE=on
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath \
     -ldflags="-w -s -X main.version=${VERSION} -extldflags '-static'" \
-    -a -mod vendor -o app ./cmd/server/main.go
+    -a -mod vendor -o server ./cmd/server/main.go
 
 # RUN
 FROM $FINAL_BASE
-COPY --from=builder /src/app /app/
+COPY --from=builder /src/server /app/
+COPY --from=builder /src/bin /app/
 WORKDIR /app
 RUN apk add --update bash curl jq cosign ca-certificates python3
 # gcloud
-RUN mkdir -p /builder && \
-    wget -qO- https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz | tar zxv -C /builder && \
-    /builder/google-cloud-sdk/install.sh --usage-reporting=false \
-        --bash-completion=false \
-        --disable-installation-options
-ENV PATH=/builder/google-cloud-sdk/bin/:$PATH
+ENV CLOUDSDK_INSTALL_DIR /gcloud/
+RUN curl -sSL https://sdk.cloud.google.com | bash
+ENV PATH=/gcloud/:$PATH
 # anchore tools 
 RUN curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh \
     | sh -s -- -b /usr/local/bin
 RUN curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh \
     | sh -s -- -b /usr/local/bin
 # automator
-COPY artomator /usr/local/bin
-ENTRYPOINT ["./app"]
+ENTRYPOINT ["./server"]

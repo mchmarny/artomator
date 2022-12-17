@@ -3,12 +3,10 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/mchmarny/artomator/pkg/cache"
 	"github.com/mchmarny/artomator/pkg/pubsub"
 )
 
@@ -33,77 +31,36 @@ const (
 	}`
 )
 
-func runTest(event string, t *testing.T) {
-	a := []string{
-		"-c",
-		"echo",
-		"test",
-	}
-	h, err := NewEventHandler(a, "", cache.NewInMemoryCache())
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err = h.validate(); err != nil {
-		t.Fatal(err)
-	}
-
+func runEventTest(t *testing.T, event string, expectedStatusCode int) {
 	b, err := json.Marshal(pubsub.GetPubSubMessage("test", event))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	req, err := http.NewRequest(http.MethodPost, "/", bytes.NewBuffer(b))
+	req, err := http.NewRequest(http.MethodPost, "/event", bytes.NewBuffer(b))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	r := httptest.NewRecorder()
-	handler := http.HandlerFunc(h.HandleEvent)
+	h := getTestHandler(t)
+	handler := http.HandlerFunc(h.EventHandler)
 	handler.ServeHTTP(r, req)
-	if status := r.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status: %d", status)
-	}
-
-	d, err := io.ReadAll(r.Body)
-	if err != nil {
-		t.Errorf("error reading body %v", err)
-	}
-	t.Log(string(d))
-}
-
-func checkErr(t *testing.T, err error) {
-	if err != nil {
-		t.Fatal(err)
+	if r.Code != http.StatusOK {
+		t.Errorf("handler returned unexpected status (want:%d, got:%d)",
+			http.StatusOK, r.Code)
 	}
 }
 
-func TestSHAParser(t *testing.T) {
-	t1, err := parseSHA("us-west1-docker.pkg.dev/test/test/tester@sha256:123")
-	checkErr(t, err)
-	if t1 != "123" {
-		t.Errorf("failed to properly parse SHA from registry URI: (got %s want 123)", t1)
-	}
-	t2, err := parseSHA("us-west1-docker.pkg.dev/test/test/tester:v1.2.3")
-	checkErr(t, err)
-	if t2 != "v1.2.3" {
-		t.Errorf("failed to properly parse label from registry URI: (got %s want v1.2.3)", t2)
-	}
-	t3, err := parseSHA("us-west1-docker.pkg.dev/test/test/tester")
-	checkErr(t, err)
-	if t3 != "" {
-		t.Errorf("failed to properly parse label from registry URI: (got %s want '')", t3)
-	}
+func TestEventHandlerWithInvalidEvent(t *testing.T) {
+	runEventTest(t, invalidEvent, http.StatusOK)
 }
-
-func TestHandlerWithInvalidEvent(t *testing.T) {
-	runTest(invalidEvent, t)
+func TestEventHandlerWithValidEvent(t *testing.T) {
+	runEventTest(t, validEvent, http.StatusOK)
 }
-func TestHandlerWithValidEvent(t *testing.T) {
-	runTest(validEvent, t)
+func TestEventHandlerWithSignatureEvent(t *testing.T) {
+	runEventTest(t, sigEvent, http.StatusOK)
 }
-func TestHandlerWithSignatureEvent(t *testing.T) {
-	runTest(sigEvent, t)
-}
-func TestHandlerWithAttestationEvent(t *testing.T) {
-	runTest(attEvent, t)
+func TestEventHandlerWithAttestationEvent(t *testing.T) {
+	runEventTest(t, attEvent, http.StatusOK)
 }

@@ -1,10 +1,10 @@
-VERSION  ?=$(shell cat .version)
-IMG_URI  ?="us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator:$(shell cat .version)"
-TEST_RIP ?=127.0.0.1
-TEST_RPT ?=6379
-TEST_PRJ ?=cloudy-demos
-TEST_KEY ?=gcpkms://projects/cloudy-demos/locations/us-west1/keyRings/artomator/cryptoKeys/artomator-signer/cryptoKeyVersions/1
-TEST_BCT ?=cloudy-demos-artomator
+VERSION  =$(shell cat .version)
+IMG_URI  ="us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator:$(shell cat .version)"
+TEST_RIP =127.0.0.1
+TEST_RPT =6379
+TEST_PRJ =cloudy-demos
+TEST_KEY =gcpkms://projects/cloudy-demos/locations/us-west1/keyRings/artomator/cryptoKeys/artomator-signer/cryptoKeyVersions/1
+TEST_BCT =cloudy-demos-artomator
 
 all: help
 
@@ -28,18 +28,33 @@ redis: ## Starts local redis
 	docker run --name redis-5 -dp $(TEST_RIP):$(TEST_RPT):$(TEST_RPT) redis
 .PHONY: redis
 
-run: ## Runs previsouly built binary
+redis-stop: ## Stops and removes running local redis 
+	docker rm /redis-5
+.PHONY: redis-stop
+
+server: ## Runs previsouly built server binary
 	PROJECT_ID=$(TEST_PRJ) SIGN_KEY=$(TEST_KEY) \
 	REDIS_IP=$(TEST_RIP) REDIS_PORT=$(TEST_RPT) \
 	GCS_BUCKET=$(TEST_BCT) \
 	./app 
-.PHONY: run
+.PHONY: server
 
-post: ## Posts to local service
+post: ## Submits POST to local service
 	curl -i -H "Content-Type: application/json" \
 	     -X POST -s -d @tests/message.json \
-         http://127.0.0.1:8080/
+         "http://127.0.0.1:8080/"
 .PHONY: post
+
+patch: ## Submits PATCH to local service
+	curl -i -H "Content-Type: application/json" \
+	     -X PATCH -s -d @tests/message.json \
+         "http://127.0.0.1:8080/?digest=$(shell cat tests/test-digest.txt)"
+.PHONY: patch
+
+get: ## Submits GET to local service
+	curl -i -H "Content-Type: application/json" \
+         "http://127.0.0.1:8080/?format=spdx&digest=$(shell cat tests/test-digest.txt)"
+.PHONY: get
 
 upgrade: ## Upgrades all dependancies 
 	go get -d -u ./...
@@ -56,26 +71,36 @@ lint: ## Lints the entire project
 .PHONY: lint
 
 image: ## Makes test image 
-	tests/run
+	tests/build-test-image
 .PHONY: image
 
 build: ## Builds, signs and publishes new image
-	bin/build
+	tools/build
 .PHONY: build
 
 update: ## Updates Cloud Run service with the latest image
-	bin/update
+	tools/update
 .PHONY: update
 
 deploy: ## Configures all dependancies and deploys the prebuild image 
 	@echo "Deploying ${IMG_URI}"
-	bin/setup
-	bin/deploy $(IMG_URI)
+	tools/setup
+	tools/deploy $(IMG_URI)
 .PHONY: deploy
 
 clean: ## Deletes deployed resoruces 
-	bin/cleanup
+	tools/cleanup
 .PHONY: clean
+
+docker-clean: ## Removes orpaned docker volumes
+	@echo "stopping all containers..."
+	docker stop $(shell docker ps -aq)
+	@echo "removing all containers..." 
+	docker rm $(shell docker ps -aq)
+	@echo "prunning system..."
+	docker system prune -a --volumes
+	@echo "done"
+.PHONY: docker-clean
 
 tag: ## Creates release tag 
 	git tag -s -m "version bump to $(VERSION)" $(VERSION)

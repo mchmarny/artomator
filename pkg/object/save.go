@@ -3,6 +3,7 @@ package object
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"path"
 
@@ -28,6 +29,7 @@ func Save(ctx context.Context, sha, bucket, dir string) error {
 			return errors.Wrapf(err, "error writing content from: %s to:%s/%s",
 				k, bucket, v)
 		}
+		log.Printf("gs://%s/%v", bucket, v)
 	}
 
 	return nil

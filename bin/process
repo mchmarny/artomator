@@ -1,0 +1,85 @@
+#!/bin/bash
+
+set -o errexit
+
+PROJECT_ID=$1
+SIGN_KEY=$2
+IMAGE_DIGEST=$3 # image (registry/image@sha:*** or ar/registry/image@sha:***)
+CONTEXT=$4 # path
+
+# check required input parameters
+[ -z "$IMAGE_DIGEST" ] && echo "arg IMAGE_DIGEST not set\n" && exit 1
+[ -z "$PROJECT_ID" ] && echo "arg PROJECT_ID not set\n" && exit 1
+[ -z "$SIGN_KEY" ] && echo "arg SIGN_KEY not set\n" && exit 1
+
+# parse registry from image 
+REGISTRY=$(echo $IMAGE_DIGEST | cut -d'/' -f 1)
+IMG_SHA=$(echo $IMAGE_DIGEST | cut -d'@' -f 2)
+
+# supported formats 
+SBOM_CYCLON=cyclonedx
+SBOM_SPDX=spdx
+
+# print run variables 
+echo "DIGEST:   $IMAGE_DIGEST"
+echo "PROJECT:  $PROJECT_ID"
+echo "KEY:      $SIGN_KEY"
+echo "REGISTRY: $REGISTRY"
+echo "SHA:      $IMG_SHA"
+echo "CONTEXT:  $CONTEXT"
+echo "FORMATS:  $SBOM_CYCLON, $SBOM_SPDX"
+
+# confgure gcloud 
+gcloud auth configure-docker $REGISTRY --quiet
+gcloud config set project $PROJECT_ID
+
+# config digest
+CONFIG_DIGEST=$(curl -s -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+    -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+    "https://us-west1-docker.pkg.dev/v2/cloudy-demos/artomator/tester/manifests/${IMG_SHA}" \
+    | jq -r '.config.digest')
+
+echo "CONFIG_DIGEST: $CONFIG_DIGEST"
+
+curl -s -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+    -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+    "https://us-west1-docker.pkg.dev/v2/cloudy-demos/artomator/tester/blobs/${CONFIG_DIGEST}" > "${CONTEXT}/meta.json"
+
+# check if image has the sbom and vuln labels 
+DO_SBOM=$(cat "${CONTEXT}/meta.json" | jq -r -e '( .config.Labels."artomator-sbom" // "false" )')
+DO_VULN=$(cat "${CONTEXT}/meta.json" | jq -r -e '( .config.Labels."artomator-vuln" // "false" )')
+
+echo "DO_SBOM: $DO_SBOM"
+echo "DO_VULN: $DO_VULN"
+
+# if sbom format is not set to valid value then exit
+if [ "$DO_SBOM" != "$SBOM_CYCLON" ] && [ "$DO_SBOM" != "$SBOM_SPDX" ] ; then
+    echo "skipping: ${IMAGE_SHA} (null or unsuported SBOM format: '${DO_SBOM}'"
+    exit 0
+fi
+
+echo "start processing: ${IMAGE_DIGEST}"
+
+# generate public key-pair from KMS if one does not exist 
+if [ ! -f cosign.pub ]; then
+    cosign generate-key-pair --kms $SIGN_KEY
+fi
+
+# sign and verify image
+cosign sign --key $SIGN_KEY $IMAGE_DIGEST
+cosign verify --key $SIGN_KEY $IMAGE_DIGEST
+
+# generate SBOM from image and attach it as attestation to the image
+syft -q packages -o "${DO_SBOM}-json" $IMAGE_DIGEST | jq --compact-output > $CONTEXT/sbom.json
+cosign attest --predicate $CONTEXT/sbom.json --type $DO_SBOM --key $SIGN_KEY $IMAGE_DIGEST
+cosign verify-attestation --type=$DO_SBOM --key $SIGN_KEY $IMAGE_DIGEST | jq -r .payload | base64 -d | jq -r .predicateType
+
+# scan packages in SBOM for vulnerabilities and attach report as attestation to the image
+if [ "$DO_VULN" == true ] ; then
+    echo "Processing Vulnerabilities for ${IMAGE_DIGEST}"
+    grype -q --add-cpes-if-none sbom:$CONTEXT/sbom.json -o json | jq --compact-output > $CONTEXT/vuln.json
+    cosign attest --predicate $CONTEXT/vuln.json --type vuln --key $SIGN_KEY $IMAGE_DIGEST
+    cosign verify-attestation --type=vuln --key $SIGN_KEY $IMAGE_DIGEST | jq -r .payload | base64 -d | jq -r .predicateType
+fi
+
+echo "finished processing: $IMAGE_DIGEST"

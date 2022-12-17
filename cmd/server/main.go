@@ -16,8 +16,11 @@ import (
 )
 
 const (
-	commandDefault = "artomator"
-	addressDefault = ":8080"
+	serviceName            = "artomator"
+	processCommandDefault  = "bin/process"
+	validateCommandDefault = "bin/validate"
+	scanCommandDefault     = "bin/validate"
+	addressDefault         = ":8080"
 
 	closeTimeout = 3
 	readTimeout  = 10
@@ -25,8 +28,11 @@ const (
 )
 
 var (
-	version     = "v0.0.1-default"
-	commandName = "artomator"
+	version = "v0.0.1-default"
+
+	processCommandName  = processCommandDefault
+	validateCommandName = validateCommandDefault
+	scanCommandName     = scanCommandDefault
 
 	projectID  = os.Getenv("PROJECT_ID")
 	signingKey = os.Getenv("SIGN_KEY")
@@ -39,7 +45,7 @@ type key int
 
 func main() {
 	log.SetFlags(log.Lshortfile)
-	log.Printf("starting %s server (%s)...\n", commandDefault, version)
+	log.Printf("starting %s server (%s)...\n", serviceName, version)
 
 	if projectID == "" || signingKey == "" {
 		log.Fatal("either PROJECT_ID or SIGN_KEY env var not defined")
@@ -56,14 +62,23 @@ func main() {
 		log.Fatalf("error while creating cache: %v", err)
 	}
 
-	a := []string{commandName, projectID, signingKey}
-	h, err := handler.NewEventHandler(a, bucketName, c)
+	processArgs := []string{processCommandName, projectID, signingKey}
+	validateArgs := []string{validateCommandName, projectID, signingKey}
+	scanArgs := []string{scanCommandName, projectID, signingKey}
+	h, err := handler.NewEventHandler(processArgs, validateArgs, scanArgs, bucketName, c)
 	if err != nil {
 		log.Fatalf("error while creating event handler: %v", err)
 	}
+	if err := h.Validate(); err != nil {
+		log.Fatalf("created service not in valid state: %v", err)
+	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", h.HandleEvent)
+	mux.HandleFunc("/", h.HandlerDefault)
+	mux.HandleFunc("/event", h.EventHandler)
+	mux.HandleFunc("/process", h.ProcessHandler)
+	mux.HandleFunc("/validation", h.ValidationHandler)
+	mux.HandleFunc("/scan", h.ScanHandler)
 
 	address := addressDefault
 	if val, ok := os.LookupEnv("PORT"); ok {

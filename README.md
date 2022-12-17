@@ -3,13 +3,13 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/mchmarny/artomator)](https://goreportcard.com/report/github.com/mchmarny/artomator) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/mchmarny/artomator) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/gojp/goreportcard/blob/master/LICENSE)
 
-[Artifact Registry (AR)](https://cloud.google.com/artifact-registry) `artomator` automates the signing, creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom), and vulnerability scanning of container images. When deployed in your GCP project, `artomator` will automatically process any images that have the expected [label](https://docs.docker.com/config/labels-custom-metadata/). For example:
+[Artifact Registry (AR)](https://cloud.google.com/artifact-registry) `artomator` automates the creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom), and vulnerability scanning of container images. When deployed in your GCP project, `artomator` will automatically process any images that have the expected [label](https://docs.docker.com/config/labels-custom-metadata/). For example:
 
 ```shell
-docker build -t $IMAGE_TAG --label artomator-sbom=true --label artomator-vuln=true .
+docker build -t $IMAGE_TAG --label artomator-sbom=spdx --label artomator-vuln=true .
 ```
 
-Simply adding the `artomator-sbom=true` and `artomator-vuln=true` label flags in the above Docker build commend will tell `artomator` to generate both signed SBOM and vulnerability report for that image, and to add these as attestations to that image in registry.
+Adding the `artomator-sbom=spdx` label flag to your existing `docker build` commend will automatically tell `artomator` to add SBOM attestations in SPDX format to to that image (the supported formats are: `cyclonedx` or `spdx`). Additionally, if you also include the `artomator-vuln=true` label, `artomator` will generate a vulnerability report from that SBOM. 
 
 ![](images/reg.png)
 
@@ -76,13 +76,13 @@ This will:
 To build the `artomator` image yourself in your own project, first, enable required APIs, create registry, and configure KMS key:
 
 ```shell
-bin/setup
+tools/setup
 ```
 
 Then, build the `artomator` image locally, sign it, generate its own SBOM with vulnerability report, publish that image to your own registry (created in setup), and run attestation validation to make sure the image is ready for use:
 
 ```shell
-bin/build
+tools/build
 ```
 
 Finally, create the PubSub topic with push subscription, and deploy Cloud Run service to process the registry events: 
@@ -90,7 +90,7 @@ Finally, create the PubSub topic with push subscription, and deploy Cloud Run se
 > Note, the created Cloud Run service requires `roles/run.invoker` roles so only the PubSub push subscription will be allowed to invoke that service. 
 
 ```shell
-bin/deploy
+tools/deploy
 ```
 
 ## test deployment
