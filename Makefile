@@ -39,21 +39,25 @@ server: ## Runs previsouly built server binary
 	./app 
 .PHONY: server
 
-post: ## Submits POST to local service
-	curl -i -H "Content-Type: application/json" \
-	     -X POST -s -d @tests/message.json \
-         "http://127.0.0.1:8080/"
+event-test: image ## Submits events test to local service
+	curl -i -X POST -H "Content-Type: application/json" \
+	     -s -d @tests/message.json \
+         "http://127.0.0.1:8080/event"
 .PHONY: post
 
-patch: ## Submits PATCH to local service
-	curl -i -H "Content-Type: application/json" \
-	     -X PATCH -s -d @tests/message.json \
-         "http://127.0.0.1:8080/?digest=$(shell cat tests/test-digest.txt)"
+process-test: image ## Submits process test to local service
+	curl -i -X POST -H "Content-Type: application/json" \
+         "http://127.0.0.1:8080/process?digest=$(shell cat tests/test-digest.txt)"
 .PHONY: patch
 
-get: ## Submits GET to local service
-	curl -i -H "Content-Type: application/json" \
-         "http://127.0.0.1:8080/?format=spdx&digest=$(shell cat tests/test-digest.txt)"
+valid-test: image process-test ## Submits validation test GET to local service
+	curl -i -X POST -H "Content-Type: application/json" \
+         "http://127.0.0.1:8080/validate?format=spdx&digest=$(shell cat tests/test-digest.txt)"
+.PHONY: get
+
+scan-test: image ## Submits scan test to local service
+	curl -i -X POST -H "Content-Type: application/json" \
+         "http://127.0.0.1:8080/scan?format=spdx&digest=$(shell cat tests/test-digest.txt)"
 .PHONY: get
 
 upgrade: ## Upgrades all dependancies 

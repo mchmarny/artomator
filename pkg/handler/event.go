@@ -44,5 +44,5 @@ func (h *EventHandler) EventHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeMessage(w, "processed")
+	writeMessage(w, "event processed")
 }

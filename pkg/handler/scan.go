@@ -11,6 +11,9 @@ import (
 const (
 	maxSeverityParamName = "severity"
 	scanScopeParamName   = "scope"
+
+	maxSeverityDefault = "critical"
+	scanScopeDefault   = "squashed"
 )
 
 func (h *EventHandler) ScanHandler(w http.ResponseWriter, r *http.Request) {
@@ -30,14 +33,12 @@ func (h *EventHandler) ScanHandler(w http.ResponseWriter, r *http.Request) {
 
 	maxSeverity := r.URL.Query().Get(maxSeverityParamName)
 	if maxSeverity == "" {
-		writeError(w, errors.Errorf("%s parameter not set", maxSeverityParamName))
-		return
+		maxSeverity = maxSeverityDefault
 	}
 
 	scanScope := r.URL.Query().Get(scanScopeParamName)
 	if scanScope == "" {
-		writeError(w, errors.Errorf("%s parameter not set", scanScopeParamName))
-		return
+		scanScope = scanScopeDefault
 	}
 
 	sha, err := parseSHA(digest)
@@ -63,7 +64,7 @@ func (h *EventHandler) ScanHandler(w http.ResponseWriter, r *http.Request) {
 		writeError(w, errors.Wrap(err, "error executing validation"))
 	}
 
-	log.Printf("done: %s\n", string(out))
+	log.Printf("scan done: %s\n", string(out))
 
-	writeMessage(w, "validated")
+	writeMessage(w, "image scanned")
 }

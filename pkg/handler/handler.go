@@ -64,23 +64,24 @@ func (h *EventHandler) HandlerDefault(w http.ResponseWriter, r *http.Request) {
 }
 
 func writeError(w http.ResponseWriter, err error) {
+	w.WriteHeader(http.StatusBadRequest)
 	log.Println(err)
-	writeContent(w, http.StatusBadRequest, result{
+	writeContent(w, result{
 		Status:  http.StatusText(http.StatusBadRequest),
 		Message: err.Error(),
 	})
 }
 
 func writeMessage(w http.ResponseWriter, msg string) {
+	w.WriteHeader(http.StatusOK)
 	log.Println(msg)
-	writeContent(w, http.StatusOK, result{
+	writeContent(w, result{
 		Status:  http.StatusText(http.StatusOK),
 		Message: msg,
 	})
 }
 
-func writeContent(w http.ResponseWriter, status int, content any) {
-	w.WriteHeader(status)
+func writeContent(w http.ResponseWriter, content any) {
 	if err := json.NewEncoder(w).Encode(content); err != nil {
 		log.Printf("error encoding: %v - %v", content, err)
 	}

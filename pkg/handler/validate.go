@@ -9,7 +9,9 @@ import (
 )
 
 const (
-	validateFormatQueryParamName = "format"
+	validateFormatParamName = "format"
+
+	validateFormatDefault = "spdx"
 )
 
 func (h *EventHandler) ValidationHandler(w http.ResponseWriter, r *http.Request) {
@@ -27,10 +29,9 @@ func (h *EventHandler) ValidationHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	sbomFmt := r.URL.Query().Get(validateFormatQueryParamName)
+	sbomFmt := r.URL.Query().Get(validateFormatParamName)
 	if sbomFmt == "" {
-		writeError(w, errors.Errorf("%s parameter not set", validateFormatQueryParamName))
-		return
+		sbomFmt = validateFormatDefault
 	}
 
 	sha, err := parseSHA(digest)
@@ -55,7 +56,7 @@ func (h *EventHandler) ValidationHandler(w http.ResponseWriter, r *http.Request)
 		writeError(w, errors.Wrap(err, "error executing validation"))
 	}
 
-	log.Printf("done: %s\n", string(out))
+	log.Printf("validation done: %s\n", string(out))
 
-	writeMessage(w, "validated")
+	writeMessage(w, "request validated")
 }

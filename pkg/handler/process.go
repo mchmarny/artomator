@@ -26,11 +26,6 @@ func (h *EventHandler) ProcessHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	log.Println("processing event...")
 
-	if r.Method != http.MethodPost {
-		writeError(w, errors.Errorf("method %s not supported, expected POST", r.Method))
-		return
-	}
-
 	digest := r.URL.Query().Get(imageDigestQueryParamName)
 	if digest == "" {
 		writeError(w, errors.Errorf("process %s parameter not set", imageDigestQueryParamName))
@@ -41,7 +36,7 @@ func (h *EventHandler) ProcessHandler(w http.ResponseWriter, r *http.Request) {
 		writeError(w, err)
 		return
 	}
-	writeMessage(w, "processed")
+	writeMessage(w, "request processed")
 }
 
 func (h *EventHandler) process(ctx context.Context, digest string, args []string) error {

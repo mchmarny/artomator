@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. "bin/config"
+. "tools/config"
 
 set -o errexit
 set -o pipefail

@@ -77,7 +77,7 @@ func main() {
 	mux.HandleFunc("/", h.HandlerDefault)
 	mux.HandleFunc("/event", h.EventHandler)
 	mux.HandleFunc("/process", h.ProcessHandler)
-	mux.HandleFunc("/validation", h.ValidationHandler)
+	mux.HandleFunc("/validate", h.ValidationHandler)
 	mux.HandleFunc("/scan", h.ScanHandler)
 
 	address := addressDefault
