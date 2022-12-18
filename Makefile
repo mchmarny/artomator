@@ -87,6 +87,10 @@ image: ## Makes test image
 	tests/build-test-image
 .PHONY: image
 
+policy: ## Creates k8s admission policies based on the current config
+	policy/policy-from-template
+.PHONY: policy
+
 build: ## Builds, signs and publishes new image
 	tools/build
 .PHONY: build

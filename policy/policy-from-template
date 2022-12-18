@@ -1,0 +1,15 @@
+#!/bin/bash
+
+. "tools/config"
+
+set -o errexit
+set -o pipefail
+
+
+# update the script as to ensure new image sha 
+sed -e "s=KEY_PATH=${SIGN_KEY}=" \
+    policy/sbom-attestation-policy-template.yaml > \
+    policy/sbom-attestation-policy.yaml
+
+
+
