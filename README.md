@@ -30,7 +30,7 @@ To processes images, `artomator` uses:
 
 * [cosign](https://github.com/sigstore/cosign) for image signing and verification
 * [syft](https://github.com/anchore/syft) for SBOM generation 
-* [grype](https://github.com/anchore/grype) for vulnerability scans 
+* [trivy](https://github.com/aquasecurity/trivy) for vulnerability scans 
 * [jq](https://stedolan.github.io/jq/) for JSON operations 
 
 ## artifacts 
@@ -50,7 +50,7 @@ then the list of artifacts in the registry for that image will be:
 where:
 
 * `-sbom.json` is SPDX 2.3 formatted SBOM file
-* `-vuln.json` is the vulnerability report based on the SBOM based on `grype` DB
+* `-vuln.json` is the vulnerability report based on the SBOM based on `trivy` DB
 * `-meta.json` is the image metadata in the registry as it was when the image was processed
 
 ## deployment 

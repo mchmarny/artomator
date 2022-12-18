@@ -19,19 +19,19 @@ docker build --no-cache \
              .
 docker push $IMAGE_URI
 
-IMAGE_SHA=$(docker inspect --format='{{index .RepoDigests 0}}' $IMAGE_URI)
-echo "IMAGE_SHA: ${IMAGE_SHA}\n"
+IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $IMAGE_URI)
+echo "IMAGE_SHA: ${IMAGE_DIGEST}\n"
 
 # Sign and verify image
-cosign sign --key $SIGN_KEY -a version=$VERSION -a commit=$COMMIT $IMAGE_SHA
-cosign verify --key $SIGN_KEY $IMAGE_SHA
+cosign sign --key $SIGN_KEY -a version=$VERSION -a commit=$COMMIT $IMAGE_DIGEST
+cosign verify --key $SIGN_KEY $IMAGE_DIGEST
 
 # Generate SBOM from image and attach it as attestation to the image
-syft -s AllLayers -q packages -o spdx-json $IMAGE_SHA | jq --compact-output > sbom.json
-cosign attest --predicate sbom.json --type spdx --key $SIGN_KEY $IMAGE_SHA
-cosign verify-attestation --type=spdx  --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType
+syft -s AllLayers -q packages -o spdx-json $IMAGE_DIGEST | jq --compact-output > sbom.json
+cosign attest --predicate sbom.json --type spdx --key $SIGN_KEY $IMAGE_DIGEST
+cosign verify-attestation --type=spdx  --key $SIGN_KEY $IMAGE_DIGEST | jq -r .payload | base64 -d | jq -r .predicateType
 
 # Scan packages in SBOM for vulnerabilities and attach report as attestation to the image
-grype -q --add-cpes-if-none sbom:sbom.json -o json | jq --compact-output > vuln.json
-cosign attest --predicate vuln.json --type vuln --key $SIGN_KEY $IMAGE_SHA
-cosign verify-attestation --type=vuln  --key $SIGN_KEY $IMAGE_SHA | jq -r .payload | base64 -d | jq -r .predicateType
+trivy image $IMAGE_DIGEST --format json --security-checks config | jq --compact-output > vuln.json
+cosign attest --predicate vuln.json --type vuln --key $SIGN_KEY $IMAGE_DIGEST
+cosign verify-attestation --type=vuln  --key $SIGN_KEY $IMAGE_DIGEST | jq -r .payload | base64 -d | jq -r .predicateType

@@ -77,7 +77,7 @@ cosign verify-attestation --type=$DO_SBOM --key $SIGN_KEY $IMAGE_DIGEST | jq -r 
 # scan packages in SBOM for vulnerabilities and attach report as attestation to the image
 if [ "$DO_VULN" == true ] ; then
     echo "Processing Vulnerabilities for ${IMAGE_DIGEST}"
-    grype -q --add-cpes-if-none sbom:$CONTEXT/sbom.json -o json | jq --compact-output > $CONTEXT/vuln.json
+    trivy image $IMAGE_DIGEST --format json -q --timeout 10m --security-checks config --output $CONTEXT/vuln.json
     cosign attest --predicate $CONTEXT/vuln.json --type vuln --key $SIGN_KEY $IMAGE_DIGEST
     cosign verify-attestation --type=vuln --key $SIGN_KEY $IMAGE_DIGEST | jq -r .payload | base64 -d | jq -r .predicateType
 fi

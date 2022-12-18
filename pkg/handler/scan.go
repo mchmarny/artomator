@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 
 	"github.com/pkg/errors"
 )
@@ -58,7 +59,8 @@ func (h *EventHandler) ScanHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	scanCmdArgs := append(h.scanCmdArgs, digest, maxSeverity, scanScope, dir)
+	reportPath := path.Join(dir, "report.json")
+	scanCmdArgs := append(h.scanCmdArgs, digest, maxSeverity, scanScope, reportPath)
 	if err := runCommand(r.Context(), scanCmdArgs); err != nil {
 		writeError(w, errors.Wrap(err, "error executing validation"))
 		return

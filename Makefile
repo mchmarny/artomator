@@ -55,9 +55,9 @@ verify-test: ## Submits verify test to local service
          "http://127.0.0.1:8080/verify?format=spdx&digest=$(shell cat tests/test-digest.txt)"
 .PHONY: get
 
-scan-test: image ## Submits scan test to local service
+scan-test: ## Submits scan test to local service
 	curl -i -X POST -H "Content-Type: application/json" \
-         "http://127.0.0.1:8080/scan?format=spdx&digest=$(shell cat tests/test-digest.txt)"
+         "http://127.0.0.1:8080/scan?severity=low&scope=squashed&digest=$(shell cat tests/test-digest.txt)"
 .PHONY: get
 
 upgrade: ## Upgrades all dependancies 
