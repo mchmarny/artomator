@@ -1,0 +1,24 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+set -o errexit
+set -o pipefail
+
+# This requires:
+# gcloud run services add-iam-policy-binding $ROOT_NAME \
+# --member "user:<user used for gcloud auth>" \
+# --region $REGION --role=roles/run.invoker
+
+SERVICE_URL=$(gcloud run services describe $ROOT_NAME \
+  --region $REGION --format="value(status.url)")
+
+curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
+     -H "Content-Type: application/json" \
+     -H "X-Goog-User-Project: ${PROJECT_ID}" \
+     "${SERVICE_URL}/process?digest=$(cat tests/test-digest.txt)"
+
+
+
+

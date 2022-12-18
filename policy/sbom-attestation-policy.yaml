@@ -1,7 +1,7 @@
 apiVersion: policy.sigstore.dev/v1alpha1
 kind: ClusterImagePolicy
 metadata:
-  name: artomator-sbom-attestation
+  name: artomator-attestation-sbom-spdxjson
 spec:
   images:
   - glob: "**"
@@ -12,21 +12,15 @@ spec:
     ctlog:
       url: https://rekor.sigstore.dev
     attestations:
-    - name: must-have-spdxjson
-      predicateType: spdxjson
-      policy:
-        type: cue
-        data: |
-          predicateType: "https://spdx.dev/Document"
-    - name: must-have-spdx
+    - name: must-have-spdx-sbom
       predicateType: spdx
       policy:
         type: cue
         data: |
           predicateType: "https://spdx.dev/Document"
-    - name: must-have-cyclonedx
-      predicateType: cyclonedx
-      policy:
-        type: cue
-        data: |
-          predicateType: "https://cyclonedx.org/schema"
+    # - name: must-have-culn-report
+    #   predicateType: vuln
+    #   policy:
+    #     type: cue
+    #     data: |
+    #       predicateType: "cosign.sigstore.dev/attestation/vuln/v1"

@@ -18,7 +18,7 @@ curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
      -H "Content-Type: application/json" \
      -H "X-Goog-User-Project: ${PROJECT_ID}" \
      -X POST -s -d @tests/message.json \
-     $SERVICE_URL
+     "${SERVICE_URL}/event"
 
 
 

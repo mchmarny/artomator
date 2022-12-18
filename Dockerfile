@@ -19,18 +19,21 @@ FROM $FINAL_BASE
 ARG VERSION
 LABEL artomator.version="${VERSION}"
 COPY --from=builder /src/server /app/
-COPY --from=builder /src/bin /app/
+COPY --from=builder /src/bin/ /app/bin/
 WORKDIR /app
 RUN apk add --update bash curl jq cosign ca-certificates python3
 # gcloud
 ENV CLOUDSDK_INSTALL_DIR /gcloud/
 RUN curl -sSL https://sdk.cloud.google.com | bash
-ENV PATH=/gcloud/:$PATH
+ENV PATH $PATH:/gcloud/google-cloud-sdk/bin/:/app/bin/
 # anchore tools 
 RUN curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh \
     | sh -s -- -b /usr/local/bin
 # aquasecurity
 RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
     | sh -s -- -b /usr/local/bin
+# debug 
+RUN echo $PATH 
+RUN ls -al 
 # automator
 ENTRYPOINT ["./server"]

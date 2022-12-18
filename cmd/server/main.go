@@ -17,9 +17,9 @@ import (
 
 const (
 	serviceName           = "artomator"
-	processCommandDefault = "bin/process"
-	verifyCommandDefault  = "bin/verify"
-	scanCommandDefault    = "bin/scan"
+	processCommandDefault = "process"
+	verifyCommandDefault  = "verify"
+	scanCommandDefault    = "scan"
 	addressDefault        = ":8080"
 
 	closeTimeout = 3

@@ -43,7 +43,7 @@ event-test: image ## Submits events test to local service
 	curl -i -X POST -H "Content-Type: application/json" \
 	     -s -d @tests/message.json \
          "http://127.0.0.1:8080/event"
-.PHONY: post
+.PHONY: event-test
 
 process-test: image ## Submits process test to local service
 	curl -i -X POST -H "Content-Type: application/json" \
@@ -90,6 +90,10 @@ image: ## Makes test image
 policy: ## Creates k8s admission policies based on the current config
 	policy/policy-from-template
 .PHONY: policy
+
+policy-test: ## Creates k8s admission policies based on the current config
+	tools/policy-tester --policy policy/sbom-attestation-policy.yaml --image $(shell cat tests/test-digest.txt)
+.PHONY: policy-test
 
 build: ## Builds, signs and publishes new image
 	tools/build

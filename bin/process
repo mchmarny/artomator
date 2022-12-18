@@ -72,7 +72,7 @@ cosign verify --key $SIGN_KEY $IMAGE_DIGEST
 # generate SBOM from image and attach it as attestation to the image
 syft -q packages -o "${DO_SBOM}-json" $IMAGE_DIGEST | jq --compact-output > $CONTEXT/sbom.json
 cosign attest --predicate $CONTEXT/sbom.json --type $DO_SBOM --key $SIGN_KEY $IMAGE_DIGEST
-cosign verify-attestation --type=$DO_SBOM --key $SIGN_KEY $IMAGE_DIGEST | jq -r .payload | base64 -d | jq -r .predicateType
+cosign verify-attestation --type $DO_SBOM --key $SIGN_KEY $IMAGE_DIGEST | jq -r .payload | base64 -d | jq -r .predicateType
 
 # scan packages in SBOM for vulnerabilities and attach report as attestation to the image
 if [ "$DO_VULN" == true ] ; then

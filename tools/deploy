@@ -98,5 +98,5 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 gcloud pubsub subscriptions create gcr-sub \
   --topic gcr \
   --ack-deadline 600 \
-  --push-endpoint "${SERVICE_URL}/" \
+  --push-endpoint "${SERVICE_URL}/event" \
   --push-auth-service-account $SA_EMAIL
