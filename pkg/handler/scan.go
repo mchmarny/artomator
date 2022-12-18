@@ -27,7 +27,7 @@ func (h *EventHandler) ScanHandler(w http.ResponseWriter, r *http.Request) {
 
 	digest := r.URL.Query().Get(imageDigestQueryParamName)
 	if digest == "" {
-		writeError(w, errors.Errorf("validate %s parameter not set", imageDigestQueryParamName))
+		writeError(w, errors.Errorf("verify %s parameter not set", imageDigestQueryParamName))
 		return
 	}
 
@@ -59,12 +59,10 @@ func (h *EventHandler) ScanHandler(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	scanCmdArgs := append(h.scanCmdArgs, digest, maxSeverity, scanScope, dir)
-	out, err := runCommand(r.Context(), scanCmdArgs)
-	if err != nil {
+	if err := runCommand(r.Context(), scanCmdArgs); err != nil {
 		writeError(w, errors.Wrap(err, "error executing validation"))
+		return
 	}
 
-	log.Printf("scan done: %s\n", string(out))
-
-	writeMessage(w, "image scanned")
+	writeImageMessage(w, digest, "image scanned")
 }

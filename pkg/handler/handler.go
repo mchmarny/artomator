@@ -17,17 +17,18 @@ const (
 
 type result struct {
 	Status  string `json:"status"`
+	Image   string `json:"image,omitempty"`
 	Message string `json:"message,omitempty"`
 	Error   string `json:"error,omitempty"`
 }
 
-func NewEventHandler(processArgs, validateArgs, scanArgs []string, bucket string, cache cache.Cache) (*EventHandler, error) {
+func NewEventHandler(processArgs, verifyArgs, scanArgs []string, bucket string, cache cache.Cache) (*EventHandler, error) {
 	h := &EventHandler{
-		bucketName:      bucket,
-		cacheService:    cache,
-		processCmdArgs:  processArgs,
-		validateCmdArgs: validateArgs,
-		scanCmdArgs:     scanArgs,
+		bucketName:     bucket,
+		cacheService:   cache,
+		processCmdArgs: processArgs,
+		verifyCmdArgs:  verifyArgs,
+		scanCmdArgs:    scanArgs,
 	}
 
 	if err := h.Validate(); err != nil {
@@ -37,11 +38,11 @@ func NewEventHandler(processArgs, validateArgs, scanArgs []string, bucket string
 }
 
 type EventHandler struct {
-	bucketName      string
-	processCmdArgs  []string
-	validateCmdArgs []string
-	scanCmdArgs     []string
-	cacheService    cache.Cache
+	bucketName     string
+	processCmdArgs []string
+	verifyCmdArgs  []string
+	scanCmdArgs    []string
+	cacheService   cache.Cache
 }
 
 // Validate ensures the services has been created in valid state.
@@ -49,8 +50,8 @@ func (h *EventHandler) Validate() error {
 	if h.processCmdArgs == nil {
 		return errors.New("process command args not set")
 	}
-	if h.validateCmdArgs == nil {
-		return errors.New("validate command args not set")
+	if h.verifyCmdArgs == nil {
+		return errors.New("verify command args not set")
 	}
 	if h.cacheService == nil {
 		return errors.New("cache service is required")
@@ -69,6 +70,16 @@ func writeError(w http.ResponseWriter, err error) {
 	writeContent(w, result{
 		Status:  http.StatusText(http.StatusBadRequest),
 		Message: err.Error(),
+	})
+}
+
+func writeImageMessage(w http.ResponseWriter, digest, msg string) {
+	w.WriteHeader(http.StatusOK)
+	log.Println(msg)
+	writeContent(w, result{
+		Status:  http.StatusText(http.StatusOK),
+		Image:   digest,
+		Message: msg,
 	})
 }
 

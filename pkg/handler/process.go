@@ -36,7 +36,7 @@ func (h *EventHandler) ProcessHandler(w http.ResponseWriter, r *http.Request) {
 		writeError(w, err)
 		return
 	}
-	writeMessage(w, "request processed")
+	writeImageMessage(w, digest, "image processed")
 }
 
 func (h *EventHandler) process(ctx context.Context, digest string, args []string) error {
@@ -68,8 +68,7 @@ func (h *EventHandler) process(ctx context.Context, digest string, args []string
 	}()
 
 	cmdArgs := append(args, digest, dir)
-	out, err := runCommand(ctx, cmdArgs)
-	if err != nil {
+	if err := runCommand(ctx, cmdArgs); err != nil {
 		return errors.Wrapf(err, "error executing command: %s\n", strings.Join(cmdArgs, ","))
 	}
 
@@ -79,7 +78,6 @@ func (h *EventHandler) process(ctx context.Context, digest string, args []string
 		}
 	}
 
-	log.Printf("done: %s\n", string(out))
 	return nil
 }
 
@@ -99,16 +97,16 @@ func parseSHA(uri string) (string, error) {
 	return parts[1], nil
 }
 
-func runCommand(ctx context.Context, args []string) ([]byte, error) {
+func runCommand(ctx context.Context, args []string) error {
 	c := exec.CommandContext(ctx, "/bin/bash", args...)
-	c.Stderr = os.Stderr
-	out, err := c.Output()
-	if err != nil {
-		return nil, errors.Wrapf(err, "error executing: %s",
-			strings.Join(args, " "))
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stdout
+
+	if err := c.Run(); err != nil {
+		return errors.Wrapf(err, "error executing cmd: %s", strings.Join(args, " "))
 	}
-	log.Println(string(out))
-	return out, nil
+
+	return nil
 }
 
 func makeFolder(sha string) (string, error) {

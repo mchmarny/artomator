@@ -6,14 +6,14 @@ PROJECT_ID=$1
 SIGN_KEY=$2
 IMAGE_DIGEST=$3 # image (registry/image@sha:*** or ar/registry/image@sha:***)
 SBOM_FMT=$4 # spdx or cyclonedx
-CONTEXT=$5 # dir path
+TARGET=$5 # target path for SBOM
 
 # check required input parameters
 [ -z "$IMAGE_DIGEST" ] && echo "arg IMAGE_DIGEST not set\n" && exit 1
 [ -z "$PROJECT_ID" ] && echo "arg PROJECT_ID not set\n" && exit 1
 [ -z "$SIGN_KEY" ] && echo "arg SIGN_KEY not set\n" && exit 1
 [ -z "$SBOM_FMT" ] && echo "arg SBOM_FMT not set\n" && exit 1
-[ -z "$CONTEXT" ] && echo "arg CONTEXT not set\n" && exit 1
+[ -z "$TARGET" ] && echo "arg TARGET not set\n" && exit 1
 
 # parse registry from image 
 REGISTRY=$(echo $IMAGE_DIGEST | cut -d'/' -f 1)
@@ -30,7 +30,7 @@ echo "DIGEST:   $IMAGE_DIGEST"
 echo "REGISTRY: $REGISTRY"
 echo "SHA:      $IMG_SHA"
 echo "SBOM:     $SBOM_FMT ($SBOM_CYCLON, $SBOM_SPDX)"
-echo "CONTEXT:  $CONTEXT"
+echo "TARGET:   $TARGET"
 
 # confgure gcloud 
 gcloud auth configure-docker $REGISTRY --quiet
@@ -40,7 +40,7 @@ gcloud config set project $PROJECT_ID
 # if sbom format is not set to valid value then exit
 if [ "$SBOM_FMT" != "$SBOM_CYCLON" ] && [ "$SBOM_FMT" != "$SBOM_SPDX" ] ; then
     echo "skipping: ${IMAGE_DIGEST} (null or unsuported SBOM format: '${SBOM_FMT}'"
-    exit 0
+    exit 1
 fi
 
 echo "start processing: ${IMAGE_DIGEST}"
@@ -50,10 +50,12 @@ if [ ! -f cosign.pub ]; then
     cosign generate-key-pair --kms $SIGN_KEY
 fi
 
-# verify image
-cosign verify --key $SIGN_KEY $IMAGE_DIGEST
-
 # verify SBOM
-cosign verify-attestation --type=$SBOM_FMT --key $SIGN_KEY $IMAGE_DIGEST | jq -r .payload | base64 -d | jq -r .predicate.Data > $CONTEXT/sbom-out.json
+cosign verify-attestation \
+    --type=$SBOM_FMT \
+    --key $SIGN_KEY \
+    --enforce-sct \
+    --timeout 9m45s \
+    $IMAGE_DIGEST | jq -r > $TARGET
 
 echo "finished processing: ${IMAGE_DIGEST}"

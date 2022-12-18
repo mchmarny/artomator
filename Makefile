@@ -39,20 +39,20 @@ server: ## Runs previsouly built server binary
 	./app 
 .PHONY: server
 
-event-test: image ## Submits events test to local service
+event-test: ## Submits events test to local service
 	curl -i -X POST -H "Content-Type: application/json" \
 	     -s -d @tests/message.json \
          "http://127.0.0.1:8080/event"
 .PHONY: post
 
-process-test: image ## Submits process test to local service
+process-test: ## Submits process test to local service
 	curl -i -X POST -H "Content-Type: application/json" \
          "http://127.0.0.1:8080/process?digest=$(shell cat tests/test-digest.txt)"
 .PHONY: patch
 
-valid-test: image process-test ## Submits validation test GET to local service
+verify-test: ## Submits verify test to local service
 	curl -i -X POST -H "Content-Type: application/json" \
-         "http://127.0.0.1:8080/validate?format=spdx&digest=$(shell cat tests/test-digest.txt)"
+         "http://127.0.0.1:8080/verify?format=spdx&digest=$(shell cat tests/test-digest.txt)"
 .PHONY: get
 
 scan-test: image ## Submits scan test to local service

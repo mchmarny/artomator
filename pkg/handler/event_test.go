@@ -31,19 +31,19 @@ const (
 )
 
 func TestEventHandlerWithInvalidEvent(t *testing.T) {
-	runEventTest(t, invalidEvent, http.StatusOK)
+	runEventTest(t, invalidEvent)
 }
 func TestEventHandlerWithValidEvent(t *testing.T) {
-	runEventTest(t, validEvent, http.StatusOK)
+	runEventTest(t, validEvent)
 }
 func TestEventHandlerWithSignatureEvent(t *testing.T) {
-	runEventTest(t, sigEvent, http.StatusOK)
+	runEventTest(t, sigEvent)
 }
 func TestEventHandlerWithAttestationEvent(t *testing.T) {
-	runEventTest(t, attEvent, http.StatusOK)
+	runEventTest(t, attEvent)
 }
 
-func runEventTest(t *testing.T, event string, expectedStatusCode int) {
+func runEventTest(t *testing.T, event string) {
 	b, err := json.Marshal(pubsub.GetPubSubMessage("test", event))
 	if err != nil {
 		t.Fatal(err)
