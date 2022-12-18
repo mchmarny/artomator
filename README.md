@@ -71,8 +71,9 @@ This will:
 * Create artifact registry (`artomator`)
 * Configure KMS key (`keyRings/artomator/cryptoKeys/artomator-signer`)
 * PubSub topic (`gcr`) and subscription to that topic (`gcr-sub`)
-* Deploy Cloud Run service (`artomator`) to process the registry events
+* Deploy Cloud Run service (`artomator`) along with the `redis` dependency 
 
+> To build your own `artomator` image see the [build your own](#build-your-own) section. 
 
 ## verify processed image
 
@@ -157,12 +158,40 @@ If the required attestation for SPDX formatted SBOM (`https://spdx.dev/Document`
 
 ```json
 {
-  "status":"OK",
-  "image":"us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:b5aeb53064773ae3f375577a9cf6fa27a80bbf89d975b16f37d78ebd4c5ad430",
-  "message":"image verified"
+  "status": "OK",
+  "image": "us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:b5aeb53064773ae3f375577a9cf6fa27a80bbf89d975b16f37d78ebd4c5ad430",
+  "message": "image verified"
 }
 ```
 
+## vulnerabilities 
+
+You can also use `artomator` to scan any image in your GCP project's Artifact Registry. Whether that image was processed before by `artomator` or not. 
+
+```shell
+curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
+     -H "Content-Type: application/json" -i -X POST \
+     -H "X-Goog-User-Project: ${PROJECT_ID}" \
+     "${SERVICE_URL}/scan?max-vuln-severity=${MAX_SEVERITY}&digest=${IMAGE_DIGEST}"
+```
+
+If vulnerability is found in the image equal or higher than the `MAX_SEVERITY` parameter, `artomator` will return `400` HTTP status. The supported severity levels are: 
+
+* `unknown`
+* `low`
+* `medium`
+* `high`
+* `critical`
+
+The response from the `/scan` query will look something like this:
+
+```json
+{
+  "status": "OK",
+  "image": "us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:b5aeb53064773ae3f375577a9cf6fa27a80bbf89d975b16f37d78ebd4c5ad430",
+  "message": "image valid"
+}
+```
 
 ## build your own
 
