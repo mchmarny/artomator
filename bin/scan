@@ -38,10 +38,10 @@ if [ ! -f cosign.pub ]; then
 fi
 
 trivy image $IMAGE_DIGEST \
-    --format json 
+    --format json \
     --security-checks vuln \
     --timeout 10m \
-    --severity $VULN_SEVERITY \
+    --severity "${VULN_SEVERITY}" | \
     jq --compact-output > $TARGET
 
 echo "finished processing: $IMAGE_DIGEST"

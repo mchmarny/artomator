@@ -39,13 +39,13 @@ server: ## Runs previsouly built server binary
 	./app 
 .PHONY: server
 
-event-test: ## Submits events test to local service
+event-test: image ## Submits events test to local service
 	curl -i -X POST -H "Content-Type: application/json" \
 	     -s -d @tests/message.json \
          "http://127.0.0.1:8080/event"
 .PHONY: post
 
-process-test: ## Submits process test to local service
+process-test: image ## Submits process test to local service
 	curl -i -X POST -H "Content-Type: application/json" \
          "http://127.0.0.1:8080/process?digest=$(shell cat tests/test-digest.txt)"
 .PHONY: patch
@@ -55,9 +55,14 @@ verify-test: ## Submits verify test to local service
          "http://127.0.0.1:8080/verify?format=spdx&digest=$(shell cat tests/test-digest.txt)"
 .PHONY: get
 
+verify-test-err: image ## Submits verify test to local service
+	curl -i -X POST -H "Content-Type: application/json" \
+         "http://127.0.0.1:8080/verify?format=spdx&digest=$(shell cat tests/test-digest.txt)"
+.PHONY: get
+
 scan-test: ## Submits scan test to local service
 	curl -i -X POST -H "Content-Type: application/json" \
-         "http://127.0.0.1:8080/scan?severity=low&scope=squashed&digest=$(shell cat tests/test-digest.txt)"
+         "http://127.0.0.1:8080/scan?max-vuln-severity=unknown&digest=$(shell cat tests/test-digest.txt)"
 .PHONY: get
 
 cmd: ## Runs bash on latest artomator image
