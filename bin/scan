@@ -5,17 +5,15 @@ set -o errexit
 PROJECT_ID=$1
 SIGN_KEY=$2
 IMAGE_DIGEST=$3 # image (registry/image@sha:*** or ar/registry/image@sha:***)
-MAX_SEVERITY=$4 # negligible low medium high critical
-SCOPE=$5 # all-layers, squashed
-TARGET=$6 # target path for report
+VULN_SEVERITY=$4 # UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+TARGET=$5 # target path for report
 
 # check required input parameters
 [ -z "$IMAGE_DIGEST" ] && echo "arg IMAGE_DIGEST not set\n" && exit 1
 [ -z "$PROJECT_ID" ] && echo "arg PROJECT_ID not set\n" && exit 1
 [ -z "$SIGN_KEY" ] && echo "arg SIGN_KEY not set\n" && exit 1
-[ -z "$MAX_SEVERITY" ] && echo "arg MAX_SEVERITY not set\n" && exit 1
+[ -z "$VULN_SEVERITY" ] && echo "arg VULN_SEVERITY not set\n" && exit 1
 [ -z "$TARGET" ] && echo "arg TARGET not set\n" && exit 1
-[ -z "$SCOPE" ] && SCOPE="squashed"
 
 # parse registry from image 
 REGISTRY=$(echo $IMAGE_DIGEST | cut -d'/' -f 1)
@@ -25,7 +23,7 @@ echo "DIGEST:   $IMAGE_DIGEST"
 echo "PROJECT:  $PROJECT_ID"
 echo "KEY:      $SIGN_KEY"
 echo "REGISTRY: $REGISTRY"
-echo "SEVERITY: $MAX_SEVERITY"
+echo "SEVERITY: $VULN_SEVERITY"
 echo "TARGET:   $TARGET"
 
 # confgure gcloud 
@@ -39,7 +37,11 @@ if [ ! -f cosign.pub ]; then
     cosign generate-key-pair --kms $SIGN_KEY
 fi
 
-trivy image $IMAGE_DIGEST --format json --security-checks config --timeout 5m | \
+trivy image $IMAGE_DIGEST \
+    --format json 
+    --security-checks vuln \
+    --timeout 10m \
+    --severity $VULN_SEVERITY \
     jq --compact-output > $TARGET
 
 echo "finished processing: $IMAGE_DIGEST"

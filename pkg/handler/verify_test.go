@@ -19,10 +19,5 @@ func TestValidationHandler(t *testing.T) {
 	q.Add("digest", "region.pkg.dev/project/artomator/artomator@sha256:123")
 	req.URL.RawQuery = q.Encode()
 
-	checkStatus(t, req, h.VerifyHandler, http.StatusOK)
-
-	q.Add("format", "spdx")
-	req.URL.RawQuery = q.Encode()
-
-	checkStatus(t, req, h.VerifyHandler, http.StatusOK)
+	checkStatus(t, req, h.VerifyHandler, http.StatusBadRequest)
 }

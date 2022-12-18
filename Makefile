@@ -60,6 +60,10 @@ scan-test: ## Submits scan test to local service
          "http://127.0.0.1:8080/scan?severity=low&scope=squashed&digest=$(shell cat tests/test-digest.txt)"
 .PHONY: get
 
+cmd: ## Runs bash on latest artomator image
+	docker container run --rm -it --entrypoint /bin/bash $(IMG_URI)
+.PHONY: cmd
+
 upgrade: ## Upgrades all dependancies 
 	go get -d -u ./...
 	go mod tidy

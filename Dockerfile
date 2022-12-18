@@ -1,19 +1,23 @@
 ARG BUILD_BASE=golang:1.19.4
 ARG FINAL_BASE=alpine:3.17
+ARG VERSION=v0.0.1-default
+ARG USER=artomator
 
 # BUILD
 FROM $BUILD_BASE as builder
 WORKDIR /src/
 WORKDIR /src/
 COPY . /src/
-ARG VERSION=v0.0.1-default
-ENV VERSION=${VERSION} GO111MODULE=on
+ARG VERSION
+ENV VERSION=$VERSION GO111MODULE=on
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath \
     -ldflags="-w -s -X main.version=${VERSION} -extldflags '-static'" \
     -a -mod vendor -o server ./cmd/server/main.go
 
 # RUN
 FROM $FINAL_BASE
+ARG VERSION
+LABEL artomator.version="${VERSION}"
 COPY --from=builder /src/server /app/
 COPY --from=builder /src/bin /app/
 WORKDIR /app

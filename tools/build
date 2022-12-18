@@ -12,8 +12,7 @@ if [ ! -f cosign.pub ]; then
 fi
 
 # Build and push image
-docker build --no-cache \
-             --build-arg VERSION=$VERSION \
+docker build --build-arg VERSION=$VERSION \
              --platform linux/amd64 \
              -t $IMAGE_URI \
              .
@@ -32,6 +31,6 @@ cosign attest --predicate sbom.json --type spdx --key $SIGN_KEY $IMAGE_DIGEST
 cosign verify-attestation --type=spdx  --key $SIGN_KEY $IMAGE_DIGEST | jq -r .payload | base64 -d | jq -r .predicateType
 
 # Scan packages in SBOM for vulnerabilities and attach report as attestation to the image
-trivy image $IMAGE_DIGEST --format json --security-checks config | jq --compact-output > vuln.json
+trivy image $IMAGE_DIGEST --format json --security-checks vuln --severity "MEDIUM,HIGH,CRITICAL" | jq --compact-output > vuln.json
 cosign attest --predicate vuln.json --type vuln --key $SIGN_KEY $IMAGE_DIGEST
 cosign verify-attestation --type=vuln  --key $SIGN_KEY $IMAGE_DIGEST | jq -r .payload | base64 -d | jq -r .predicateType

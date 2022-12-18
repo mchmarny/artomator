@@ -17,13 +17,6 @@ const (
 	expectedAttestationPayloadType = "application/vnd.in-toto+json"
 )
 
-type attestation struct {
-	PayloadType string `json:"payloadType"`
-	Signatures  []struct {
-		Signature string `json:"sig"`
-	} `json:"signatures"`
-}
-
 func (h *EventHandler) VerifyHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	log.Println("verifying request...")
@@ -75,6 +68,13 @@ func (h *EventHandler) VerifyHandler(w http.ResponseWriter, r *http.Request) {
 	writeImageMessage(w, digest, "image verified")
 }
 
+type attestation struct {
+	PayloadType string `json:"payloadType"`
+	Signatures  []struct {
+		Signature string `json:"sig"`
+	} `json:"signatures"`
+}
+
 func validateAttestation(path string) error {
 	if path == "" {
 		return errors.New("path required")
@@ -95,7 +95,7 @@ func validateAttestation(path string) error {
 	}
 
 	if len(att.Signatures) < 1 {
-		return errors.New("attestation missing sigantures")
+		return errors.New("attestation missing signatures")
 	}
 
 	return nil
