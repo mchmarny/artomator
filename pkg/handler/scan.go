@@ -19,11 +19,6 @@ func (h *EventHandler) ScanHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	log.Println("processing scan request...")
 
-	if r.Method != http.MethodPost {
-		writeError(w, errors.Errorf("method %s not supported, expected POST", r.Method))
-		return
-	}
-
 	digest := r.URL.Query().Get(imageDigestQueryParamName)
 	if digest == "" {
 		writeError(w, errors.Errorf("verify %s parameter not set", imageDigestQueryParamName))

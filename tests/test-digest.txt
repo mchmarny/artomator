@@ -1,1 +1,1 @@
-us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:b5aeb53064773ae3f375577a9cf6fa27a80bbf89d975b16f37d78ebd4c5ad430
+us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:a84e54cfc9bdd9f17de597910496b7dd6bada0f9598f1559e55697ae942714ad

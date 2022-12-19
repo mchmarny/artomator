@@ -19,18 +19,18 @@ TARGET=$5 # target path for report
 REGISTRY=$(echo $IMAGE_DIGEST | cut -d'/' -f 1)
 
 # print run variables 
-echo "DIGEST:   $IMAGE_DIGEST"
-echo "PROJECT:  $PROJECT_ID"
-echo "KEY:      $SIGN_KEY"
-echo "REGISTRY: $REGISTRY"
-echo "SEVERITY: $VULN_SEVERITY"
-echo "TARGET:   $TARGET"
+echo "
+DIGEST:   $IMAGE_DIGEST
+PROJECT:  $PROJECT_ID
+KEY:      $SIGN_KEY
+REGISTRY: $REGISTRY
+SEVERITY: $VULN_SEVERITY
+TARGET:   $TARGET
+"
 
 # confgure gcloud 
 gcloud auth configure-docker $REGISTRY --quiet --no-user-output-enabled
 gcloud config set project $PROJECT_ID --quiet --no-user-output-enabled
-
-echo "start processing: ${IMAGE_DIGEST}"
 
 # generate public key-pair from KMS if one does not exist 
 if [ ! -f cosign.pub ]; then
@@ -43,5 +43,3 @@ trivy image $IMAGE_DIGEST \
     --timeout 10m \
     --severity "${VULN_SEVERITY}" | \
     jq --compact-output > $TARGET
-
-echo "finished processing: $IMAGE_DIGEST"

@@ -14,7 +14,7 @@ func getTestHandler(t *testing.T) *EventHandler {
 		"echo",
 		"test",
 	}
-	h, err := NewEventHandler(a, a, a, "", cache.NewInMemoryCache())
+	h, err := NewEventHandler(a, a, a, a, "", cache.NewInMemoryCache())
 	if err != nil {
 		t.Fatal(err)
 	}

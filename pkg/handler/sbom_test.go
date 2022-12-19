@@ -5,22 +5,22 @@ import (
 	"testing"
 )
 
-func TestProcessHandler(t *testing.T) {
-	req, err := http.NewRequest(http.MethodPost, "/process", nil)
+func TestSBOMHandler(t *testing.T) {
+	req, err := http.NewRequest(http.MethodPost, "/sbom", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	h := getTestHandler(t)
 
-	checkStatus(t, req, h.ProcessHandler, http.StatusBadRequest)
+	checkStatus(t, req, h.SBOMHandler, http.StatusBadRequest)
 
 	q := req.URL.Query()
 	q.Add("format", "spdx")
 	q.Add("digest", "region.pkg.dev/project/artomator/artomator@sha256:123")
 	req.URL.RawQuery = q.Encode()
 
-	checkStatus(t, req, h.ProcessHandler, http.StatusOK)
+	checkStatus(t, req, h.SBOMHandler, http.StatusOK)
 }
 
 func TestSHAParser(t *testing.T) {

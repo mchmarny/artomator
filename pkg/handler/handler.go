@@ -22,13 +22,14 @@ type result struct {
 	Error   string `json:"error,omitempty"`
 }
 
-func NewEventHandler(processArgs, verifyArgs, scanArgs []string, bucket string, cache cache.Cache) (*EventHandler, error) {
+func NewEventHandler(eventArgs, verifyArgs, scanArgs, sbomArgs []string, bucket string, cache cache.Cache) (*EventHandler, error) {
 	h := &EventHandler{
-		bucketName:     bucket,
-		cacheService:   cache,
-		processCmdArgs: processArgs,
-		verifyCmdArgs:  verifyArgs,
-		scanCmdArgs:    scanArgs,
+		bucketName:    bucket,
+		cacheService:  cache,
+		eventCmdArgs:  eventArgs,
+		verifyCmdArgs: verifyArgs,
+		scanCmdArgs:   scanArgs,
+		sbomCmdArgs:   sbomArgs,
 	}
 
 	if err := h.Validate(); err != nil {
@@ -38,20 +39,27 @@ func NewEventHandler(processArgs, verifyArgs, scanArgs []string, bucket string, 
 }
 
 type EventHandler struct {
-	bucketName     string
-	processCmdArgs []string
-	verifyCmdArgs  []string
-	scanCmdArgs    []string
-	cacheService   cache.Cache
+	bucketName    string
+	eventCmdArgs  []string
+	verifyCmdArgs []string
+	scanCmdArgs   []string
+	sbomCmdArgs   []string
+	cacheService  cache.Cache
 }
 
 // Validate ensures the services has been created in valid state.
 func (h *EventHandler) Validate() error {
-	if h.processCmdArgs == nil {
-		return errors.New("process command args not set")
+	if h.eventCmdArgs == nil {
+		return errors.New("event command args not set")
 	}
 	if h.verifyCmdArgs == nil {
 		return errors.New("verify command args not set")
+	}
+	if h.scanCmdArgs == nil {
+		return errors.New("scan command args not set")
+	}
+	if h.sbomCmdArgs == nil {
+		return errors.New("sbom command args not set")
 	}
 	if h.cacheService == nil {
 		return errors.New("cache service is required")
@@ -68,8 +76,8 @@ func writeError(w http.ResponseWriter, err error) {
 	w.WriteHeader(http.StatusBadRequest)
 	log.Println(err)
 	writeContent(w, result{
-		Status:  http.StatusText(http.StatusBadRequest),
-		Message: err.Error(),
+		Status: http.StatusText(http.StatusBadRequest),
+		Error:  err.Error(),
 	})
 }
 

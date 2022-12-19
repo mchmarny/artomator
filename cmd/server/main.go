@@ -16,11 +16,12 @@ import (
 )
 
 const (
-	serviceName           = "artomator"
-	processCommandDefault = "process"
-	verifyCommandDefault  = "verify"
-	scanCommandDefault    = "scan"
-	addressDefault        = ":8080"
+	serviceName          = "artomator"
+	eventCommandDefault  = "event"
+	sbomCommandDefault   = "sbom"
+	verifyCommandDefault = "verify"
+	scanCommandDefault   = "scan"
+	addressDefault       = ":8080"
 
 	closeTimeout = 3
 	readTimeout  = 10
@@ -30,9 +31,10 @@ const (
 var (
 	version = "v0.0.1-default"
 
-	processCommandName = processCommandDefault
-	verifyCommandName  = verifyCommandDefault
-	scanCommandName    = scanCommandDefault
+	eventCommandName  = eventCommandDefault
+	verifyCommandName = verifyCommandDefault
+	scanCommandName   = scanCommandDefault
+	sbomCommandName   = sbomCommandDefault
 
 	projectID  = os.Getenv("PROJECT_ID")
 	signingKey = os.Getenv("SIGN_KEY")
@@ -62,10 +64,11 @@ func main() {
 		log.Fatalf("error while creating cache: %v", err)
 	}
 
-	processArgs := []string{processCommandName, projectID, signingKey}
+	eventArgs := []string{eventCommandName, projectID, signingKey}
 	verifyArgs := []string{verifyCommandName, projectID, signingKey}
 	scanArgs := []string{scanCommandName, projectID, signingKey}
-	h, err := handler.NewEventHandler(processArgs, verifyArgs, scanArgs, bucketName, c)
+	sbomArgs := []string{sbomCommandName, projectID, signingKey}
+	h, err := handler.NewEventHandler(eventArgs, verifyArgs, scanArgs, sbomArgs, bucketName, c)
 	if err != nil {
 		log.Fatalf("error while creating event handler: %v", err)
 	}
@@ -76,7 +79,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", h.HandlerDefault)
 	mux.HandleFunc("/event", h.EventHandler)
-	mux.HandleFunc("/process", h.ProcessHandler)
+	mux.HandleFunc("/sbom", h.SBOMHandler)
 	mux.HandleFunc("/verify", h.VerifyHandler)
 	mux.HandleFunc("/scan", h.ScanHandler)
 

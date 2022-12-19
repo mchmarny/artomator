@@ -1,0 +1,38 @@
+{
+    "_type": "https://in-toto.io/Statement/v0.1",
+    "predicateType": "https://cyclonedx.org/schema",
+    "subject": [
+        {
+            "name": "us-west1-docker.pkg.dev/cloudy-demos/artomator/tester",
+            "digest": {
+                "sha256": "0cd15f675e83a763022ef96d415c1a2da5ec544b65520b3c77029954afddc38a"
+            }
+        }
+    ],
+    "predicate": {
+        "Data": {
+            "bomFormat": "CycloneDX",
+            "components": [],
+            "metadata": {
+                "component": {
+                    "bom-ref": "23ffcd1aa14dd9b0",
+                    "name": "us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:0cd15f675e83a763022ef96d415c1a2da5ec544b65520b3c77029954afddc38a",
+                    "type": "container",
+                    "version": "sha256:f6c61b0362a2378b09c4284777247afb139e6a68ab44df39909601d37782eba5"
+                },
+                "timestamp": "2022-12-18T16:09:34-08:00",
+                "tools": [
+                    {
+                        "name": "syft",
+                        "vendor": "anchore",
+                        "version": "0.62.1"
+                    }
+                ]
+            },
+            "serialNumber": "urn:uuid:1d0f4a4a-28ec-422e-a92e-4be7bf351aad",
+            "specVersion": "1.4",
+            "version": 1
+        },
+        "Timestamp": ""
+    }
+}

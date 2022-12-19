@@ -6,6 +6,8 @@ TEST_PRJ =cloudy-demos
 TEST_KEY =gcpkms://projects/cloudy-demos/locations/us-west1/keyRings/artomator/cryptoKeys/artomator-signer/cryptoKeyVersions/1
 TEST_BCT =cloudy-demos-artomator
 
+export PATH := bin:$(PATH)
+
 all: help
 
 info: ## Prints the current version
@@ -45,25 +47,25 @@ event-test: image ## Submits events test to local service
          "http://127.0.0.1:8080/event"
 .PHONY: event-test
 
-process-test: image ## Submits process test to local service
-	curl -i -X POST -H "Content-Type: application/json" \
-         "http://127.0.0.1:8080/process?digest=$(shell cat tests/test-digest.txt)"
-.PHONY: patch
+sbom-test: image ## Submits process test to local service
+	curl -i -H "Content-Type: application/json" \
+         "http://127.0.0.1:8080/sbom?digest=$(shell cat tests/test-digest.txt)"
+.PHONY: sbom-test
 
 verify-test: ## Submits verify test to local service
-	curl -i -X POST -H "Content-Type: application/json" \
-         "http://127.0.0.1:8080/verify?format=spdx&digest=$(shell cat tests/test-digest.txt)"
-.PHONY: get
+	curl -sS -H "Content-Type: application/json" \
+         "http://127.0.0.1:8080/verify?type=spdx&digest=$(shell cat tests/test-digest.txt)" | jq -r .
+.PHONY: verify-test
 
 verify-test-err: image ## Submits verify test to local service
-	curl -i -X POST -H "Content-Type: application/json" \
-         "http://127.0.0.1:8080/verify?format=spdx&digest=$(shell cat tests/test-digest.txt)"
-.PHONY: get
+	curl -i -H "Content-Type: application/json" \
+         "http://127.0.0.1:8080/verify?type=spdx&digest=$(shell cat tests/test-digest.txt)"
+.PHONY: verify-test-err
 
 scan-test: ## Submits scan test to local service
-	curl -i -X POST -H "Content-Type: application/json" \
+	curl -i -H "Content-Type: application/json" \
          "http://127.0.0.1:8080/scan?max-vuln-severity=unknown&digest=$(shell cat tests/test-digest.txt)"
-.PHONY: get
+.PHONY: scan-test
 
 cmd: ## Runs bash on latest artomator image
 	docker container run --rm -it --entrypoint /bin/bash $(IMG_URI)

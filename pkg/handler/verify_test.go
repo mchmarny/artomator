@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestValidationHandler(t *testing.T) {
+func TestVerificationHandler(t *testing.T) {
 	req, err := http.NewRequest(http.MethodPost, "/verify", nil)
 	if err != nil {
 		t.Fatal(err)
@@ -20,4 +20,13 @@ func TestValidationHandler(t *testing.T) {
 	req.URL.RawQuery = q.Encode()
 
 	checkStatus(t, req, h.VerifyHandler, http.StatusBadRequest)
+}
+
+func TestPredicateParser(t *testing.T) {
+	if _, err := validateAttestation("../../tests/attestation.json"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := validateAttestation("../../tests/empty.json"); err == nil {
+		t.Fatal(err)
+	}
 }
