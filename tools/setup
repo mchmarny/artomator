@@ -21,9 +21,10 @@ gcloud services enable \
   container.googleapis.com \
   containerregistry.googleapis.com \
   containerscanning.googleapis.com \
-  pubsub.googleapis.com
+  monitoring.googleapis.com \
+  pubsub.googleapis.com \
   redis.googleapis.com \
-  run.googleapis.com \
+  run.googleapis.com
 
 # key to sign images
 gcloud kms keyrings create $ROOT_NAME \

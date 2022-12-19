@@ -14,11 +14,8 @@ set -o pipefail
 SERVICE_URL=$(gcloud run services describe $ROOT_NAME \
   --region $REGION --format="value(status.url)")
 
-curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
+curl -sS -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
      -H "Content-Type: application/json" \
      -H "X-Goog-User-Project: ${PROJECT_ID}" \
-     "${SERVICE_URL}/process?digest=$(cat tests/test-digest.txt)"
-
-
-
+     "${SERVICE_URL}/sbom?digest=$(cat tests/test-digest.txt)" | jq -r .
 

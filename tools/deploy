@@ -36,6 +36,10 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 gcloud projects add-iam-policy-binding $PROJECT_ID \
      --member "serviceAccount:${SA_EMAIL}" \
      --role roles/cloudkms.signerVerifier
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+     --member "serviceAccount:${SA_EMAIL}" \
+     --role roles/monitoring.metricWriter
 	 
 # gcs 
 gcloud storage buckets create "gs://${GCS_BUCKET}" \

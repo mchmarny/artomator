@@ -6,12 +6,14 @@
 tmp
 tests/hello
 
+# node 
+tests/app/node_modules
+tests/app/package-lock.json
+
 # Coverage
 *.out
 
 # Binaries
-dist
-app
 server
 
 # Keys 

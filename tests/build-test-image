@@ -12,14 +12,14 @@ FMT="${SBOM_FORMAT_SPDX}"
 NOW=$(date +%s)
 
 # update the script as to ensure new image sha 
-sed -e "s/REPLACE/${NOW}/" tests/hello-template > tests/hello
+sed -e "s/REPLACE/${NOW}/" tests/app/template.js > tests/app/index.js
 
 TEST_IMAGE_URI="${IMAGE_REG}/tester:v1.2.${NOW}"
 echo $TEST_IMAGE_URI
 
 
 # Build and push image
-docker build -f tests/Dockerfile \
+docker build -f tests/app/Dockerfile \
              -t $TEST_IMAGE_URI \
              --label artomator-sbom=$FMT \
              --label artomator-vuln=true \

@@ -15,10 +15,6 @@ SERVICE_URL=$(gcloud run services describe $ROOT_NAME \
   --region $REGION --format="value(status.url)")
 
 curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
-     -H "Content-Type: application/json" -i -X POST \
+     -H "Content-Type: application/json" -sS -X POST \
      -H "X-Goog-User-Project: ${PROJECT_ID}" \
-     "${SERVICE_URL}/verify?format=spdx&digest=$(cat tests/test-digest.txt)"
-
-
-
-
+     "${SERVICE_URL}/verify?type=spdx&digest=$(cat tests/test-digest.txt)" | jq -r .
