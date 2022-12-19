@@ -14,6 +14,7 @@ import (
 	"github.com/mchmarny/artomator/pkg/cache"
 	"github.com/mchmarny/artomator/pkg/cmd"
 	"github.com/mchmarny/artomator/pkg/handler"
+	"github.com/mchmarny/artomator/pkg/metric"
 )
 
 const (
@@ -56,7 +57,16 @@ func main() {
 		log.Fatalf("error while creating cache: %v", err)
 	}
 
-	h, err := handler.NewHandler(bucketName, c,
+	m, err := metric.NewAPICounter(projectID)
+	if err != nil {
+		log.Fatalf("error while creating counter: %v", err)
+	}
+
+	if err := m.Count(ctx, metric.MakeMetricType("server/start"), 1, nil); err != nil {
+		log.Printf("unable to write metrics: %v", err)
+	}
+
+	h, err := handler.NewHandler(bucketName, c, m,
 		cmd.NewBashCommand(handler.CommandNameEvent, "event", projectID, signingKey),
 		cmd.NewBashCommand(handler.CommandNameSBOM, "sbom", projectID, signingKey),
 		cmd.NewBashCommand(handler.CommandNameVerify, "verify", projectID, signingKey),

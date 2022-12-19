@@ -10,6 +10,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/mchmarny/artomator/pkg/metric"
 	"github.com/pkg/errors"
 )
 
@@ -38,10 +39,20 @@ func (h *Handler) SBOMHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ri, err := getRegInfo(digest)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
 	m, err := h.processSBOM(r.Context(), digest)
 	if err != nil {
 		writeError(w, err)
 		return
+	}
+
+	if err := h.counter.Count(r.Context(), metric.MakeMetricType("sbom/processed"), 1, ri); err != nil {
+		log.Printf("unable to write metrics: %v", err)
 	}
 
 	writeContent(w, m)

@@ -7,11 +7,17 @@ import (
 
 	"github.com/mchmarny/artomator/pkg/cache"
 	"github.com/mchmarny/artomator/pkg/cmd"
+	"github.com/mchmarny/artomator/pkg/metric"
 )
 
 func getTestHandler(t *testing.T) *Handler {
 	testCmd := "echo"
-	h, err := NewHandler("", cache.NewInMemoryCache(),
+	c, err := metric.NewConsoleCounter()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	h, err := NewHandler("", cache.NewInMemoryCache(), c,
 		cmd.NewCommand(CommandNameEvent, testCmd),
 		cmd.NewCommand(CommandNameSBOM, testCmd),
 		cmd.NewCommand(CommandNameVerify, testCmd),
@@ -34,5 +40,41 @@ func checkStatus(t *testing.T, req *http.Request, f func(http.ResponseWriter, *h
 	handler.ServeHTTP(r, req)
 	if r.Code != status {
 		t.Errorf("handler returned unexpected status (want:%d, got:%d)", status, r.Code)
+	}
+}
+
+func TestRegistryInfo(t *testing.T) {
+	runRegistryTest(t,
+		"us-east1-docker.pkg.dev/my-project/my-repo/hello-world@sha256:6ec",
+		"us-east1-docker.pkg.dev")
+	runRegistryTest(t,
+		"us-east1-docker.pkg.dev/my-project/hello-world:v0.1.2",
+		"us-east1-docker.pkg.dev")
+
+	runRegistryNameTest(t,
+		"us-east1-docker.pkg.dev/my-project/my-repo/hello-world@sha256:6ec",
+		"my-project/my-repo")
+	runRegistryNameTest(t,
+		"us-east1-docker.pkg.dev/my-project/hello-world:v0.1.2",
+		"my-project")
+}
+
+func runRegistryTest(t *testing.T, uri, want string) {
+	v, err := parseRegistry(uri)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v != want {
+		t.Fatalf("expected: %s, got: %s", want, v)
+	}
+}
+
+func runRegistryNameTest(t *testing.T, uri, want string) {
+	v, err := parseRegistryName(uri)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v != want {
+		t.Fatalf("expected: %s, got: %s", want, v)
 	}
 }

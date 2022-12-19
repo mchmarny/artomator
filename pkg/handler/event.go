@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/mchmarny/artomator/pkg/metric"
 	"github.com/mchmarny/artomator/pkg/object"
 	"github.com/mchmarny/artomator/pkg/pubsub"
 	"github.com/pkg/errors"
@@ -61,6 +62,11 @@ func (h *Handler) EventHandler(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) processEvent(ctx context.Context, digest string) error {
 	log.Printf("processing digest: %s", digest)
 
+	ri, err := getRegInfo(digest)
+	if err != nil {
+		return errors.Wrap(err, "error invoking caching service")
+	}
+
 	sha, err := parseSHA(digest)
 	if err != nil {
 		return errors.Wrap(err, "error parsing process event sha")
@@ -73,6 +79,9 @@ func (h *Handler) processEvent(ctx context.Context, digest string) error {
 
 	if alreadyProcessed {
 		log.Printf("image already processed: %s\n", digest)
+		if err := h.counter.Count(ctx, metric.MakeMetricType("event/cached"), 1, ri); err != nil {
+			log.Printf("unable to write metrics: %v", err)
+		}
 		return nil
 	}
 
@@ -94,6 +103,10 @@ func (h *Handler) processEvent(ctx context.Context, digest string) error {
 		if err := object.Save(ctx, sha, h.bucket, dir); err != nil {
 			return errors.Wrapf(err, "error saving %s resulting artifacts from: %s", sha, dir)
 		}
+	}
+
+	if err := h.counter.Count(ctx, metric.MakeMetricType("event/processed"), 1, ri); err != nil {
+		log.Printf("unable to write metrics: %v", err)
 	}
 
 	return nil

@@ -31,16 +31,18 @@ TARGET:   $TARGET_DIR
 gcloud auth configure-docker $REGISTRY --quiet
 gcloud config set project $PROJECT_ID
 
-# get labels 
-trivy image $IMAGE_DIGEST \
+# get labels
+trivy image \
     --security-checks vuln \
+    --timeout 10m \
     --format json \
-    --timeout 10m > "${TARGET_DIR}/vuln.json" 
+    --output $TARGET_DIR/vuln.json \
+    $IMAGE_DIGEST
 
 # check if image has the sbom and vuln labels 
-DO_SBOM=$(cat "${TARGET_DIR}/vuln.json" | \
+DO_SBOM=$(cat $TARGET_DIR/vuln.json | \
     jq -r -e '( .Metadata.ImageConfig.config.Labels."artomator-sbom" // "false" )')
-DO_VULN=$(cat "${TARGET_DIR}/vuln.json" | \
+DO_VULN=$(cat $TARGET_DIR/vuln.json | \
     jq -r -e '( .Metadata.ImageConfig.config.Labels."artomator-vuln" // "false" )')
 
 echo "
@@ -63,5 +65,7 @@ cosign attest --predicate $TARGET_DIR/sbom.json --type $DO_SBOM --key $SIGN_KEY 
 
 # scan packages in SBOM for vulnerabilities and attach report as attestation to the image
 if [ "$DO_VULN" == true ] ; then
-    cosign attest --predicate "${TARGET_DIR}/vuln.json" --type vuln --key $SIGN_KEY $IMAGE_DIGEST
+    cosign attest --predicate $TARGET_DIR/vuln.json --type vuln --key $SIGN_KEY $IMAGE_DIGEST
 fi
+
+

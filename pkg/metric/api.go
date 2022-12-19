@@ -2,7 +2,8 @@ package metric
 
 import (
 	"context"
-	"math/rand"
+	"fmt"
+	"strings"
 	"time"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
@@ -13,21 +14,29 @@ import (
 	"google.golang.org/genproto/googleapis/api/monitoredres"
 )
 
-func NewCounter(project, metric string, labels map[string]string) (*Counter, error) {
-	return &Counter{
-		projectID:    project,
-		metric:       metric,
-		metricLabels: labels,
+type Counter interface {
+	Count(ctx context.Context, metric string, count int64, labels map[string]string) error
+}
+
+func NewAPICounter(project string) (Counter, error) {
+	return &APICounter{
+		projectID: project,
+		labels: map[string]string{
+			"project_id": project,
+		},
 	}, nil
 }
 
-type Counter struct {
-	projectID    string
-	metric       string
-	metricLabels map[string]string
+func MakeMetricType(v string) string {
+	return fmt.Sprintf("custom.googleapis.com/%s", strings.ToLower(v))
 }
 
-func (r *Counter) Count(ctx context.Context, resource string, resourceLabels map[string]string, count int64) error {
+type APICounter struct {
+	projectID string
+	labels    map[string]string
+}
+
+func (r *APICounter) Count(ctx context.Context, metricType string, count int64, labels map[string]string) error {
 	c, err := monitoring.NewMetricClient(ctx)
 	if err != nil {
 		return errors.Wrap(err, "error creating client")
@@ -36,16 +45,25 @@ func (r *Counter) Count(ctx context.Context, resource string, resourceLabels map
 	now := &timestamp.Timestamp{
 		Seconds: time.Now().Unix(),
 	}
+
+	if labels == nil {
+		labels = map[string]string{}
+	}
+
+	// HACK: prevents time series from being overwritten \
+	// for timespan which leads to errors on write.
+	labels["nanos"] = fmt.Sprintf("e-%d", now.AsTime().UnixMilli())
+
 	req := &monitoringpb.CreateTimeSeriesRequest{
 		Name: "projects/" + r.projectID,
 		TimeSeries: []*monitoringpb.TimeSeries{{
-			Metric: &metricpb.Metric{
-				Type:   r.metric,
-				Labels: r.metricLabels,
-			},
 			Resource: &monitoredres.MonitoredResource{
-				Type:   resource,
-				Labels: resourceLabels,
+				Type:   "global",
+				Labels: r.labels,
+			},
+			Metric: &metricpb.Metric{
+				Type:   metricType,
+				Labels: labels,
 			},
 			Points: []*monitoringpb.Point{{
 				Interval: &monitoringpb.TimeInterval{
@@ -54,7 +72,7 @@ func (r *Counter) Count(ctx context.Context, resource string, resourceLabels map
 				},
 				Value: &monitoringpb.TypedValue{
 					Value: &monitoringpb.TypedValue_Int64Value{
-						Int64Value: rand.Int63n(count),
+						Int64Value: count,
 					},
 				},
 			}},

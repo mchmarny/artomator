@@ -46,4 +46,5 @@ cosign verify-attestation \
     --enforce-sct \
     --timeout 10m \
     $IMAGE_DIGEST | \
-    jq -r .payload | base64 -d > $TARGET
+    jq -r .payload | \
+    base64 -d > $TARGET

@@ -38,5 +38,3 @@ EVENT_ENCODED_DAT=$(echo -ne ${EVENT_DATA} | base64)
 
 # update message 
 sed -e "s/EVENT_DATA/${EVENT_ENCODED_DAT}/g" tests/message-template.json > tests/message.json
-
-

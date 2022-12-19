@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/mchmarny/artomator/pkg/metric"
 	"github.com/pkg/errors"
 )
 
@@ -37,6 +38,12 @@ func (h *Handler) VerifyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ri, err := getRegInfo(digest)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
 	sha, err := parseSHA(digest)
 	if err != nil {
 		writeError(w, errors.Wrap(err, "error parsing process event sha"))
@@ -63,8 +70,15 @@ func (h *Handler) VerifyHandler(w http.ResponseWriter, r *http.Request) {
 	att, err := validateAttestation(predicatePath)
 	if err != nil {
 		log.Printf("error validating attestation: %v", err)
+		if err := h.counter.Count(r.Context(), metric.MakeMetricType("verify/failed"), 1, ri); err != nil {
+			log.Printf("unable to write metrics: %v", err)
+		}
 		writeError(w, errors.Errorf("image does not have a predicate of type: %s", predicateType))
 		return
+	}
+
+	if err := h.counter.Count(r.Context(), metric.MakeMetricType("verify/processed"), 1, ri); err != nil {
+		log.Printf("unable to write metrics: %v", err)
 	}
 
 	writeContent(w, att)

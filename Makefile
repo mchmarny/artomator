@@ -52,6 +52,11 @@ verify-test: ## Submits verify test to local service
          "http://127.0.0.1:8080/verify?type=spdx&digest=$(shell cat tests/test-digest.txt)" | jq -r .
 .PHONY: verify-test
 
+verify-vuln: ## Submits verify test to local service
+	curl -sS -H "Content-Type: application/json" \
+         "http://127.0.0.1:8080/verify?type=vuln&digest=$(shell cat tests/test-digest.txt)" | jq -r .
+.PHONY: verify-vuln
+
 verify-test-err: image ## Submits verify test to local service
 	curl -i -H "Content-Type: application/json" \
          "http://127.0.0.1:8080/verify?type=spdx&digest=$(shell cat tests/test-digest.txt)"
