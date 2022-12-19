@@ -2,44 +2,35 @@
 
 set -o errexit
 
-PROJECT_ID=$1
-SIGN_KEY=$2
-IMAGE_DIGEST=$3 # image (registry/image@sha:*** or ar/registry/image@sha:***)
-VULN_SEVERITY=$4 # UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
-TARGET=$5 # target path for report
+PRJ=$1
+IMG=$2 # image (registry/image@sha:*** or ar/registry/image@sha:***)
+DIR=${3:-.} # target dir path for the report or current folder
 
 # check required input parameters
-[ -z "$IMAGE_DIGEST" ] && echo "arg IMAGE_DIGEST not set\n" && exit 1
-[ -z "$PROJECT_ID" ] && echo "arg PROJECT_ID not set\n" && exit 1
-[ -z "$SIGN_KEY" ] && echo "arg SIGN_KEY not set\n" && exit 1
-[ -z "$VULN_SEVERITY" ] && echo "arg VULN_SEVERITY not set\n" && exit 1
-[ -z "$TARGET" ] && echo "arg TARGET not set\n" && exit 1
+[ -z "$PRJ" ] && echo "arg PRJ not set\n" && exit 1
+[ -z "$IMG" ] && echo "arg IMG not set\n" && exit 1
 
 # parse registry from image 
-REGISTRY=$(echo $IMAGE_DIGEST | cut -d'/' -f 1)
+REG=$(echo $IMG | cut -d'/' -f 1)
+SHA=$(echo $IMG | cut -d':' -f 2)
+
+REP="${DIR}/${SHA}-vuln.json"
 
 # print run variables 
 echo "
-DIGEST:   $IMAGE_DIGEST
-PROJECT:  $PROJECT_ID
-KEY:      $SIGN_KEY
-REGISTRY: $REGISTRY
-SEVERITY: $VULN_SEVERITY
-TARGET:   $TARGET
+PRJ: $PRJ
+REG: $REG
+IMG: $IMG
+SHA: $SHA
+REP: $REP
 "
 
 # confgure gcloud 
-gcloud auth configure-docker $REGISTRY --quiet --no-user-output-enabled
-gcloud config set project $PROJECT_ID --quiet --no-user-output-enabled
+gcloud auth configure-docker $REG --quiet
+gcloud config set project $PRJ --quiet
 
-# generate public key-pair from KMS if one does not exist 
-if [ ! -f cosign.pub ]; then
-    cosign generate-key-pair --kms $SIGN_KEY
-fi
-
-trivy image $IMAGE_DIGEST \
+trivy image $IMG \
     --format json \
     --security-checks vuln \
-    --timeout 10m \
-    --severity "${VULN_SEVERITY}" | \
-    jq --compact-output > $TARGET
+    --timeout 5m | \
+    jq --compact-output > $REP

@@ -12,15 +12,17 @@ func TestSBOMHandler(t *testing.T) {
 	}
 
 	h := getTestHandler(t)
+	if err = h.Validate(CommandNameEvent); err != nil {
+		t.Fatal(err)
+	}
 
 	checkStatus(t, req, h.SBOMHandler, http.StatusBadRequest)
 
 	q := req.URL.Query()
 	q.Add("format", "spdx")
-	q.Add("digest", "region.pkg.dev/project/artomator/artomator@sha256:123")
 	req.URL.RawQuery = q.Encode()
 
-	checkStatus(t, req, h.SBOMHandler, http.StatusOK)
+	checkStatus(t, req, h.SBOMHandler, http.StatusBadRequest)
 }
 
 func TestSHAParser(t *testing.T) {

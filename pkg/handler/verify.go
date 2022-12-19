@@ -13,11 +13,17 @@ import (
 const (
 	verifyPredicateTypeParamName = "type"
 	predicateTypeKey             = "predicateType"
+
+	CommandNameVerify = "verify"
 )
 
-func (h *EventHandler) VerifyHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) VerifyHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	log.Println("verifying request...")
+
+	if err := h.Validate(CommandNameVerify); err != nil {
+		log.Fatalf("service not configured")
+	}
 
 	digest := r.URL.Query().Get(imageDigestQueryParamName)
 	if digest == "" {
@@ -49,14 +55,15 @@ func (h *EventHandler) VerifyHandler(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	predicatePath := path.Join(dir, "predicate.json")
-	if err := runCommand(r.Context(), append(h.verifyCmdArgs, digest, predicateType, predicatePath)); err != nil {
-		writeError(w, errors.Wrap(err, "error executing verification"))
+	if err := h.commands[CommandNameVerify].Run(r.Context(), digest, predicateType, predicatePath); err != nil {
+		writeError(w, errors.Wrap(err, "error validating"))
 		return
 	}
 
 	att, err := validateAttestation(predicatePath)
 	if err != nil {
-		writeError(w, errors.Wrap(err, "image does not have a valid attestation"))
+		log.Printf("error validating attestation: %v", err)
+		writeError(w, errors.Errorf("image does not have a predicate of type: %s", predicateType))
 		return
 	}
 

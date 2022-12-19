@@ -12,6 +12,9 @@ func TestVerificationHandler(t *testing.T) {
 	}
 
 	h := getTestHandler(t)
+	if err = h.Validate(CommandNameEvent); err != nil {
+		t.Fatal(err)
+	}
 
 	checkStatus(t, req, h.VerifyHandler, http.StatusBadRequest)
 

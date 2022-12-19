@@ -6,19 +6,17 @@ import (
 	"testing"
 
 	"github.com/mchmarny/artomator/pkg/cache"
+	"github.com/mchmarny/artomator/pkg/cmd"
 )
 
-func getTestHandler(t *testing.T) *EventHandler {
-	a := []string{
-		"-c",
-		"echo",
-		"test",
-	}
-	h, err := NewEventHandler(a, a, a, a, "", cache.NewInMemoryCache())
+func getTestHandler(t *testing.T) *Handler {
+	testCmd := "echo"
+	h, err := NewHandler("", cache.NewInMemoryCache(),
+		cmd.NewCommand(CommandNameEvent, testCmd),
+		cmd.NewCommand(CommandNameSBOM, testCmd),
+		cmd.NewCommand(CommandNameVerify, testCmd),
+	)
 	if err != nil {
-		t.Fatal(err)
-	}
-	if err = h.Validate(); err != nil {
 		t.Fatal(err)
 	}
 	return h

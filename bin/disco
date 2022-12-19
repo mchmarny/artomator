@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -o errexit
+
+DIR=${1:-.} # target dir path for the report or current folder
+
+# for all active projects excluding folders
+for prj in $(gcloud projects list --format 'value(projectId)' --filter 'parent.type:organization AND lifecycleState:ACTIVE'); do
+  # where run service is anabled 
+  run=$(gcloud services list --project $prj --format 'value(name)' --filter 'config.name:"run.googleapis.com" AND state:ENABLED')
+  if [ -z "$run" ]; then continue; fi
+  # for all regions where run is supported 
+  for reg in  $(gcloud run regions list --project $prj --format "value(locationId)"); do
+    # list all services
+    for svc in $(gcloud run services list --project $prj --region $reg --format "value(metadata.name)"); do
+      # get the service image uri
+      img=$(gcloud run services describe artomator --project $prj --region $reg --format "value(image)")
+      # scan that image
+      bin/scan $prj $img $DIR
+    done
+  done
+done

@@ -158,40 +158,23 @@ If the required attestation for SPDX formatted SBOM (`https://spdx.dev/Document`
 
 ```json
 {
-  "status": "OK",
-  "image": "us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:b5aeb53064773ae3f375577a9cf6fa27a80bbf89d975b16f37d78ebd4c5ad430",
-  "message": "image verified"
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "creationInfo": {
+    "comment": "",
+    "created": "2022-12-19T14:54:19Z",
+    "creators": [
+      "Organization: Anchore, Inc",
+      "Tool: syft-0.62.1"
+    ],
+    "licenseListVersion": "3.18"
+  },
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "https://anchore.com/syft/image/us-west1-docker.pkg.dev/.../artomator/tester@sha256-950...14d983fe9151",
+  "name": "us-west1-docker.pkg.dev/.../artomator/tester@sha256:950...064",
+  "spdxVersion": "SPDX-2.3"
 }
 ```
 
-## vulnerabilities 
-
-You can also use `artomator` to scan any image in your GCP project's Artifact Registry. Whether that image was processed before by `artomator` or not. 
-
-```shell
-curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
-     -H "Content-Type: application/json" -i -X POST \
-     -H "X-Goog-User-Project: ${PROJECT_ID}" \
-     "${SERVICE_URL}/scan?max-vuln-severity=${MAX_SEVERITY}&digest=${IMAGE_DIGEST}"
-```
-
-If vulnerability is found in the image equal or higher than the `MAX_SEVERITY` parameter, `artomator` will return `400` HTTP status. The supported severity levels are: 
-
-* `unknown`
-* `low`
-* `medium`
-* `high`
-* `critical`
-
-The response from the `/scan` query will look something like this:
-
-```json
-{
-  "status": "OK",
-  "image": "us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:b5aeb53064773ae3f375577a9cf6fa27a80bbf89d975b16f37d78ebd4c5ad430",
-  "message": "image valid"
-}
-```
 
 ## build your own
 

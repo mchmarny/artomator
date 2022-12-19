@@ -54,5 +54,10 @@ func runEventTest(t *testing.T, event string) {
 		t.Fatal(err)
 	}
 
-	checkStatus(t, req, getTestHandler(t).EventHandler, http.StatusOK)
+	h := getTestHandler(t)
+	if err = h.Validate(CommandNameEvent); err != nil {
+		t.Fatal(err)
+	}
+
+	checkStatus(t, req, h.EventHandler, http.StatusOK)
 }

@@ -12,9 +12,17 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (h *EventHandler) EventHandler(w http.ResponseWriter, r *http.Request) {
+const (
+	CommandNameEvent = "event"
+)
+
+func (h *Handler) EventHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	log.Println("processing event...")
+
+	if err := h.Validate(CommandNameEvent); err != nil {
+		log.Fatalf("service not configured")
+	}
 
 	if r.Method != http.MethodPost {
 		writeError(w, errors.Errorf("method %s not supported, expected POST", r.Method))
@@ -42,7 +50,7 @@ func (h *EventHandler) EventHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.processEvent(r.Context(), e.Digest, h.eventCmdArgs); err != nil {
+	if err := h.processEvent(r.Context(), e.Digest); err != nil {
 		writeError(w, errors.Wrapf(err, "error processing event for %s", e.Digest))
 		return
 	}
@@ -50,7 +58,7 @@ func (h *EventHandler) EventHandler(w http.ResponseWriter, r *http.Request) {
 	writeImageMessage(w, e.Digest, "event processed")
 }
 
-func (h *EventHandler) processEvent(ctx context.Context, digest string, args []string) error {
+func (h *Handler) processEvent(ctx context.Context, digest string) error {
 	log.Printf("processing digest: %s", digest)
 
 	sha, err := parseSHA(digest)
@@ -58,7 +66,7 @@ func (h *EventHandler) processEvent(ctx context.Context, digest string, args []s
 		return errors.Wrap(err, "error parsing process event sha")
 	}
 
-	alreadyProcessed, err := h.cacheService.HasBeenProcessed(ctx, sha, digest)
+	alreadyProcessed, err := h.cache.HasBeenProcessed(ctx, sha, digest)
 	if err != nil {
 		return errors.Wrap(err, "error invoking caching service")
 	}
@@ -78,13 +86,12 @@ func (h *EventHandler) processEvent(ctx context.Context, digest string, args []s
 		}
 	}()
 
-	cmdArgs := append(args, digest, dir)
-	if err := runCommand(ctx, cmdArgs); err != nil {
-		return errors.Wrapf(err, "error executing command: %s\n", strings.Join(cmdArgs, ","))
+	if err := h.commands[CommandNameEvent].Run(ctx, digest, dir); err != nil {
+		return errors.Wrap(err, "error executing command")
 	}
 
-	if h.bucketName != "" {
-		if err := object.Save(ctx, sha, h.bucketName, dir); err != nil {
+	if h.bucket != "" {
+		if err := object.Save(ctx, sha, h.bucket, dir); err != nil {
 			return errors.Wrapf(err, "error saving %s resulting artifacts from: %s", sha, dir)
 		}
 	}

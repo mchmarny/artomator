@@ -12,16 +12,13 @@ import (
 	"time"
 
 	"github.com/mchmarny/artomator/pkg/cache"
+	"github.com/mchmarny/artomator/pkg/cmd"
 	"github.com/mchmarny/artomator/pkg/handler"
 )
 
 const (
-	serviceName          = "artomator"
-	eventCommandDefault  = "event"
-	sbomCommandDefault   = "sbom"
-	verifyCommandDefault = "verify"
-	scanCommandDefault   = "scan"
-	addressDefault       = ":8080"
+	serviceName    = "artomator"
+	addressDefault = ":8080"
 
 	closeTimeout = 3
 	readTimeout  = 10
@@ -30,11 +27,6 @@ const (
 
 var (
 	version = "v0.0.1-default"
-
-	eventCommandName  = eventCommandDefault
-	verifyCommandName = verifyCommandDefault
-	scanCommandName   = scanCommandDefault
-	sbomCommandName   = sbomCommandDefault
 
 	projectID  = os.Getenv("PROJECT_ID")
 	signingKey = os.Getenv("SIGN_KEY")
@@ -64,16 +56,13 @@ func main() {
 		log.Fatalf("error while creating cache: %v", err)
 	}
 
-	eventArgs := []string{eventCommandName, projectID, signingKey}
-	verifyArgs := []string{verifyCommandName, projectID, signingKey}
-	scanArgs := []string{scanCommandName, projectID, signingKey}
-	sbomArgs := []string{sbomCommandName, projectID, signingKey}
-	h, err := handler.NewEventHandler(eventArgs, verifyArgs, scanArgs, sbomArgs, bucketName, c)
+	h, err := handler.NewHandler(bucketName, c,
+		cmd.NewBashCommand(handler.CommandNameEvent, "event", projectID, signingKey),
+		cmd.NewBashCommand(handler.CommandNameSBOM, "sbom", projectID, signingKey),
+		cmd.NewBashCommand(handler.CommandNameVerify, "verify", projectID, signingKey),
+	)
 	if err != nil {
 		log.Fatalf("error while creating event handler: %v", err)
-	}
-	if err := h.Validate(); err != nil {
-		log.Fatalf("created service not in valid state: %v", err)
 	}
 
 	mux := http.NewServeMux()
@@ -81,7 +70,6 @@ func main() {
 	mux.HandleFunc("/event", h.EventHandler)
 	mux.HandleFunc("/sbom", h.SBOMHandler)
 	mux.HandleFunc("/verify", h.VerifyHandler)
-	mux.HandleFunc("/scan", h.ScanHandler)
 
 	address := addressDefault
 	if val, ok := os.LookupEnv("PORT"); ok {

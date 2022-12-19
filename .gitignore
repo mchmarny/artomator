@@ -12,6 +12,7 @@ tests/hello
 # Binaries
 dist
 app
+server
 
 # Keys 
 cosign.*

@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/pkg/errors"
-
 	"github.com/mchmarny/artomator/pkg/cache"
+	"github.com/mchmarny/artomator/pkg/cmd"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -22,52 +22,44 @@ type result struct {
 	Error   string `json:"error,omitempty"`
 }
 
-func NewEventHandler(eventArgs, verifyArgs, scanArgs, sbomArgs []string, bucket string, cache cache.Cache) (*EventHandler, error) {
-	h := &EventHandler{
-		bucketName:    bucket,
-		cacheService:  cache,
-		eventCmdArgs:  eventArgs,
-		verifyCmdArgs: verifyArgs,
-		scanCmdArgs:   scanArgs,
-		sbomCmdArgs:   sbomArgs,
+func NewHandler(bucket string, cache cache.Cache, commands ...*cmd.Command) (*Handler, error) {
+	if cache == nil {
+		return nil, errors.New("cache service not set")
 	}
 
-	if err := h.Validate(); err != nil {
-		return nil, err
+	h := &Handler{
+		bucket:   bucket,
+		cache:    cache,
+		commands: make(map[string]*cmd.Command),
 	}
+
+	for _, c := range commands {
+		h.commands[c.Kind] = c
+	}
+
 	return h, nil
 }
 
-type EventHandler struct {
-	bucketName    string
-	eventCmdArgs  []string
-	verifyCmdArgs []string
-	scanCmdArgs   []string
-	sbomCmdArgs   []string
-	cacheService  cache.Cache
+type Handler struct {
+	bucket   string
+	commands map[string]*cmd.Command
+	cache    cache.Cache
 }
 
-// Validate ensures the services has been created in valid state.
-func (h *EventHandler) Validate() error {
-	if h.eventCmdArgs == nil {
-		return errors.New("event command args not set")
+func (h *Handler) Validate(cmdName string) error {
+	if h.cache == nil {
+		return errors.New("cache service not set")
 	}
-	if h.verifyCmdArgs == nil {
-		return errors.New("verify command args not set")
+	if h.commands == nil {
+		return errors.New("commands not defined")
 	}
-	if h.scanCmdArgs == nil {
-		return errors.New("scan command args not set")
-	}
-	if h.sbomCmdArgs == nil {
-		return errors.New("sbom command args not set")
-	}
-	if h.cacheService == nil {
-		return errors.New("cache service is required")
+	if _, ok := h.commands[cmdName]; !ok {
+		return errors.Errorf("command %s not configured", cmdName)
 	}
 	return nil
 }
 
-func (h *EventHandler) HandlerDefault(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) HandlerDefault(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	writeMessage(w, "hello")
 }

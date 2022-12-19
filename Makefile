@@ -20,11 +20,11 @@ tidy: ## Updates the go modules and vendors all dependancies
 	go mod vendor
 .PHONY: tidy
 
-app: ## Builds local binary 
+bin: ## Builds local binary 
 	CGO_ENABLED=0 go build -trimpath \
     -ldflags="-w -s -X main.version=${VERSION} -extldflags '-static'" \
-    -a -mod vendor -o app cmd/server/main.go
-.PHONY: app
+    -a -mod vendor -o server cmd/server/main.go
+.PHONY: bin
 
 redis: ## Starts local redis 
 	docker run --name redis-5 -dp $(TEST_RIP):$(TEST_RPT):$(TEST_RPT) redis
@@ -38,7 +38,7 @@ server: ## Runs previsouly built server binary
 	PROJECT_ID=$(TEST_PRJ) SIGN_KEY=$(TEST_KEY) \
 	REDIS_IP=$(TEST_RIP) REDIS_PORT=$(TEST_RPT) \
 	GCS_BUCKET=$(TEST_BCT) \
-	./app 
+	./server 
 .PHONY: server
 
 event-test: image ## Submits events test to local service
@@ -46,11 +46,6 @@ event-test: image ## Submits events test to local service
 	     -s -d @tests/message.json \
          "http://127.0.0.1:8080/event"
 .PHONY: event-test
-
-sbom-test: image ## Submits process test to local service
-	curl -i -H "Content-Type: application/json" \
-         "http://127.0.0.1:8080/sbom?digest=$(shell cat tests/test-digest.txt)"
-.PHONY: sbom-test
 
 verify-test: ## Submits verify test to local service
 	curl -sS -H "Content-Type: application/json" \
@@ -62,10 +57,10 @@ verify-test-err: image ## Submits verify test to local service
          "http://127.0.0.1:8080/verify?type=spdx&digest=$(shell cat tests/test-digest.txt)"
 .PHONY: verify-test-err
 
-scan-test: ## Submits scan test to local service
-	curl -i -H "Content-Type: application/json" \
-         "http://127.0.0.1:8080/scan?max-vuln-severity=unknown&digest=$(shell cat tests/test-digest.txt)"
-.PHONY: scan-test
+sbom-test: image ## Submits process test to local service
+	curl -sS -H "Content-Type: application/json" \
+         "http://127.0.0.1:8080/sbom?digest=$(shell cat tests/test-digest.txt)" | jq -r .
+.PHONY: sbom-test
 
 cmd: ## Runs bash on latest artomator image
 	docker container run --rm -it --entrypoint /bin/bash $(IMG_URI)

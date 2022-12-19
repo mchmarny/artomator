@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
 
@@ -21,11 +20,17 @@ const (
 	attTagSuffix        = ".att"
 	sbomFormatParamName = "format"
 	spdxVersionKey      = "spdxVersion"
+
+	CommandNameSBOM = "sbom"
 )
 
-func (h *EventHandler) SBOMHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) SBOMHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	log.Println("processing event...")
+
+	if err := h.Validate(CommandNameSBOM); err != nil {
+		log.Fatalf("service not configured")
+	}
 
 	digest := r.URL.Query().Get(imageDigestQueryParamName)
 	if digest == "" {
@@ -33,7 +38,7 @@ func (h *EventHandler) SBOMHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m, err := h.processSBOM(r.Context(), digest, h.eventCmdArgs)
+	m, err := h.processSBOM(r.Context(), digest)
 	if err != nil {
 		writeError(w, err)
 		return
@@ -42,7 +47,7 @@ func (h *EventHandler) SBOMHandler(w http.ResponseWriter, r *http.Request) {
 	writeContent(w, m)
 }
 
-func (h *EventHandler) processSBOM(ctx context.Context, digest string, args []string) (map[string]interface{}, error) {
+func (h *Handler) processSBOM(ctx context.Context, digest string) (map[string]interface{}, error) {
 	log.Printf("processing digest: %s", digest)
 
 	sha, err := parseSHA(digest)
@@ -61,10 +66,8 @@ func (h *EventHandler) processSBOM(ctx context.Context, digest string, args []st
 	}()
 
 	sbomPath := path.Join(dir, "sbom.json")
-	cmdArgs := append(args, digest, sbomPath)
-
-	if err := runCommand(ctx, cmdArgs); err != nil {
-		return nil, errors.Wrapf(err, "error executing command: %s\n", strings.Join(cmdArgs, ","))
+	if err := h.commands[CommandNameSBOM].Run(ctx, digest, sbomPath); err != nil {
+		return nil, errors.Wrap(err, "error executing command")
 	}
 
 	sbom, err := validateSBOM(sbomPath)
@@ -118,18 +121,6 @@ func parseSHA(uri string) (string, error) {
 		return "", errors.Errorf("unable to parse SHA (:) from %s", uri)
 	}
 	return parts[1], nil
-}
-
-func runCommand(ctx context.Context, args []string) error {
-	c := exec.CommandContext(ctx, "/bin/bash", args...)
-	c.Stdout = os.Stdout
-	c.Stderr = os.Stdout
-
-	if err := c.Run(); err != nil {
-		return errors.Wrapf(err, "error executing cmd: %s", strings.Join(args, " "))
-	}
-
-	return nil
 }
 
 func makeFolder(sha string) (string, error) {
