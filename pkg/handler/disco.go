@@ -13,6 +13,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/mchmarny/artomator/pkg/metric"
+	"github.com/mchmarny/artomator/pkg/object"
 	"github.com/pkg/errors"
 )
 
@@ -59,7 +60,27 @@ func (h *Handler) DiscoHandler(w http.ResponseWriter, r *http.Request) {
 
 	h.recordDiscoMetrics(r.Context(), d.Counts)
 
+	if h.bucket != "" {
+		b, err := json.Marshal(d)
+		if err != nil {
+			writeError(w, err)
+			return
+		}
+
+		reportName := getDiscoReportName("cloud-run")
+		if err := object.Put(r.Context(), h.bucket, reportName, b); err != nil {
+			writeError(w, errors.Wrapf(err, "error writing content to: %s/%s",
+				h.bucket, reportName))
+			return
+		}
+	}
+
 	writeContent(w, d)
+}
+
+func getDiscoReportName(prefix string) string {
+	return fmt.Sprintf("disco/%s/vuln-report-%s.json",
+		prefix, time.Now().Format("2006-01-02"))
 }
 
 func (h *Handler) recordDiscoMetrics(ctx context.Context, counts *DiscoCounts) {
