@@ -1,23 +1,23 @@
 package handler
 
-type DiscoReport struct {
-	Created string         `json:"created"`
-	Counts  *DiscoCounts   `json:"meta"`
-	Results []*DiscoResult `json:"results"`
-}
+const (
+	VulnCountUnknown  = "unknown"
+	VulnCountLow      = "low"
+	VulnCountMedium   = "medium"
+	VulnCountHigh     = "high"
+	VulnCountCritical = "critical"
+)
 
-type DiscoCounts struct {
-	Unknown  int `json:"unknown"`
-	Low      int `json:"low"`
-	Medium   int `json:"medium"`
-	High     int `json:"high"`
-	Critical int `json:"critical"`
+type DiscoReport struct {
+	Created   string           `json:"created"`
+	Exposures map[string]int64 `json:"exposures"`
+	Results   []*DiscoResult   `json:"results"`
 }
 
 type DiscoResult struct {
-	Target          string   `json:"target"`
-	Tags            []string `json:"tag"`
-	Digests         []string `json:"digest"`
+	Artifact        string   `json:"artifact"`
+	Digests         []string `json:"digests"`
+	Service         string   `json:"service"`
 	Source          string   `json:"source"`
 	Vulnerabilities map[string]*DiscoVulnerabilities
 }
@@ -25,7 +25,27 @@ type DiscoResult struct {
 type DiscoVulnerabilities struct {
 	ID       string `json:"id"`
 	Pkg      string `json:"pkg"`
+	Version  string `json:"version"`
 	URL      string `json:"url"`
 	Severity string `json:"severity"`
 	Updated  string `json:"updated"`
+}
+
+type ScanReport struct {
+	ArtifactName string
+	Metadata     struct {
+		RepoTags    []string
+		RepoDigests []string
+	}
+	Results []struct {
+		Target          string
+		Vulnerabilities []struct {
+			VulnerabilityID  string
+			PkgName          string
+			InstalledVersion string
+			PrimaryURL       string
+			Severity         string
+			LastModifiedDate string
+		}
+	}
 }

@@ -40,6 +40,20 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 gcloud projects add-iam-policy-binding $PROJECT_ID \
      --member "serviceAccount:${SA_EMAIL}" \
      --role roles/monitoring.metricWriter
+
+# disco
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+     --member "serviceAccount:${SA_EMAIL}" \
+     --role roles/browser
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+     --member "serviceAccount:${SA_EMAIL}" \
+     --role roles/run.viewer
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+     --member "serviceAccount:${SA_EMAIL}" \
+     --role roles/viewer
 	 
 # gcs 
 gcloud storage buckets create "gs://${GCS_BUCKET}" \

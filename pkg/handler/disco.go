@@ -2,10 +2,12 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -53,7 +55,16 @@ func (h *Handler) DiscoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.counter.Count(r.Context(), metric.MakeMetricType("disco/processed"), 1, nil); err != nil {
-		log.Printf("unable to write metrics: %v", err)
+		log.Printf("unable to write metric: %v", err)
+	}
+
+	cveCounts := make(map[string]int64)
+	for k, v := range d.Exposures {
+		cveCounts[metric.MakeMetricType(fmt.Sprintf("cve/%s", k))] = v
+	}
+
+	if err := h.counter.CountAll(r.Context(), cveCounts, nil); err != nil {
+		log.Printf("unable to write count metrics: %v", err)
 	}
 
 	writeContent(w, d)
@@ -70,9 +81,9 @@ func processReports(dir string) (*DiscoReport, error) {
 	}
 
 	report := &DiscoReport{
-		Created: time.Now().Format(time.RFC3339),
-		Counts:  &DiscoCounts{},
-		Results: make([]*DiscoResult, 0),
+		Created:   time.Now().Format(time.RFC3339),
+		Exposures: make(map[string]int64),
+		Results:   make([]*DiscoResult, 0),
 	}
 
 	for _, file := range files {
@@ -82,23 +93,6 @@ func processReports(dir string) (*DiscoReport, error) {
 	}
 
 	return report, nil
-}
-
-type scanReport struct {
-	Metadata struct {
-		RepoTags    []string
-		RepoDigests []string
-	}
-	Results []struct {
-		Target          string
-		Vulnerabilities []struct {
-			VulnerabilityID  string
-			PkgName          string
-			PrimaryURL       string
-			Severity         string
-			LastModifiedDate string
-		}
-	}
 }
 
 func fileToDiscoService(dir, file string, rez *DiscoReport) error {
@@ -118,17 +112,17 @@ func fileToDiscoService(dir, file string, rez *DiscoReport) error {
 		return errors.Wrapf(err, "error reading file: %s", f)
 	}
 
-	var r scanReport
+	var r ScanReport
 	if err := json.Unmarshal(b, &r); err != nil {
 		return errors.Wrapf(err, "error parsing scanned report: %s", f)
 	}
 
 	for _, z := range r.Results {
 		d := &DiscoResult{
-			Target:          z.Target,
-			Tags:            r.Metadata.RepoTags,
+			Artifact:        r.ArtifactName,
+			Service:         toServiceName(file),
+			Source:          z.Target,
 			Digests:         r.Metadata.RepoDigests,
-			Source:          file,
 			Vulnerabilities: make(map[string]*DiscoVulnerabilities),
 		}
 
@@ -136,24 +130,38 @@ func fileToDiscoService(dir, file string, rez *DiscoReport) error {
 			d.Vulnerabilities[v.VulnerabilityID] = &DiscoVulnerabilities{
 				ID:       v.VulnerabilityID,
 				Pkg:      v.PkgName,
+				Version:  v.InstalledVersion,
 				URL:      v.PrimaryURL,
 				Severity: v.Severity,
 				Updated:  v.LastModifiedDate,
 			}
 			switch v.Severity {
 			case "LOW":
-				rez.Counts.Low++
+				rez.Exposures[VulnCountLow]++
 			case "MEDIUM":
-				rez.Counts.Medium++
+				rez.Exposures[VulnCountMedium]++
 			case "HIGH":
-				rez.Counts.High++
+				rez.Exposures[VulnCountHigh]++
 			case "CRITICAL":
-				rez.Counts.Critical++
+				rez.Exposures[VulnCountCritical]++
 			default:
-				rez.Counts.Unknown++
+				rez.Exposures[VulnCountUnknown]++
 			}
 		}
 		rez.Results = append(rez.Results, d)
 	}
 	return nil
+}
+
+const (
+	fileNamePartDeliminator   = "---"
+	fileNameExpectedPartCount = 3
+)
+
+func toServiceName(fileName string) string {
+	if len(strings.Split(fileName, fileNamePartDeliminator)) != fileNameExpectedPartCount {
+		return strings.ReplaceAll(fileName, ".json", "")
+	}
+	fileName = strings.ReplaceAll(fileName, ".json", "")
+	return strings.ReplaceAll(fileName, fileNamePartDeliminator, "/")
 }

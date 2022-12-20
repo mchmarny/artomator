@@ -16,6 +16,7 @@ import (
 
 type Counter interface {
 	Count(ctx context.Context, metric string, count int64, labels map[string]string) error
+	CountAll(ctx context.Context, items map[string]int64, labels map[string]string) error
 }
 
 func NewAPICounter(project string) (Counter, error) {
@@ -37,6 +38,16 @@ type APICounter struct {
 }
 
 func (r *APICounter) Count(ctx context.Context, metricType string, count int64, labels map[string]string) error {
+	items := make(map[string]int64)
+	items[metricType] = count
+
+	if err := r.CountAll(ctx, items, labels); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *APICounter) CountAll(ctx context.Context, items map[string]int64, labels map[string]string) error {
 	c, err := monitoring.NewMetricClient(ctx)
 	if err != nil {
 		return errors.Wrap(err, "error creating client")
@@ -54,15 +65,15 @@ func (r *APICounter) Count(ctx context.Context, metricType string, count int64, 
 	// for timespan which leads to errors on write.
 	labels["nanos"] = fmt.Sprintf("e-%d", now.AsTime().UnixMilli())
 
-	req := &monitoringpb.CreateTimeSeriesRequest{
-		Name: "projects/" + r.projectID,
-		TimeSeries: []*monitoringpb.TimeSeries{{
+	list := make([]*monitoringpb.TimeSeries, 0)
+	for k, v := range items {
+		s := &monitoringpb.TimeSeries{
 			Resource: &monitoredres.MonitoredResource{
 				Type:   "global",
 				Labels: r.labels,
 			},
 			Metric: &metricpb.Metric{
-				Type:   metricType,
+				Type:   k,
 				Labels: labels,
 			},
 			Points: []*monitoringpb.Point{{
@@ -72,11 +83,17 @@ func (r *APICounter) Count(ctx context.Context, metricType string, count int64, 
 				},
 				Value: &monitoringpb.TypedValue{
 					Value: &monitoringpb.TypedValue_Int64Value{
-						Int64Value: count,
+						Int64Value: v,
 					},
 				},
 			}},
-		}},
+		}
+		list = append(list, s)
+	}
+
+	req := &monitoringpb.CreateTimeSeriesRequest{
+		Name:       "projects/" + r.projectID,
+		TimeSeries: list,
 	}
 
 	err = c.CreateTimeSeries(ctx, req)
