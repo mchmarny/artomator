@@ -3,6 +3,7 @@ package metric
 import (
 	"context"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -14,9 +15,15 @@ import (
 	timestamp "google.golang.org/protobuf/types/known/timestamppb"
 )
 
+type Record struct {
+	MetricType  string
+	MetricValue int64
+	Labels      map[string]string
+}
+
 type Counter interface {
 	Count(ctx context.Context, metric string, count int64, labels map[string]string) error
-	CountAll(ctx context.Context, items map[string]int64, labels map[string]string) error
+	CountAll(ctx context.Context, records ...*Record) error
 }
 
 func NewAPICounter(project string) (Counter, error) {
@@ -41,13 +48,22 @@ func (r *APICounter) Count(ctx context.Context, metricType string, count int64, 
 	items := make(map[string]int64)
 	items[metricType] = count
 
-	if err := r.CountAll(ctx, items, labels); err != nil {
+	rec := &Record{
+		MetricType:  metricType,
+		MetricValue: count,
+		Labels:      labels,
+	}
+
+	if err := r.CountAll(ctx, rec); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *APICounter) CountAll(ctx context.Context, items map[string]int64, labels map[string]string) error {
+func (r *APICounter) CountAll(ctx context.Context, records ...*Record) error {
+	if len(records) < 1 {
+		log.Printf("no metrics to record")
+	}
 	c, err := monitoring.NewMetricClient(ctx)
 	if err != nil {
 		return errors.Wrap(err, "error creating client")
@@ -57,24 +73,24 @@ func (r *APICounter) CountAll(ctx context.Context, items map[string]int64, label
 		Seconds: time.Now().Unix(),
 	}
 
-	if labels == nil {
-		labels = map[string]string{}
-	}
-
-	// HACK: prevents time series from being overwritten \
-	// for timespan which leads to errors on write.
-	labels["nanos"] = fmt.Sprintf("e-%d", now.AsTime().UnixMilli())
-
 	list := make([]*monitoringpb.TimeSeries, 0)
-	for k, v := range items {
+	for _, d := range records {
+		if d.Labels == nil {
+			d.Labels = map[string]string{}
+		}
+
+		// HACK: prevents time series from being overwritten \
+		// for timespan which leads to errors on write.
+		d.Labels["nanos"] = fmt.Sprintf("e-%d", now.AsTime().UnixMilli())
+
 		s := &monitoringpb.TimeSeries{
 			Resource: &monitoredres.MonitoredResource{
 				Type:   "global",
 				Labels: r.labels,
 			},
 			Metric: &metricpb.Metric{
-				Type:   k,
-				Labels: labels,
+				Type:   d.MetricType,
+				Labels: d.Labels,
 			},
 			Points: []*monitoringpb.Point{{
 				Interval: &monitoringpb.TimeInterval{
@@ -83,7 +99,7 @@ func (r *APICounter) CountAll(ctx context.Context, items map[string]int64, label
 				},
 				Value: &monitoringpb.TypedValue{
 					Value: &monitoringpb.TypedValue_Int64Value{
-						Int64Value: v,
+						Int64Value: d.MetricValue,
 					},
 				},
 			}},

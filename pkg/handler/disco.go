@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -17,6 +18,8 @@ import (
 
 const (
 	CommandNameDisco = "disco"
+
+	severityKey = "severity"
 )
 
 func (h *Handler) DiscoHandler(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +47,7 @@ func (h *Handler) DiscoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	d, err := processReports(dir)
+	d, err := processReports(r.Context(), dir)
 	if err != nil {
 		log.Printf("error validating attestation: %v", err)
 		if err := h.counter.Count(r.Context(), metric.MakeMetricType("disco/failed"), 1, nil); err != nil {
@@ -54,29 +57,53 @@ func (h *Handler) DiscoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.counter.Count(r.Context(), metric.MakeMetricType("disco/processed"), 1, nil); err != nil {
-		log.Printf("unable to write metric: %v", err)
-	}
-
-	cveCounts := make(map[string]int64)
-	for k, v := range d.Counts.TotalExposures {
-		cveCounts[metric.MakeMetricType(fmt.Sprintf("cve/%s", k))] = v
-	}
-	for k, v := range d.Counts.ServiceExposures {
-		cveCounts[metric.MakeMetricType(fmt.Sprintf("cve/service/%s", k))] = v
-	}
-	for k, v := range d.Counts.ProjectExposures {
-		cveCounts[metric.MakeMetricType(fmt.Sprintf("cve/project/%s", k))] = v
-	}
-
-	if err := h.counter.CountAll(r.Context(), cveCounts, nil); err != nil {
-		log.Printf("unable to write count metrics: %v", err)
-	}
+	h.recordDiscoMetrics(r.Context(), d.Counts)
 
 	writeContent(w, d)
 }
 
-func processReports(dir string) (*DiscoReport, error) {
+func (h *Handler) recordDiscoMetrics(ctx context.Context, counts *DiscoCounts) {
+	items := make([]*metric.Record, 0)
+
+	for k, v := range counts.TotalExposures {
+		m := &metric.Record{
+			MetricType:  metric.MakeMetricType("cve/total"),
+			MetricValue: v,
+			Labels: map[string]string{
+				severityKey: k,
+			},
+		}
+		items = append(items, m)
+	}
+
+	for k, v := range counts.ProjectExposures {
+		m := &metric.Record{
+			MetricType:  metric.MakeMetricType("cve/project"),
+			MetricValue: v,
+			Labels: map[string]string{
+				severityKey: k,
+			},
+		}
+		items = append(items, m)
+	}
+
+	for k, v := range counts.ServiceExposures {
+		m := &metric.Record{
+			MetricType:  metric.MakeMetricType("cve/service"),
+			MetricValue: v,
+			Labels: map[string]string{
+				severityKey: k,
+			},
+		}
+		items = append(items, m)
+	}
+
+	if err := h.counter.CountAll(ctx, items...); err != nil {
+		log.Printf("unable to write count metrics: %v", err)
+	}
+}
+
+func processReports(ctx context.Context, dir string) (*DiscoReport, error) {
 	if dir == "" {
 		return nil, errors.New("path required")
 	}
@@ -97,7 +124,7 @@ func processReports(dir string) (*DiscoReport, error) {
 	}
 
 	for _, file := range files {
-		if err := fileToDiscoService(dir, file.Name(), report); err != nil {
+		if err := fileToDiscoService(ctx, dir, file.Name(), report); err != nil {
 			return nil, errors.Wrapf(err, "error parsing: %s/%s", dir, file.Name())
 		}
 	}
@@ -105,7 +132,7 @@ func processReports(dir string) (*DiscoReport, error) {
 	return report, nil
 }
 
-func fileToDiscoService(dir, file string, rez *DiscoReport) error {
+func fileToDiscoService(ctx context.Context, dir, file string, rez *DiscoReport) error {
 	if dir == "" {
 		return errors.New("dir required")
 	}
@@ -148,43 +175,53 @@ func fileToDiscoService(dir, file string, rez *DiscoReport) error {
 				Severity: v.Severity,
 				Updated:  v.LastModifiedDate,
 			}
-			switch v.Severity {
-			case VulnCountLow:
-				rez.Counts.TotalExposures[VulnCountLow]++
-			case VulnCountMedium:
-				rez.Counts.TotalExposures[VulnCountMedium]++
-			case VulnCountHigh:
-				rez.Counts.TotalExposures[VulnCountHigh]++
-			case VulnCountCritical:
-				rez.Counts.TotalExposures[VulnCountCritical]++
-			default:
-				rez.Counts.TotalExposures[VulnCountUnknown]++
-			}
+
+			meter(ctx, rez.Counts.TotalExposures, v.Severity, "", "")
 
 			// only if the name parsing was successful
 			if ok {
-				switch v.Severity {
-				case VulnCountLow:
-					rez.Counts.ServiceExposures[fmt.Sprintf("%s/%s", srvName, VulnCountLow)]++
-					rez.Counts.ProjectExposures[fmt.Sprintf("%s/%s", prjName, VulnCountLow)]++
-				case VulnCountMedium:
-					rez.Counts.ServiceExposures[fmt.Sprintf("%s/%s", srvName, VulnCountMedium)]++
-					rez.Counts.ProjectExposures[fmt.Sprintf("%s/%s", prjName, VulnCountMedium)]++
-				case VulnCountHigh:
-					rez.Counts.ServiceExposures[fmt.Sprintf("%s/%s", srvName, VulnCountHigh)]++
-					rez.Counts.ProjectExposures[fmt.Sprintf("%s/%s", prjName, VulnCountHigh)]++
-				case VulnCountCritical:
-					rez.Counts.ServiceExposures[fmt.Sprintf("%s/%s", srvName, VulnCountCritical)]++
-					rez.Counts.ProjectExposures[fmt.Sprintf("%s/%s", prjName, VulnCountCritical)]++
-				default:
-					rez.Counts.ServiceExposures[fmt.Sprintf("%s/%s", srvName, VulnCountUnknown)]++
-					rez.Counts.ProjectExposures[fmt.Sprintf("%s/%s", prjName, VulnCountUnknown)]++
-				}
+				meter(ctx, rez.Counts.ServiceExposures, v.Severity, prjName, srvName)
 			}
 		}
 		rez.Results = append(rez.Results, d)
 	}
+
 	return nil
+}
+
+func meter(ctx context.Context, m map[string]int64, sev, proj, srv string) {
+	switch sev {
+	case VulnCountLow:
+		m[VulnCountLow]++
+	case VulnCountMedium:
+		m[VulnCountMedium]++
+	case VulnCountHigh:
+		m[VulnCountHigh]++
+	case VulnCountCritical:
+		m[VulnCountCritical]++
+	default:
+		m[VulnCountUnknown]++
+	}
+
+	if proj != "" && srv != "" {
+		switch sev {
+		case VulnCountLow:
+			m[fmt.Sprintf("%s/%s", proj, VulnCountLow)]++
+			m[fmt.Sprintf("%s/%s", srv, VulnCountLow)]++
+		case VulnCountMedium:
+			m[fmt.Sprintf("%s/%s", proj, VulnCountMedium)]++
+			m[fmt.Sprintf("%s/%s", srv, VulnCountMedium)]++
+		case VulnCountHigh:
+			m[fmt.Sprintf("%s/%s", proj, VulnCountHigh)]++
+			m[fmt.Sprintf("%s/%s", srv, VulnCountHigh)]++
+		case VulnCountCritical:
+			m[fmt.Sprintf("%s/%s", proj, VulnCountCritical)]++
+			m[fmt.Sprintf("%s/%s", srv, VulnCountCritical)]++
+		default:
+			m[fmt.Sprintf("%s/%s", proj, VulnCountUnknown)]++
+			m[fmt.Sprintf("%s/%s", srv, VulnCountUnknown)]++
+		}
+	}
 }
 
 const (
@@ -196,7 +233,7 @@ const (
 func toProjectService(fileName string) (project string, service string, ok bool) {
 	n := toServiceName(fileName)
 	p := strings.Split(n, ".")
-	if len(p) == 3 {
+	if len(p) == fileNameExpectedPartCount {
 		return p[0], p[2], true
 	}
 	log.Printf("unable to parse project/service from: %s", n)

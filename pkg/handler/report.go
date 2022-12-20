@@ -15,9 +15,9 @@ type DiscoReport struct {
 }
 
 type DiscoCounts struct {
-	TotalExposures   map[string]int64 `json:"total-exposures"`
-	ProjectExposures map[string]int64 `json:"project-exposures"`
-	ServiceExposures map[string]int64 `json:"service-exposures"`
+	TotalExposures   map[string]int64 `json:"totalExposures"`
+	ProjectExposures map[string]int64 `json:"projectExposures"`
+	ServiceExposures map[string]int64 `json:"serviceExposures"`
 }
 
 type DiscoResult struct {

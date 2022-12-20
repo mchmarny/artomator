@@ -17,10 +17,10 @@ func (r *ConsoleCounter) Count(ctx context.Context, metric string, count int64, 
 	return nil
 }
 
-func (r *ConsoleCounter) CountAll(ctx context.Context, items map[string]int64, labels map[string]string) error {
+func (r *ConsoleCounter) CountAll(ctx context.Context, records ...*Record) error {
 	fmt.Println("console counter:")
-	for k, v := range items {
-		fmt.Printf("%s:%d", k, v)
+	for _, d := range records {
+		fmt.Printf("%s:%d", d.MetricType, d.MetricValue)
 	}
 	return nil
 }
