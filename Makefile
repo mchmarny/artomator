@@ -86,8 +86,16 @@ lint: ## Lints the entire project
 .PHONY: lint
 
 image: ## Makes test image 
-	tests/build-test-image
+	tools/image
 .PHONY: image
+
+verify: ## Verifies previosly processed image
+	tools/post-verify
+.PHONY: verify
+
+sbom: ## Verifies previosly processed image
+	tools/post-sbom
+.PHONY: sbom
 
 policy: ## Creates k8s admission policies based on the current config
 	policy/policy-from-template

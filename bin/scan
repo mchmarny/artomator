@@ -4,24 +4,21 @@ set -o errexit
 
 PRJ=$1
 IMG=$2 # image (registry/image@sha:*** or ar/registry/image@sha:***)
-DIR=${3:-.} # target dir path for the report or current folder
+REP=$3  # target path for the report
 
 # check required input parameters
 [ -z "$PRJ" ] && echo "arg PRJ not set\n" && exit 1
 [ -z "$IMG" ] && echo "arg IMG not set\n" && exit 1
+[ -z "$REP" ] && echo "arg REP not set\n" && exit 1
 
 # parse registry from image 
 REG=$(echo $IMG | cut -d'/' -f 1)
-SHA=$(echo $IMG | cut -d':' -f 2)
-
-REP="${DIR}/${SHA}-vuln.json"
 
 # print run variables 
 echo "
 PRJ: $PRJ
 REG: $REG
 IMG: $IMG
-SHA: $SHA
 REP: $REP
 "
 
@@ -29,8 +26,4 @@ REP: $REP
 gcloud auth configure-docker $REG --quiet
 gcloud config set project $PRJ --quiet
 
-trivy image $IMG \
-    --format json \
-    --security-checks vuln \
-    --timeout 5m | \
-    jq --compact-output > $REP
+trivy image --security-checks vuln --timeout 10m --format json --output $REP $IMG

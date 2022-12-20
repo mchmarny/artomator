@@ -51,12 +51,10 @@ func TestRegistryInfo(t *testing.T) {
 		"us-east1-docker.pkg.dev/my-project/hello-world:v0.1.2",
 		"us-east1-docker.pkg.dev")
 
-	runRegistryNameTest(t,
-		"us-east1-docker.pkg.dev/my-project/my-repo/hello-world@sha256:6ec",
-		"my-project/my-repo")
-	runRegistryNameTest(t,
-		"us-east1-docker.pkg.dev/my-project/hello-world:v0.1.2",
-		"my-project")
+	runRegistryNameTest(t, "us-west1-docker.pkg.dev/image:v1.2.3", "image:v1.2.3")
+	runRegistryNameTest(t, "us-west1-docker.pkg.dev/folder/image:v1.2.4", "folder")
+	runRegistryNameTest(t, "us-west1-docker.pkg.dev/project/folder/image:v1.2.5", "folder")
+	runRegistryNameTest(t, "us-west1-docker.pkg.dev/project/reg/folder/image:v1.2.6", "reg/folder")
 }
 
 func runRegistryTest(t *testing.T, uri, want string) {

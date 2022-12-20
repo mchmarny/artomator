@@ -124,12 +124,13 @@ func parseRegistryName(uri string) (string, error) {
 
 	switch len(parts) {
 	case regURIFormat2: // us-west1-docker.pkg.dev/image:v1.2.3
+		return parts[1], nil
 	case regURIFormat3: // us-west1-docker.pkg.dev/folder/image:v1.2.3
 		return parts[1], nil
 	case regURIFormat4: // us-west1-docker.pkg.dev/reg/folder/image:v1.2.3
-		return fmt.Sprintf("%s/%s", parts[2], parts[3]), nil
+		return parts[2], nil
 	case regURIFormat5: // us-west1-docker.pkg.dev/project/reg/folder/image:v1.2.3
-		return fmt.Sprintf("%s/%s", parts[3], parts[4]), nil
+		return fmt.Sprintf("%s/%s", parts[2], parts[3]), nil
 	}
 
 	return "", errors.Errorf("unable to parse registry name from %s", uri)

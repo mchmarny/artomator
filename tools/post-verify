@@ -6,7 +6,7 @@ DIR="$(dirname "$0")"
 set -o errexit
 set -o pipefail
 
-# This requires:
+# Requires:
 # gcloud run services add-iam-policy-binding $ROOT_NAME \
 # --member "user:<user used for gcloud auth>" \
 # --region $REGION --role=roles/run.invoker
@@ -14,7 +14,7 @@ set -o pipefail
 SERVICE_URL=$(gcloud run services describe $ROOT_NAME \
   --region $REGION --format="value(status.url)")
 
-curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
-     -H "Content-Type: application/json" -sS -X POST \
+curl -sS -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
+     -H "Content-Type: application/json" \
      -H "X-Goog-User-Project: ${PROJECT_ID}" \
      "${SERVICE_URL}/verify?type=spdx&digest=$(cat tests/test-digest.txt)" | jq -r .

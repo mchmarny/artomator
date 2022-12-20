@@ -14,9 +14,9 @@ for prj in $(gcloud projects list --format 'value(projectId)' --filter 'parent.t
     # list all services
     for svc in $(gcloud run services list --project $prj --region $reg --format "value(metadata.name)"); do
       # get the service image uri
-      img=$(gcloud run services describe artomator --project $prj --region $reg --format "value(image)")
+      img=$(gcloud run services describe $svc --project $prj --region $reg --format "value(image)")
       # scan that image
-      bin/scan $prj $img $DIR
+      bin/scan $prj $img "${DIR}/${prj}--${reg}--${svc}.json"
     done
   done
 done

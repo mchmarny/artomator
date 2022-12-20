@@ -22,8 +22,7 @@ echo $TEST_IMAGE_URI
 docker build -f tests/app/Dockerfile \
              -t $TEST_IMAGE_URI \
              --label artomator-sbom=$FMT \
-             --label artomator-vuln=true \
-             --platform linux/amd64 .
+             --label artomator-vuln=true .
 docker push $TEST_IMAGE_URI
 
 TEST_IMAGE_SHA=$(docker inspect --format='{{index .RepoDigests 0}}' $TEST_IMAGE_URI)

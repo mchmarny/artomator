@@ -1,0 +1,90 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "us-docker.pkg.dev/cloudrun/container/hello",
+  "ArtifactType": "container_image",
+  "Metadata": {
+    "OS": {
+      "Family": "alpine",
+      "Name": "3.16.2"
+    },
+    "ImageID": "sha256:8fce62fb738f8dde0fe0864fb975298f59e9d5ebf730a074790475aada531cd4",
+    "DiffIDs": [
+      "sha256:994393dc58e7931862558d06e46aa2bb17487044f670f310dffe1d24e4d1eec7",
+      "sha256:e350b30d4a253cd252da95c45bc77ceec1f4a8cfbdc2bd499af29687abc6cc40",
+      "sha256:7da9988035d4b08bd8b71d2e8ab5e2db90db04daf06be68194107cd1cd4836ca",
+      "sha256:abae62d2115af489cd9c2d4c33e83cc4d2c4c74fe6c5a5491e228c93b392c494",
+      "sha256:4febb84bf7fa7c3c70b1044644fee5953d1d27a552aa274c873673db607d128a"
+    ],
+    "RepoTags": [
+      "us-docker.pkg.dev/cloudrun/container/hello:latest"
+    ],
+    "RepoDigests": [
+      "us-docker.pkg.dev/cloudrun/container/hello@sha256:2e70803dbc92a7bffcee3af54b5d264b23a6096f304f00d63b7d1e177e40986c"
+    ],
+    "ImageConfig": {
+      "architecture": "amd64",
+      "container": "be052c19cc26a829690b0a1e1e78fac7ea8d01f02edb585d6f155a1ff73d786a",
+      "created": "2022-09-14T19:22:58.091674421Z",
+      "docker_version": "20.10.17",
+      "history": [
+        {
+          "created": "2022-08-09T17:19:53.274069586Z",
+          "created_by": "/bin/sh -c #(nop) ADD file:2a949686d9886ac7c10582a6c29116fd29d3077d02755e87e111870d63607725 in / "
+        },
+        {
+          "created": "2022-08-09T17:19:53.47374331Z",
+          "created_by": "/bin/sh -c #(nop)  CMD [\"/bin/sh\"]",
+          "empty_layer": true
+        },
+        {
+          "created": "2022-09-14T19:22:57.092387042Z",
+          "created_by": "/bin/sh -c apk add --no-cache ca-certificates"
+        },
+        {
+          "created": "2022-09-14T19:22:57.431717632Z",
+          "created_by": "/bin/sh -c #(nop) COPY file:0dd134aaf073a77593952dfc02e152802ae3c7f0432d2b68def5ecafcd427425 in /server "
+        },
+        {
+          "created": "2022-09-14T19:22:57.782315322Z",
+          "created_by": "/bin/sh -c #(nop) COPY file:6bf0178d8add6dfda5f04b4f5287e7eef12e156450635bfab3a2b1ce4e3d221f in ./index.html "
+        },
+        {
+          "created": "2022-09-14T19:22:57.949460784Z",
+          "created_by": "/bin/sh -c #(nop) COPY dir:79b6fcbddbd2c078cca0e2468e82ef6c293b44db38fe7c8b0804674b994c140f in ./assets/ "
+        },
+        {
+          "created": "2022-09-14T19:22:58.091674421Z",
+          "created_by": "/bin/sh -c #(nop)  CMD [\"/server\"]",
+          "empty_layer": true
+        }
+      ],
+      "os": "linux",
+      "rootfs": {
+        "type": "layers",
+        "diff_ids": [
+          "sha256:994393dc58e7931862558d06e46aa2bb17487044f670f310dffe1d24e4d1eec7",
+          "sha256:e350b30d4a253cd252da95c45bc77ceec1f4a8cfbdc2bd499af29687abc6cc40",
+          "sha256:7da9988035d4b08bd8b71d2e8ab5e2db90db04daf06be68194107cd1cd4836ca",
+          "sha256:abae62d2115af489cd9c2d4c33e83cc4d2c4c74fe6c5a5491e228c93b392c494",
+          "sha256:4febb84bf7fa7c3c70b1044644fee5953d1d27a552aa274c873673db607d128a"
+        ]
+      },
+      "config": {
+        "Cmd": [
+          "/server"
+        ],
+        "Env": [
+          "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        ],
+        "Image": "sha256:a0c2b432596c42e128d87b49517678edd64926a12aa3c28711dcadc7188c3217"
+      }
+    }
+  },
+  "Results": [
+    {
+      "Target": "us-docker.pkg.dev/cloudrun/container/hello (alpine 3.16.2)",
+      "Class": "os-pkgs",
+      "Type": "alpine"
+    }
+  ]
+}

@@ -31,6 +31,12 @@ func ParseEvent(r *http.Request) (*Event, error) {
 		return nil, errors.Wrap(err, "error parsing pubsub message")
 	}
 
+	b, err := json.Marshal(m)
+	if err != nil {
+		return nil, errors.Wrap(err, "error marshaling pubsub message for debug")
+	}
+	fmt.Println(string(b))
+
 	d, err := base64.StdEncoding.DecodeString(m.Message.Data)
 	if err != nil {
 		return nil, errors.Wrap(err, "error decoding message data")

@@ -4,7 +4,7 @@ metadata:
   name: artomator-attestation-sbom-spdxjson
 spec:
   images:
-  - glob: "**"
+  - glob: "*.pkg.dev/cloudy-demos/**"
   authorities:
   - name: signer-key
     key:
@@ -18,9 +18,9 @@ spec:
         type: cue
         data: |
           predicateType: "https://spdx.dev/Document"
-    # - name: must-have-culn-report
-    #   predicateType: vuln
-    #   policy:
-    #     type: cue
-    #     data: |
-    #       predicateType: "cosign.sigstore.dev/attestation/vuln/v1"
+    - name: must-have-culn-report
+      predicateType: vuln
+      policy:
+        type: cue
+        data: |
+          predicateType: "cosign.sigstore.dev/attestation/vuln/v1"
