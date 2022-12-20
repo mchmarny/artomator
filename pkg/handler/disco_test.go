@@ -1,12 +1,11 @@
 package handler
 
 import (
-	"context"
 	"testing"
 )
 
 func TestDiscoParser(t *testing.T) {
-	r, err := processReports(context.TODO(), "../../tests/reports")
+	r, err := processReports("../../tests/reports")
 	if err != nil {
 		t.Fatal(err)
 	}

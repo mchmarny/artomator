@@ -47,7 +47,7 @@ func (h *Handler) DiscoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	d, err := processReports(r.Context(), dir)
+	d, err := processReports(dir)
 	if err != nil {
 		log.Printf("error validating attestation: %v", err)
 		if err := h.counter.Count(r.Context(), metric.MakeMetricType("disco/failed"), 1, nil); err != nil {
@@ -103,7 +103,7 @@ func (h *Handler) recordDiscoMetrics(ctx context.Context, counts *DiscoCounts) {
 	}
 }
 
-func processReports(ctx context.Context, dir string) (*DiscoReport, error) {
+func processReports(dir string) (*DiscoReport, error) {
 	if dir == "" {
 		return nil, errors.New("path required")
 	}
@@ -124,7 +124,7 @@ func processReports(ctx context.Context, dir string) (*DiscoReport, error) {
 	}
 
 	for _, file := range files {
-		if err := fileToDiscoService(ctx, dir, file.Name(), report); err != nil {
+		if err := fileToDiscoService(dir, file.Name(), report); err != nil {
 			return nil, errors.Wrapf(err, "error parsing: %s/%s", dir, file.Name())
 		}
 	}
@@ -132,7 +132,7 @@ func processReports(ctx context.Context, dir string) (*DiscoReport, error) {
 	return report, nil
 }
 
-func fileToDiscoService(ctx context.Context, dir, file string, rez *DiscoReport) error {
+func fileToDiscoService(dir, file string, rez *DiscoReport) error {
 	if dir == "" {
 		return errors.New("dir required")
 	}
@@ -176,11 +176,11 @@ func fileToDiscoService(ctx context.Context, dir, file string, rez *DiscoReport)
 				Updated:  v.LastModifiedDate,
 			}
 
-			meter(ctx, rez.Counts.TotalExposures, v.Severity, "", "")
+			meter(rez.Counts.TotalExposures, v.Severity, "", "")
 
 			// only if the name parsing was successful
 			if ok {
-				meter(ctx, rez.Counts.ServiceExposures, v.Severity, prjName, srvName)
+				meter(rez.Counts.ServiceExposures, v.Severity, prjName, srvName)
 			}
 		}
 		rez.Results = append(rez.Results, d)
@@ -189,7 +189,7 @@ func fileToDiscoService(ctx context.Context, dir, file string, rez *DiscoReport)
 	return nil
 }
 
-func meter(ctx context.Context, m map[string]int64, sev, proj, srv string) {
+func meter(m map[string]int64, sev, proj, srv string) {
 	switch sev {
 	case VulnCountLow:
 		m[VulnCountLow]++
