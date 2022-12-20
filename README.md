@@ -3,13 +3,13 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/mchmarny/artomator)](https://goreportcard.com/report/github.com/mchmarny/artomator) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/mchmarny/artomator) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/gojp/goreportcard/blob/master/LICENSE)
 
-[Artifact Registry (AR)](https://cloud.google.com/artifact-registry) `artomator` automates the creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom), and vulnerability scanning of container images. When deployed in your GCP project, `artomator` will automatically process any images that have the expected [label](https://docs.docker.com/config/labels-custom-metadata/). For example:
+[Artifact Registry (AR)](https://cloud.google.com/artifact-registry) `artomator` automates the creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom), and vulnerability scanning of container images. When deployed in your GCP project, `artomator` will automatically process any images that pushed into registry with the expected [label](https://docs.docker.com/config/labels-custom-metadata/). For example:
 
 ```shell
-docker build -t $IMAGE_TAG --label artomator-sbom=spdx --label artomator-vuln=true .
+docker build -t $TAG --label artomator-sbom=spdx --label artomator-vuln=true .
 ```
 
-Adding the `artomator-sbom=spdx` label flag to your existing `docker build` commend will automatically tell `artomator` to add SBOM attestations in SPDX format to to that image (the supported formats are: `cyclonedx` or `spdx`). Additionally, if you also include the `artomator-vuln=true` label, `artomator` will generate a vulnerability report from that SBOM. 
+The `artomator-sbom=spdx` label in your `docker build` commend will automatically tell `artomator` to add SBOM attestations in SPDX format to the resulting image (the supported formats are: `cyclonedx` or `spdx`). Additionally, if you also include the `artomator-vuln=true` label, `artomator` will generate a vulnerability report from that SBOM. 
 
 ![](images/reg.png)
 
@@ -131,8 +131,7 @@ cosign verify-attestation --type=spdx --key "gcpkms://${SIGN_KEY}" $IMAGE_DIGEST
     | jq -r .payload | base64 -d > sbom.spdx.json
 ```
 
-
-#### using artomator
+#### using artomator itself
 
 The `artomator` service exposes `/verify` which you can query with the image digest to verify the expected attestations on the image.
 
