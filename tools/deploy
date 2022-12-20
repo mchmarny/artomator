@@ -118,3 +118,12 @@ gcloud pubsub subscriptions create gcr-sub \
   --ack-deadline 600 \
   --push-endpoint "${SERVICE_URL}/event" \
   --push-auth-service-account $SA_EMAIL
+
+gcloud scheduler jobs create http "${ROOT_NAME}-disco" \
+    --location $REGION \
+    --schedule "42 */5 * * 0" \
+    --max-retry-attempts 2 \
+    --min-backoff 30s \
+    --uri "${SERVICE_URL}/disco" \
+    --oidc-token-audience "${SERVICE_URL}/disco" \
+    --oidc-service-account-email $SA_EMAIL

@@ -18,6 +18,7 @@ gcloud services enable \
   binaryauthorization.googleapis.com \
   cloudkms.googleapis.com \
   cloudresourcemanager.googleapis.com \
+  cloudscheduler.googleapis.com \
   container.googleapis.com \
   containerregistry.googleapis.com \
   containerscanning.googleapis.com \
