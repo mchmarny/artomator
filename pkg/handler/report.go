@@ -1,17 +1,23 @@
 package handler
 
 const (
-	VulnCountUnknown  = "unknown"
-	VulnCountLow      = "low"
-	VulnCountMedium   = "medium"
-	VulnCountHigh     = "high"
-	VulnCountCritical = "critical"
+	VulnCountUnknown  = "UNKNOWN"
+	VulnCountLow      = "LOW"
+	VulnCountMedium   = "MEDIUM"
+	VulnCountHigh     = "HIGH"
+	VulnCountCritical = "CRITICAL"
 )
 
 type DiscoReport struct {
-	Created   string           `json:"created"`
-	Exposures map[string]int64 `json:"exposures"`
-	Results   []*DiscoResult   `json:"results"`
+	Created string         `json:"created"`
+	Counts  *DiscoCounts   `json:"counts"`
+	Results []*DiscoResult `json:"results"`
+}
+
+type DiscoCounts struct {
+	TotalExposures   map[string]int64 `json:"total-exposures"`
+	ProjectExposures map[string]int64 `json:"project-exposures"`
+	ServiceExposures map[string]int64 `json:"service-exposures"`
 }
 
 type DiscoResult struct {

@@ -59,8 +59,14 @@ func (h *Handler) DiscoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cveCounts := make(map[string]int64)
-	for k, v := range d.Exposures {
+	for k, v := range d.Counts.TotalExposures {
 		cveCounts[metric.MakeMetricType(fmt.Sprintf("cve/%s", k))] = v
+	}
+	for k, v := range d.Counts.ServiceExposures {
+		cveCounts[metric.MakeMetricType(fmt.Sprintf("cve/service/%s", k))] = v
+	}
+	for k, v := range d.Counts.ProjectExposures {
+		cveCounts[metric.MakeMetricType(fmt.Sprintf("cve/project/%s", k))] = v
 	}
 
 	if err := h.counter.CountAll(r.Context(), cveCounts, nil); err != nil {
@@ -81,9 +87,13 @@ func processReports(dir string) (*DiscoReport, error) {
 	}
 
 	report := &DiscoReport{
-		Created:   time.Now().Format(time.RFC3339),
-		Exposures: make(map[string]int64),
-		Results:   make([]*DiscoResult, 0),
+		Created: time.Now().Format(time.RFC3339),
+		Counts: &DiscoCounts{
+			TotalExposures:   make(map[string]int64),
+			ProjectExposures: make(map[string]int64),
+			ServiceExposures: make(map[string]int64),
+		},
+		Results: make([]*DiscoResult, 0),
 	}
 
 	for _, file := range files {
@@ -117,10 +127,13 @@ func fileToDiscoService(dir, file string, rez *DiscoReport) error {
 		return errors.Wrapf(err, "error parsing scanned report: %s", f)
 	}
 
+	svcFullName := toServiceName(file)
+	prjName, srvName, ok := toProjectService(file)
+
 	for _, z := range r.Results {
 		d := &DiscoResult{
 			Artifact:        r.ArtifactName,
-			Service:         toServiceName(file),
+			Service:         svcFullName,
 			Source:          z.Target,
 			Digests:         r.Metadata.RepoDigests,
 			Vulnerabilities: make(map[string]*DiscoVulnerabilities),
@@ -136,16 +149,37 @@ func fileToDiscoService(dir, file string, rez *DiscoReport) error {
 				Updated:  v.LastModifiedDate,
 			}
 			switch v.Severity {
-			case "LOW":
-				rez.Exposures[VulnCountLow]++
-			case "MEDIUM":
-				rez.Exposures[VulnCountMedium]++
-			case "HIGH":
-				rez.Exposures[VulnCountHigh]++
-			case "CRITICAL":
-				rez.Exposures[VulnCountCritical]++
+			case VulnCountLow:
+				rez.Counts.TotalExposures[VulnCountLow]++
+			case VulnCountMedium:
+				rez.Counts.TotalExposures[VulnCountMedium]++
+			case VulnCountHigh:
+				rez.Counts.TotalExposures[VulnCountHigh]++
+			case VulnCountCritical:
+				rez.Counts.TotalExposures[VulnCountCritical]++
 			default:
-				rez.Exposures[VulnCountUnknown]++
+				rez.Counts.TotalExposures[VulnCountUnknown]++
+			}
+
+			// only if the name parsing was successful
+			if ok {
+				switch v.Severity {
+				case VulnCountLow:
+					rez.Counts.ServiceExposures[fmt.Sprintf("%s/%s", srvName, VulnCountLow)]++
+					rez.Counts.ProjectExposures[fmt.Sprintf("%s/%s", prjName, VulnCountLow)]++
+				case VulnCountMedium:
+					rez.Counts.ServiceExposures[fmt.Sprintf("%s/%s", srvName, VulnCountMedium)]++
+					rez.Counts.ProjectExposures[fmt.Sprintf("%s/%s", prjName, VulnCountMedium)]++
+				case VulnCountHigh:
+					rez.Counts.ServiceExposures[fmt.Sprintf("%s/%s", srvName, VulnCountHigh)]++
+					rez.Counts.ProjectExposures[fmt.Sprintf("%s/%s", prjName, VulnCountHigh)]++
+				case VulnCountCritical:
+					rez.Counts.ServiceExposures[fmt.Sprintf("%s/%s", srvName, VulnCountCritical)]++
+					rez.Counts.ProjectExposures[fmt.Sprintf("%s/%s", prjName, VulnCountCritical)]++
+				default:
+					rez.Counts.ServiceExposures[fmt.Sprintf("%s/%s", srvName, VulnCountUnknown)]++
+					rez.Counts.ProjectExposures[fmt.Sprintf("%s/%s", prjName, VulnCountUnknown)]++
+				}
 			}
 		}
 		rez.Results = append(rez.Results, d)
@@ -158,10 +192,21 @@ const (
 	fileNameExpectedPartCount = 3
 )
 
+// example: cloudy-demos.us-west1.artomator.unknown
+func toProjectService(fileName string) (project string, service string, ok bool) {
+	n := toServiceName(fileName)
+	p := strings.Split(n, ".")
+	if len(p) == 3 {
+		return p[0], p[2], true
+	}
+	log.Printf("unable to parse project/service from: %s", n)
+	return "", "", false
+}
+
 func toServiceName(fileName string) string {
 	if len(strings.Split(fileName, fileNamePartDeliminator)) != fileNameExpectedPartCount {
 		return strings.ReplaceAll(fileName, ".json", "")
 	}
 	fileName = strings.ReplaceAll(fileName, ".json", "")
-	return strings.ReplaceAll(fileName, fileNamePartDeliminator, "/")
+	return strings.ReplaceAll(fileName, fileNamePartDeliminator, ".")
 }
