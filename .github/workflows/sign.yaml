@@ -39,8 +39,9 @@ jobs:
   sign:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
+      security-events: write
     steps:
     
     - name: Input Digest
@@ -60,20 +61,21 @@ jobs:
       with:
         scan-type: image
         security-checks: vuln
-        image-ref: '${{ inputs.digest }}'
-        format: 'sarif'
-        output: 'trivy-results.sarif'
+        image-ref: ${{ inputs.digest }}
+        format: sarif
+        output: trivy-results.sarif
         hide-progress: true
         timeout: '10m'
-        # exit-code: '1'
-        # severity: 'CRITICAL,HIGH'
+        exit-code: '1'
+        severity: 'CRITICAL'
       env:
-        GOOGLE_APPLICATION_CREDENTIAL: /path/to/credential.json
+        GOOGLE_APPLICATION_CREDENTIAL: ${{ steps.auth.outputs.access_token }}
 
     - name: Upload Results
       uses: github/codeql-action/upload-sarif@v2
       with:
-        sarif_file: 'trivy-results.sarif'
+        sarif_file: trivy-results.sarif
+        category: trivy-report
 
 
     - name: Install Cosign
