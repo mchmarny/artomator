@@ -14,16 +14,16 @@ while [ "$STATUS" != "completed" ]
 do
 	sleep 7
   	STATUS=$(curl -Ss -H "Accept: application/vnd.github.v3+json" \
-	         -H "Authorization: token $GITHUB_TOKEN" \
-			 https://api.github.com/repos/mchmarny/followme/actions/runs | \
+	         -H "Authorization: token $GITHUB_ACCESS_TOKEN" \
+			 https://api.github.com/repos/mchmarny/artomator/actions/runs | \
 			 jq -r '[.workflow_runs[] | select(.name == "publish")] | .[0].status')
 	echo "Status: $STATUS"
 done
 
 
 CODE=$(curl -Ss -H "Accept: application/vnd.github.v3+json" \
-        -H "Authorization: token $GITHUB_TOKEN" \
-		https://api.github.com/repos/mchmarny/followme/actions/runs | \
+        -H "Authorization: token $GITHUB_ACCESS_TOKEN" \
+		https://api.github.com/repos/mchmarny/artomator/actions/runs | \
 		jq -r '[.workflow_runs[] | select(.name == "publish")] | .[0].conclusion')
 
 if [ "$CODE" != "success" ]

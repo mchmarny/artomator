@@ -1,0 +1,18 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-image
+spec:
+  validationFailureAction: enforce
+  background: false
+  webhookTimeoutSeconds: 30
+  failurePolicy: Fail
+  rules:
+    - name: check-image
+      match:
+        resources:
+          kinds:
+            - Pod
+      verifyImages:
+      - image: "us-west1-docker.pkg.dev/cloudy-demos/**"
+        key: "gcpkms://projects/cloudy-demos/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer/cryptoKeyVersions/1"

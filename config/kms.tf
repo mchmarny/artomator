@@ -2,6 +2,7 @@ resource "google_kms_key_ring" "keyring" {
   name     = "${var.name}-signer-ring"
   location = "global"
 }
+
 resource "google_kms_crypto_key" "key" {
   name     = "${var.name}-signer"
   key_ring = google_kms_key_ring.keyring.id
@@ -16,19 +17,28 @@ resource "google_kms_crypto_key" "key" {
   }
 }
 
-resource "google_kms_crypto_key_iam_binding" "crypto_key_binding" {
+
+
+resource "google_kms_crypto_key_iam_member" "crypto_key_member" {
   crypto_key_id = google_kms_crypto_key.key.id
   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  member        = "serviceAccount:${google_service_account.github_actions_user.email}"
+}
 
+
+resource "google_kms_crypto_key_iam_binding" "crypto_key_verifier" {
+  crypto_key_id = google_kms_crypto_key.key.id
+  role          = "roles/cloudkms.verifier"
   members = [
-    "serviceAccount:service-${data.google_project.project.number}@compute-system.iam.gserviceaccount.com",
     "serviceAccount:${google_service_account.github_actions_user.email}",
   ]
 }
 
-resource "google_kms_crypto_key_iam_member" "crypto_key_member" {
+resource "google_kms_crypto_key_iam_binding" "crypto_key_viewer" {
   crypto_key_id = google_kms_crypto_key.key.id
-  role          = "roles/cloudkms.cryptoKeyEncrypter"
-  member        = "serviceAccount:${google_service_account.github_actions_user.email}"
+  role          = "roles/cloudkms.viewer"
+  members = [
+    "serviceAccount:${google_service_account.github_actions_user.email}",
+  ]
 }
 
