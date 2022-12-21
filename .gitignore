@@ -71,3 +71,6 @@ digest.txt
 /sbom.spdx.json
 /sbom.vuln.json
 
+tests/app/index.js
+tests/test-digest.txt
+.gitignore

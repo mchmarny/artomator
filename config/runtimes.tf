@@ -69,7 +69,7 @@ resource "google_cloud_run_service" "app" {
         }
         env {
           name  = "SIGN_KEY"
-          value = google_kms_crypto_key.key.id
+          value = "gcpkms://${google_kms_crypto_key.key.id}"
         }
         env {
           name  = "REDIS_IP"
