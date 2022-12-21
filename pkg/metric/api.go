@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
@@ -15,17 +14,6 @@ import (
 	timestamp "google.golang.org/protobuf/types/known/timestamppb"
 )
 
-type Record struct {
-	MetricType  string
-	MetricValue int64
-	Labels      map[string]string
-}
-
-type Counter interface {
-	Count(ctx context.Context, metric string, count int64, labels map[string]string) error
-	CountAll(ctx context.Context, records ...*Record) error
-}
-
 func NewAPICounter(project string) (Counter, error) {
 	return &APICounter{
 		projectID: project,
@@ -33,10 +21,6 @@ func NewAPICounter(project string) (Counter, error) {
 			"project_id": project,
 		},
 	}, nil
-}
-
-func MakeMetricType(v string) string {
-	return fmt.Sprintf("custom.googleapis.com/%s", strings.ToLower(v))
 }
 
 type APICounter struct {
@@ -107,6 +91,7 @@ func (r *APICounter) CountAll(ctx context.Context, records ...*Record) error {
 		list = append(list, s)
 	}
 
+	log.Printf("creating %d metrics...", len(list))
 	req := &monitoringpb.CreateTimeSeriesRequest{
 		Name:       "projects/" + r.projectID,
 		TimeSeries: list,
@@ -114,7 +99,7 @@ func (r *APICounter) CountAll(ctx context.Context, records ...*Record) error {
 
 	err = c.CreateTimeSeries(ctx, req)
 	if err != nil {
-		return errors.Wrapf(err, "writing time series request: %+v", req)
+		return errors.Wrap(err, "writing time series request")
 	}
 	return nil
 }

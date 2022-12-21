@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -19,8 +20,6 @@ import (
 
 const (
 	CommandNameDisco = "disco"
-
-	severityKey = "severity"
 )
 
 func (h *Handler) DiscoHandler(w http.ResponseWriter, r *http.Request) {
@@ -48,7 +47,14 @@ func (h *Handler) DiscoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	d, err := processReports(dir)
+	rec := newReporter(h.counter, dir)
+	defer func() {
+		if err = rec.close(r.Context()); err != nil {
+			log.Printf("error closing recorder: %s\n", dir)
+		}
+	}()
+
+	rep, err := rec.create(r.Context())
 	if err != nil {
 		log.Printf("error validating attestation: %v", err)
 		if err := h.counter.Count(r.Context(), metric.MakeMetricType("disco/failed"), 1, nil); err != nil {
@@ -58,10 +64,8 @@ func (h *Handler) DiscoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.recordDiscoMetrics(r.Context(), d.Counts)
-
 	if h.bucket != "" {
-		b, err := json.Marshal(d)
+		b, err := json.Marshal(rep)
 		if err != nil {
 			writeError(w, err)
 			return
@@ -75,7 +79,7 @@ func (h *Handler) DiscoHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	writeContent(w, d)
+	writeContent(w, rep)
 }
 
 func getDiscoReportName(prefix string) string {
@@ -83,107 +87,85 @@ func getDiscoReportName(prefix string) string {
 		prefix, time.Now().Format("2006-01-02"))
 }
 
-func (h *Handler) recordDiscoMetrics(ctx context.Context, counts *DiscoCounts) {
-	items := make([]*metric.Record, 0)
-
-	for k, v := range counts.TotalExposures {
-		m := &metric.Record{
-			MetricType:  metric.MakeMetricType("cve/total"),
-			MetricValue: v,
-			Labels: map[string]string{
-				severityKey: k,
-			},
-		}
-		items = append(items, m)
-	}
-
-	for k, v := range counts.ProjectExposures {
-		m := &metric.Record{
-			MetricType:  metric.MakeMetricType("cve/project"),
-			MetricValue: v,
-			Labels: map[string]string{
-				severityKey: k,
-			},
-		}
-		items = append(items, m)
-	}
-
-	for k, v := range counts.ServiceExposures {
-		m := &metric.Record{
-			MetricType:  metric.MakeMetricType("cve/service"),
-			MetricValue: v,
-			Labels: map[string]string{
-				severityKey: k,
-			},
-		}
-		items = append(items, m)
-	}
-
-	if err := h.counter.CountAll(ctx, items...); err != nil {
-		log.Printf("unable to write count metrics: %v", err)
+func newReporter(counter metric.Counter, dir string) *reporter {
+	return &reporter{
+		recorder: metric.NewRecorder(counter, nil),
+		dir:      dir,
 	}
 }
 
-func processReports(dir string) (*DiscoReport, error) {
-	if dir == "" {
+type reporter struct {
+	report   *DiscoReport
+	recorder *metric.Recorder
+	dir      string
+	lock     sync.Mutex
+}
+
+func (r *reporter) close(ctx context.Context) error {
+	if r.recorder == nil {
+		return errors.New("recorder required")
+	}
+	if err := r.recorder.Flush(ctx); err != nil {
+		return errors.Wrap(err, "error closing recorder")
+	}
+	return nil
+}
+
+func (r *reporter) create(ctx context.Context) (*DiscoReport, error) {
+	if r.dir == "" {
 		return nil, errors.New("path required")
 	}
+	if r.recorder == nil {
+		return nil, errors.New("recorder required")
+	}
+	if r.report != nil {
+		return nil, errors.New("reporter already initialized, create new one")
+	}
 
-	files, err := os.ReadDir(dir)
+	files, err := os.ReadDir(r.dir)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error reading files from dir: %s", dir)
+		return nil, errors.Wrapf(err, "error reading files from dir: %s", r.dir)
 	}
 
-	report := &DiscoReport{
-		Created: time.Now().Format(time.RFC3339),
-		Counts: &DiscoCounts{
-			TotalExposures:   make(map[string]int64),
-			ProjectExposures: make(map[string]int64),
-			ServiceExposures: make(map[string]int64),
-		},
-		Results: make([]*DiscoResult, 0),
-	}
+	r.report = newDiscoReport()
 
 	for _, file := range files {
-		if err := fileToDiscoService(dir, file.Name(), report); err != nil {
-			return nil, errors.Wrapf(err, "error parsing: %s/%s", dir, file.Name())
+		if err := r.processFile(ctx, file.Name()); err != nil {
+			return nil, errors.Wrapf(err, "error parsing: %s/%s", r.dir, file.Name())
 		}
 	}
 
-	return report, nil
+	return r.report, nil
 }
 
-func fileToDiscoService(dir, file string, rez *DiscoReport) error {
-	if dir == "" {
-		return errors.New("dir required")
+func (r *reporter) processFile(ctx context.Context, file string) error {
+	if r.dir == "" {
+		return errors.New("path not set")
 	}
-	if file == "" {
-		return errors.New("file required")
+	if r.recorder == nil {
+		return errors.New("recorder not set")
 	}
-	if rez == nil {
-		return errors.New("rez required")
+	if r.report == nil {
+		return errors.New("report not created")
 	}
 
-	f := path.Join(dir, file)
-	b, err := os.ReadFile(f)
+	fi, ok := parseFileInfo(r.dir, file)
+	b, err := os.ReadFile(fi.path)
 	if err != nil {
-		return errors.Wrapf(err, "error reading file: %s", f)
+		return errors.Wrapf(err, "error reading file: %s", fi.path)
 	}
 
-	var r ScanReport
-	if err := json.Unmarshal(b, &r); err != nil {
-		return errors.Wrapf(err, "error parsing scanned report: %s", f)
+	var sr ScanReport
+	if err := json.Unmarshal(b, &sr); err != nil {
+		return errors.Wrapf(err, "error parsing scanned report: %+v", fi)
 	}
 
-	svcFullName := toServiceName(file)
-	prjName, srvName, ok := toProjectService(file)
-
-	for _, z := range r.Results {
+	for _, z := range sr.Results {
 		d := &DiscoResult{
-			Artifact:        r.ArtifactName,
-			Service:         svcFullName,
+			Artifact:        sr.ArtifactName,
+			Service:         fi.name,
 			Source:          z.Target,
-			Digests:         r.Metadata.RepoDigests,
+			Digests:         sr.Metadata.RepoDigests,
 			Vulnerabilities: make(map[string]*DiscoVulnerabilities),
 		}
 
@@ -197,74 +179,79 @@ func fileToDiscoService(dir, file string, rez *DiscoReport) error {
 				Updated:  v.LastModifiedDate,
 			}
 
-			meter(rez.Counts.TotalExposures, v.Severity, "", "")
+			if err := r.recorder.Add(ctx, "cve", map[string]string{
+				"project":  fi.project,
+				"region":   fi.region,
+				"service":  fi.service,
+				"severity": strings.ToLower(v.Severity),
+				"code":     v.VulnerabilityID,
+			}); err != nil {
+				log.Printf("error adding cve metric: %v", err)
+			}
+
+			r.lock.Lock()
+			r.report.Counts.Totals[strings.ToLower(v.Severity)]++
+			r.lock.Unlock()
 
 			// only if the name parsing was successful
 			if ok {
-				meter(rez.Counts.ServiceExposures, v.Severity, prjName, srvName)
+				r.lock.Lock()
+				r.report.Counts.Projects[sevLabel(fi.project, v.Severity)]++
+				r.report.Counts.Services[sevLabel(fi.service, v.Severity)]++
+				r.report.Counts.Regions[sevLabel(fi.region, v.Severity)]++
+				r.lock.Unlock()
 			}
 		}
-		rez.Results = append(rez.Results, d)
+
+		r.lock.Lock()
+		r.report.Results = append(r.report.Results, d)
+		r.lock.Unlock()
 	}
 
 	return nil
 }
 
-func meter(m map[string]int64, sev, proj, srv string) {
-	switch sev {
-	case VulnCountLow:
-		m[VulnCountLow]++
-	case VulnCountMedium:
-		m[VulnCountMedium]++
-	case VulnCountHigh:
-		m[VulnCountHigh]++
-	case VulnCountCritical:
-		m[VulnCountCritical]++
-	default:
-		m[VulnCountUnknown]++
-	}
+func sevLabel(pref, sev string) string {
+	return fmt.Sprintf("%s/%s", pref, strings.ToLower(sev))
+}
 
-	if proj != "" && srv != "" {
-		switch sev {
-		case VulnCountLow:
-			m[fmt.Sprintf("%s/%s", proj, VulnCountLow)]++
-			m[fmt.Sprintf("%s/%s", srv, VulnCountLow)]++
-		case VulnCountMedium:
-			m[fmt.Sprintf("%s/%s", proj, VulnCountMedium)]++
-			m[fmt.Sprintf("%s/%s", srv, VulnCountMedium)]++
-		case VulnCountHigh:
-			m[fmt.Sprintf("%s/%s", proj, VulnCountHigh)]++
-			m[fmt.Sprintf("%s/%s", srv, VulnCountHigh)]++
-		case VulnCountCritical:
-			m[fmt.Sprintf("%s/%s", proj, VulnCountCritical)]++
-			m[fmt.Sprintf("%s/%s", srv, VulnCountCritical)]++
-		default:
-			m[fmt.Sprintf("%s/%s", proj, VulnCountUnknown)]++
-			m[fmt.Sprintf("%s/%s", srv, VulnCountUnknown)]++
-		}
-	}
+type fileInfo struct {
+	// name - a/b/c
+	name string
+	// path - dir/file.json
+	path string
+	// project - cloudy-demos
+	project string
+	// region - artomator
+	service string
+	// region - us-west1
+	region string
 }
 
 const (
-	fileNamePartDeliminator   = "---"
-	fileNameExpectedPartCount = 3
+	fileNamePartDeliminator    = "---"
+	fileNameExpectedPartCount  = 3
+	labelNameExpectedPartCount = 2
 )
 
-// example: cloudy-demos.us-west1.artomator.unknown
-func toProjectService(fileName string) (project string, service string, ok bool) {
-	n := toServiceName(fileName)
-	p := strings.Split(n, ".")
-	if len(p) == fileNameExpectedPartCount {
-		return p[0], p[2], true
+// example: cloudy-demos.us-west1.artomator
+func parseFileInfo(dir, name string) (*fileInfo, bool) {
+	cleanName := strings.ReplaceAll(name, ".json", "")
+	fi := &fileInfo{
+		path: path.Join(dir, name),
+		name: strings.ReplaceAll(cleanName, fileNamePartDeliminator, "/"),
 	}
-	log.Printf("unable to parse project/service from: %s", n)
-	return "", "", false
-}
 
-func toServiceName(fileName string) string {
-	if len(strings.Split(fileName, fileNamePartDeliminator)) != fileNameExpectedPartCount {
-		return strings.ReplaceAll(fileName, ".json", "")
+	p := strings.Split(fi.name, "/")
+	if len(p) != fileNameExpectedPartCount {
+		log.Printf("invalid number of name parts, want: %d, got: %d",
+			fileNameExpectedPartCount, len(p))
+		return fi, false
 	}
-	fileName = strings.ReplaceAll(fileName, ".json", "")
-	return strings.ReplaceAll(fileName, fileNamePartDeliminator, ".")
+
+	fi.project = p[0]
+	fi.region = p[1]
+	fi.service = p[2]
+
+	return fi, true
 }

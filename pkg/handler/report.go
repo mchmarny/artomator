@@ -1,23 +1,39 @@
 package handler
 
-const (
-	VulnCountUnknown  = "UNKNOWN"
-	VulnCountLow      = "LOW"
-	VulnCountMedium   = "MEDIUM"
-	VulnCountHigh     = "HIGH"
-	VulnCountCritical = "CRITICAL"
-)
+import "time"
+
+func newDiscoReport() *DiscoReport {
+	return &DiscoReport{
+		Created: time.Now().Format(time.RFC3339),
+		Counts: &DiscoCounter{
+			Totals:   make(map[string]int64),
+			Projects: make(map[string]int64),
+			Services: make(map[string]int64),
+			Regions:  make(map[string]int64),
+		},
+		Results: make([]*DiscoResult, 0),
+	}
+}
 
 type DiscoReport struct {
 	Created string         `json:"created"`
-	Counts  *DiscoCounts   `json:"counts"`
+	Counts  *DiscoCounter  `json:"counts"`
 	Results []*DiscoResult `json:"results"`
 }
 
-type DiscoCounts struct {
-	TotalExposures   map[string]int64 `json:"totalExposures"`
-	ProjectExposures map[string]int64 `json:"projectExposures"`
-	ServiceExposures map[string]int64 `json:"serviceExposures"`
+type DiscoCounter struct {
+	Totals   map[string]int64 `json:"total"`
+	Projects map[string]int64 `json:"projects"`
+	Services map[string]int64 `json:"services"`
+	Regions  map[string]int64 `json:"regions"`
+}
+
+type VulnCounter struct {
+	Critical int64 `json:"critical"`
+	High     int64 `json:"high"`
+	Medium   int64 `json:"medium"`
+	Low      int64 `json:"low"`
+	Unknown  int64 `json:"unknown"`
 }
 
 type DiscoResult struct {

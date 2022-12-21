@@ -5,10 +5,6 @@ import (
 	"fmt"
 )
 
-func NewConsoleCounter() (Counter, error) {
-	return &ConsoleCounter{}, nil
-}
-
 type ConsoleCounter struct {
 }
 

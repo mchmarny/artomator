@@ -12,10 +12,7 @@ import (
 
 func getTestHandler(t *testing.T) *Handler {
 	testCmd := "echo"
-	c, err := metric.NewConsoleCounter()
-	if err != nil {
-		t.Fatal(err)
-	}
+	c := &metric.ConsoleCounter{}
 
 	h, err := NewHandler("", cache.NewInMemoryCache(), c,
 		cmd.NewCommand(CommandNameEvent, testCmd),
