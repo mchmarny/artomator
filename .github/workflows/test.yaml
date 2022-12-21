@@ -2,9 +2,6 @@ name: test
 
 on:
   workflow_call:
-    secrets:
-      token:
-        required: true
     inputs:
       go_version:
         description: 'Version of Go to use for tests'

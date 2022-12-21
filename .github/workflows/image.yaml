@@ -2,14 +2,19 @@ name: image
 
 on:
   workflow_call:
-    secrets:
-      registry:
-        required: true
-      id_provider:
-        required: true
-      service_account:
-        required: true
     inputs:
+      registry:
+        description: 'Artifact Registry'
+        required: true
+        type: string
+      id_provider:
+        description: 'OIDC provider'
+        required: true
+        type: string
+      service_account:
+        description: 'Email of the service account'
+        required: true
+        type: string
       image:
         description: 'Image URI without the label or sha'
         required: true

@@ -1,6 +1,11 @@
 # Mac 
 .DS_Store
 
+# Terraform 
+config/.terraform.lock.hcl
+config/terraform.tfvars
+config/terraform.tfstate
+
 # Test binaries
 *.test
 tmp

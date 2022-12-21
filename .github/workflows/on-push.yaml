@@ -11,7 +11,3 @@ on:
 jobs:
   test:
     uses: ./.github/workflows/test.yaml
-    secrets:
-      token: ${{ secrets.SNYK_TOKEN }}
-    with:
-      go_version: "1.19.4"
