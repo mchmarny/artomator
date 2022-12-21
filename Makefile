@@ -123,6 +123,10 @@ apply: ## Applies Terraform
 	terraform -chdir=./config apply -auto-approve
 .PHONY: apply
 
+nice: ## Formats Terraform 
+	terraform -chdir=./config fmt
+.PHONY: nice
+
 clean: ## Deletes deployed resoruces 
 	tools/cleanup
 .PHONY: clean

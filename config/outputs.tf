@@ -15,13 +15,18 @@ output "IDENTITY_PROVIDER" {
   description = "Provider ID to use in Auth action for GCP in GitHub."
 }
 
+output "KMS_KEY" {
+  value       = "gcpkms://${google_kms_crypto_key.key.id}"
+  description = "Cosign-formated URI to the signing key."
+}
+
 output "REGISTRY_URI" {
   value       = "${google_artifact_registry_repository.registry.location}-docker.pkg.dev/${data.google_project.project.name}/${google_artifact_registry_repository.registry.name}"
   description = "Artifact Registry location."
 }
 
 output "SERVICE_URL" {
-  value       = "${google_cloud_run_service.app.status[0].url}"
+  value       = google_cloud_run_service.app.status[0].url
   description = "Cloud Run service URL."
 }
 

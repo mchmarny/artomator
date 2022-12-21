@@ -37,8 +37,8 @@ resource "google_cloud_run_service" "app" {
 
   metadata {
     annotations = {
-      "run.googleapis.com/ingress"      = "all"
-      "run.googleapis.com/client-name"  = "terraform"
+      "run.googleapis.com/ingress"     = "all"
+      "run.googleapis.com/client-name" = "terraform"
     }
   }
 
@@ -65,23 +65,23 @@ resource "google_cloud_run_service" "app" {
         }
         env {
           name  = "PROJECT_ID"
-          value = "${var.project_id}"
+          value = var.project_id
         }
         env {
           name  = "SIGN_KEY"
-          value = "${google_kms_crypto_key.key.id}"
+          value = google_kms_crypto_key.key.id
         }
         env {
           name  = "REDIS_IP"
-          value = "${google_redis_instance.cache.host}"
+          value = google_redis_instance.cache.host
         }
         env {
           name  = "REDIS_PORT"
-          value = "${google_redis_instance.cache.port}"
+          value = google_redis_instance.cache.port
         }
         env {
           name  = "GCS_BUCKET"
-          value = "${google_storage_bucket.artifact_store.name}"
+          value = google_storage_bucket.artifact_store.name
         }
       }
 
