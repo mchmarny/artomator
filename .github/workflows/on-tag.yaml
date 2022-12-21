@@ -20,14 +20,14 @@ jobs:
       image: us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator
 
 
-  # sign:
-  #   uses: ./.github/workflows/sign.yaml
-  #   needs: image
-  #   secrets:
-  #     registry: ${{ secrets.REGISTRY_URI }}
-  #     id_provider: ${{ secrets.ID_PROVIDER }}
-  #     service_account: ${{ secrets.SERVICE_ACCOUNT }}
-  #     key: ${{ secrets.KMS_KEY }}
-  #   with:
-  #     digest: ${{ needs.image.outputs.digest }}
+  sign:
+    uses: ./.github/workflows/sign.yaml
+    needs: image
+    secrets:
+      registry: us-west1-docker.pkg.dev
+      id_provider: projects/799736955886/locations/global/workloadIdentityPools/artomator-github-pool/providers/github-provider
+      service_account: artomator-github-actions-user@cloudy-demos.iam.gserviceaccount.com
+      key: gcpkms://projects/cloudy-demos/locations/us-west1/keyRings/artomator/cryptoKeys/artomator-signer/cryptoKeyVersions/1
+    with:
+      digest: ${{ needs.image.outputs.digest }}
 

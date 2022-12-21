@@ -2,16 +2,23 @@ name: sign
 
 on:
   workflow_call:
-    secrets:
+    inputs:
       registry:
+        description: 'Artifact Registry URI'
         required: true
+        type: string
       id_provider:
+        description: 'OIDC provider'
         required: true
+        type: string
       service_account:
-        required: true 
+        description: 'Email of the service account'
+        required: true
+        type: string
       key:
         required: true
-    inputs:
+        description: 'KMS key path'
+        type: string
       digest:
         description: 'Fully qualified URI of the image with its digest'
         required: true
