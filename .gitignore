@@ -5,6 +5,7 @@
 config/.terraform.lock.hcl
 config/terraform.tfvars
 config/terraform.tfstate
+config/.terraform
 
 # Test binaries
 *.test
