@@ -6,7 +6,7 @@ DIR="$(dirname "$0")"
 set -o errexit
 set -o pipefail
 
-gcloud artifacts repositories delete $ROOT_NAME --location $REGION -q
+# gcloud artifacts repositories delete $ROOT_NAME --location $REGION -q
 gcloud iam service-accounts delete $SA_EMAIL -q
 gcloud pubsub subscriptions delete gcr-sub -q
 gcloud pubsub topics delete gcr -q
