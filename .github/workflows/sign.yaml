@@ -58,13 +58,15 @@ jobs:
     - name: Scan Image
       uses: aquasecurity/trivy-action@master
       with:
+        scan-type: image
+        security-checks: vuln
         image-ref: '${{ inputs.digest }}'
         format: 'sarif'
         output: 'trivy-results.sarif'
-        exit-code: '1'
-        ignore-unfixed: true
-        severity: 'CRITICAL,HIGH'
+        hide-progress: true
         timeout: '10m'
+        # exit-code: '1'
+        # severity: 'CRITICAL,HIGH'
       env:
         GOOGLE_APPLICATION_CREDENTIAL: /path/to/credential.json
 
@@ -73,7 +75,7 @@ jobs:
       with:
         sarif_file: 'trivy-results.sarif'
 
-    
+
     - name: Install Cosign
       uses: sigstore/cosign-installer@main
       with:
