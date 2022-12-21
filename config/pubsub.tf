@@ -21,3 +21,9 @@ resource "google_pubsub_subscription" "gcr_sub" {
     }
   }
 }
+
+resource "google_project_iam_member" "pubsub_token_creator" {
+  project = data.google_project.project.project_id
+  role    = "roles/iam.serviceAccountTokenCreator"
+  member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+}
