@@ -2,10 +2,11 @@
 .DS_Store
 
 # Terraform 
-config/.terraform.lock.hcl
+config/.terraform
 config/terraform.tfvars
 config/terraform.tfstate
-config/.terraform
+config/terraform.tfstate.backup
+
 
 # Test binaries
 *.test
