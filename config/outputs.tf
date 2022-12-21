@@ -19,3 +19,11 @@ output "REGISTRY_URI" {
   value       = "${google_artifact_registry_repository.registry.location}-docker.pkg.dev/${data.google_project.project.name}/${google_artifact_registry_repository.registry.name}"
   description = "Artifact Registry location."
 }
+
+output "SERVICE_URL" {
+  value       = "${google_cloud_run_service.app.status[0].url}"
+  description = "Cloud Run service URL."
+}
+
+
+

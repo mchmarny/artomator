@@ -8,7 +8,7 @@ resource "google_kms_crypto_key" "key" {
   purpose  = "ASYMMETRIC_SIGN"
 
   version_template {
-    algorithm = "rsa-sign-pkcs1-4096-sha512"
+    algorithm = "RSA_SIGN_PKCS1_4096_SHA512"
   }
   
   lifecycle {
