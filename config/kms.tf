@@ -48,3 +48,11 @@ resource "google_kms_crypto_key_iam_binding" "crypto_key_viewer" {
   ]
 }
 
+resource "google_kms_crypto_key_iam_binding" "crypto_key_admin" {
+  crypto_key_id = google_kms_crypto_key.key.id
+  role          = "roles/cloudkms.admin"
+  members = [
+    "serviceAccount:${google_service_account.github_actions_user.email}",
+  ]
+}
+

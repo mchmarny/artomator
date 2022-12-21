@@ -73,4 +73,5 @@ digest.txt
 
 tests/app/index.js
 tests/test-digest.txt
-.gitignore
+
+tests/message.json

@@ -36,6 +36,7 @@ trivy image \
     --security-checks vuln \
     --timeout 10m \
     --format json \
+    --no-progress \
     --output $TARGET_DIR/vuln.json \
     $IMAGE_DIGEST
 

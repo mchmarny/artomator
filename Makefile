@@ -41,7 +41,7 @@ server: ## Runs previsouly built server binary
 	./server 
 .PHONY: server
 
-event-test: image ## Submits events test to local service
+event-test: ## Submits events test to local service
 	curl -i -X POST -H "Content-Type: application/json" \
 	     -s -d @tests/message.json \
          "http://127.0.0.1:8080/event"
