@@ -46,16 +46,6 @@ jobs:
     - name: Input Digest
       run: |
         echo "${{ inputs.digest }}"
-
-    - name: Scan canner
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: "${{ inputs.digest }}"
-        format: 'json'
-        exit-code: '1'
-        ignore-unfixed: true
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
     
     - id: auth
       name: Get GCP token
@@ -64,6 +54,25 @@ jobs:
           token_format: "access_token"
           workload_identity_provider: ${{ inputs.id_provider }}
           service_account: ${{ inputs.service_account }}
+
+    - name: Scan Image
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: '${{ inputs.digest }}'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        exit-code: '1'
+        ignore-unfixed: true
+        severity: 'CRITICAL,HIGH'
+        timeout: '10m'
+      env:
+        GOOGLE_APPLICATION_CREDENTIAL: /path/to/credential.json
+
+    - name: Upload Results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+
     
     - name: Install Cosign
       uses: sigstore/cosign-installer@main
@@ -101,3 +110,5 @@ jobs:
         cosign verify-attestation --type spdx-json --key ${{ inputs.key }} ${{ inputs.digest }}
       env:
         COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
+
+    
