@@ -3,28 +3,28 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/mchmarny/artomator)](https://goreportcard.com/report/github.com/mchmarny/artomator) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/mchmarny/artomator) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/gojp/goreportcard/blob/master/LICENSE)
 
-[Artifact Registry (AR)](https://cloud.google.com/artifact-registry) `artomator` automates the creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom), and vulnerability scanning of container images. When deployed in your GCP project, `artomator` will automatically process any images that pushed into registry with the expected [label](https://docs.docker.com/config/labels-custom-metadata/). For example:
+Automates the creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom), and vulnerability scanning of container images. When deployed in your GCP project, `artomator` will automatically process any image that is pushed into [Artifact Registry (AR)](https://cloud.google.com/artifact-registry) with one of the expected [label](https://docs.docker.com/config/labels-custom-metadata/). For example:
 
 ```shell
 docker build -t $TAG --label artomator-sbom=spdx --label artomator-vuln=true .
 ```
 
-The `artomator-sbom=spdx` label in your `docker build` commend will automatically tell `artomator` to add SBOM attestations in SPDX format to the resulting image (the supported formats are: `cyclonedx` or `spdx`). Additionally, if you also include the `artomator-vuln=true` label, `artomator` will generate a vulnerability report from that SBOM. 
-
-![](images/reg.png)
-
-## how it works
+The `artomator-sbom=spdx` label in the above `docker build` commend will tell `artomator` to add SBOM attestations in an [SPDX](https://spdx.dev/) format (the supported formats are: `cyclonedx` or `spdx`). Additionally, if you also include the `artomator-vuln=true` label, `artomator` will also generate a vulnerability report from that SBOM. 
 
 ![](images/flow.png)
+
+> `artomator` also exposes an attestation verification and runtime vulnerability discovery APIs. See API section for details
+
+## how it works
 
 1. Whenever an image is published to the Artifact Registry 
 2. A [registry event](https://cloud.google.com/artifact-registry/docs/configure-notifications) is automatically published if there is a [PubSub](https://cloud.google.com/pubsub/docs/overview) topic named `gcr` in the same project
 3. PubSub subscription pushes that event to `artomator` service in [Cloud Run](https://cloud.google.com/run) with the operation type (e.g. `INSERT`) and the image digest (SHA256)
-4. The `artomator` service retrieves metadata for that image from the registry
-5. Signs that image using KMS key and creates the requested artifacts (SBOM or vulnerability report) based on the labels
-6. Creates attestation for these artifacts on the original image using the KMS key, and pushes it all the registry
-7. (optional) If GCS bucket is configured, `artomator` will persist the generated artifacts
-8. Store the processed image digests in Redis to avoid re-processing the same image (technically adding attestation to an image creates yet another event so this could cause recursion without that check)
+4. The `artomator` service retrieves metadata for that image from the registry and check its labels
+5. If the image includes `artomator-*` labels, signs that image using KMS key, and creates the requested artifacts (SBOM or vulnerability report)
+6. Adds attestation on the image using the KMS key and stores it all in the registry
+7. (optional) If GCS bucket is configured, `artomator` will also persist the generated artifacts
+8. Stores the processed image digests in a Redis store to avoid re-processing the same image (technically adding attestation to an image creates yet another event, so this could cause recursion without that check)
 
 To processes images, `artomator` uses:
 
@@ -55,31 +55,36 @@ where:
 * `-vuln.json` is the vulnerability report based on the SBOM based on `trivy` DB
 * `-meta.json` is the image metadata in the registry as it was when the image was processed
 
-## deployment 
+## api 
 
-To deploy the prebuilt `artomator` image with all the dependencies run:
+`artomator` exposes also APIs for image attestation verification and runtime vulnerability discovery. 
 
-> Note, provisioning Redis service may take a few minutes
+### image attestation verification api
+
+The `artomator` service exposes (GET `/verify`) API which you can query with the image digest to verify the expected attestations on the image.
+
+> Note, access to the `artomator` service requires `roles/run.invoker` IAM role
+
+First, start by exporting the `artomator` service URL:
 
 ```shell
-make deploy
+export SERVICE_URL=$(gcloud run services describe artomator \
+  --region $REGION --format="value(status.url)")
 ```
 
-This will:
+Then, to query the verify endpoint:
 
-* Enable required APIs
-* Create artifact registry (`artomator`)
-* Configure KMS key (`keyRings/artomator/cryptoKeys/artomator-signer`)
-* PubSub topic (`gcr`) and subscription to that topic (`gcr-sub`)
-* Deploy Cloud Run service (`artomator`) along with the `redis` dependency 
+```shell
+curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
+     -H "Content-Type: application/json" \
+     -H "X-Goog-User-Project: ${PROJECT_ID}" \
+     "${SERVICE_URL}/verify?type=spdx&digest=${IMAGE_DIGEST}"
+```
 
-> To build your own `artomator` image see the [build your own](#build-your-own) section. 
+If the required attestation for SPDX formatted SBOM (`https://spdx.dev/Document`) is found, `artomator` will return the entire attestation.
 
-## verify processed image
 
-You can verify images using either `artomator` service or `cosign` CLI.
-
-#### using cosign
+## verify processed image using cosign
 
 To verify the attestation for `artomator` processed images you will need the KMS key name that was used to sign that image. You retrieve it using the following command:
 
@@ -131,71 +136,33 @@ cosign verify-attestation --type=spdx --key "gcpkms://${SIGN_KEY}" $IMAGE_DIGEST
     | jq -r .payload | base64 -d > sbom.spdx.json
 ```
 
-#### using artomator itself
+## deployment 
 
-The `artomator` service exposes `/verify` which you can query with the image digest to verify the expected attestations on the image.
-
-> Note, access to the `artomator` service requires `roles/run.invoker` IAM role
-
-First, start by exporting the `artomator` service URL:
+To deploy the prebuilt `artomator` first, start by exporting the GCP `PROJECT_ID` to which you want to deploy:
 
 ```shell
-export SERVICE_URL=$(gcloud run services describe artomator \
-  --region $REGION --format="value(status.url)")
+export PROJECT_ID=<your-project-id-here>
 ```
 
-Then, to query the verify endpoint:
+Next, deploy the pre-built image:
 
 ```shell
-curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
-     -H "Content-Type: application/json" -i -X POST \
-     -H "X-Goog-User-Project: ${PROJECT_ID}" \
-     "${SERVICE_URL}/verify?format=spdx&digest=${IMAGE_DIGEST}"
+make deploy
 ```
 
-If the required attestation for SPDX formatted SBOM (`https://spdx.dev/Document`) is found, `artomator` will return something like this:
+> Note, provisioning some service dependencies may take a few minutes
 
-```json
-{
-  "SPDXID": "SPDXRef-DOCUMENT",
-  "creationInfo": {
-    "comment": "",
-    "created": "2022-12-19T14:54:19Z",
-    "creators": [
-      "Organization: Anchore, Inc",
-      "Tool: syft-0.62.1"
-    ],
-    "licenseListVersion": "3.18"
-  },
-  "dataLicense": "CC0-1.0",
-  "documentNamespace": "https://anchore.com/syft/image/us-west1-docker.pkg.dev/.../artomator/tester@sha256-950...14d983fe9151",
-  "name": "us-west1-docker.pkg.dev/.../artomator/tester@sha256:950...064",
-  "spdxVersion": "SPDX-2.3"
-}
-```
+When done, this will:
+
+* Enable required APIs
+* Create artifact registry (`artomator`)
+* Configure KMS key (`keyRings/artomator/cryptoKeys/artomator-signer`)
+* PubSub topic (`gcr`) and subscription to that topic (`gcr-sub`)
+* Deploy Cloud Run service (`artomator`) along with the `redis` dependency 
+* Create a GCS bucket (`$PROJECT_ID-artomator`)
 
 
-## build your own
-
-To build the `artomator` image yourself in your own project, first, enable required APIs, create registry, and configure KMS key:
-
-```shell
-tools/setup
-```
-
-Then, build the `artomator` image locally, sign it, generate its own SBOM with vulnerability report, publish that image to your own registry (created in setup), and run attestation validation to make sure the image is ready for use:
-
-```shell
-tools/build
-```
-
-Finally, create the PubSub topic with push subscription, and deploy Cloud Run service to process the registry events: 
-
-> Note, the created Cloud Run service requires `roles/run.invoker` roles so only the PubSub push subscription will be allowed to invoke that service. 
-
-```shell
-tools/deploy
-```
+> To build your own `artomator` image and deploy everything manually, see [BUILD.md](BUILD.md). 
 
 ## test deployment
 

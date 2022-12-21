@@ -1,1 +1,555 @@
-{"SchemaVersion":2,"ArtifactName":"us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:a4951ed5e60d05b418a57085c297344fa21f98c5e9aebbd74f70f61c4b697a9c","ArtifactType":"container_image","Metadata":{"OS":{"Family":"alpine","Name":"3.17.0"},"ImageID":"sha256:88c1811158df211a3a5c36e69857fcd9ed3dd4a9a6ee93607155006380bc39f7","DiffIDs":["sha256:ded7a220bb058e28ee3254fbba04ca90b679070424424761a53a043b93b612bf","sha256:34d9e0b0553510b6ed4548635e493c902933196b420c4b5f30faba8ed82fc935","sha256:044e6c0625c1e9101ddd9123f17c8b55ca82cb2f124dc8b832ce9a0b26b7e120","sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef","sha256:323ce44d4082cbe6e3fe6c28b2e26e54fbd363c767348aed5902593517aff3f9","sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005","sha256:4d59e050d0e30080199048ad653abdf4d50088a6562e4f4111d36a7d3a15e7a4","sha256:08d1cc6fa7f03092dbea33c4e6874265fc36f1ac51702b1f01e8947bbfb1adea","sha256:5f078aa540d00cbde7ab87f86ce2476fd31dc0726931ac278e1959637be5ec81","sha256:5f078aa540d00cbde7ab87f86ce2476fd31dc0726931ac278e1959637be5ec81"],"RepoTags":["us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator:v0.7.4"],"RepoDigests":["us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:a4951ed5e60d05b418a57085c297344fa21f98c5e9aebbd74f70f61c4b697a9c"],"ImageConfig":{"architecture":"amd64","created":"2022-12-21T11:04:49.94886218Z","history":[{"created":"2022-11-22T22:19:28Z","created_by":"/bin/sh -c #(nop) ADD file:587cae71969871d3c6456d844a8795df9b64b12c710c275295a1182b46f630e7 in / "},{"created":"2022-11-22T22:19:29Z","created_by":"/bin/sh -c #(nop)  CMD [\"/bin/sh\"]","empty_layer":true},{"created":"2022-12-21T11:01:52Z","created_by":"ARG VERSION","comment":"buildkit.dockerfile.v0","empty_layer":true},{"created":"2022-12-21T11:01:52Z","created_by":"LABEL artomator.version=v0.7.4","comment":"buildkit.dockerfile.v0","empty_layer":true},{"created":"2022-12-21T11:01:52Z","created_by":"COPY /src/server /app/ # buildkit","comment":"buildkit.dockerfile.v0"},{"created":"2022-12-21T11:01:52Z","created_by":"COPY /src/bin/ /app/bin/ # buildkit","comment":"buildkit.dockerfile.v0"},{"created":"2022-12-21T11:01:52Z","created_by":"WORKDIR /app","comment":"buildkit.dockerfile.v0"},{"created":"2022-12-21T11:02:02Z","created_by":"RUN |1 VERSION=v0.7.4 /bin/sh -c apk add --update bash curl jq cosign ca-certificates python3 # buildkit","comment":"buildkit.dockerfile.v0"},{"created":"2022-12-21T11:02:02Z","created_by":"ENV CLOUDSDK_INSTALL_DIR=/gcloud/","comment":"buildkit.dockerfile.v0","empty_layer":true},{"created":"2022-12-21T11:04:25Z","created_by":"RUN |1 VERSION=v0.7.4 /bin/sh -c curl -sSL https://sdk.cloud.google.com | bash # buildkit","comment":"buildkit.dockerfile.v0"},{"created":"2022-12-21T11:04:25Z","created_by":"ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/gcloud/google-cloud-sdk/bin/:/app/bin/","comment":"buildkit.dockerfile.v0","empty_layer":true},{"created":"2022-12-21T11:04:36Z","created_by":"RUN |1 VERSION=v0.7.4 /bin/sh -c curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh     | sh -s -- -b /usr/local/bin # buildkit","comment":"buildkit.dockerfile.v0"},{"created":"2022-12-21T11:04:49Z","created_by":"RUN |1 VERSION=v0.7.4 /bin/sh -c curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh     | sh -s -- -b /usr/local/bin # buildkit","comment":"buildkit.dockerfile.v0"},{"created":"2022-12-21T11:04:49Z","created_by":"RUN |1 VERSION=v0.7.4 /bin/sh -c echo $PATH # buildkit","comment":"buildkit.dockerfile.v0"},{"created":"2022-12-21T11:04:49Z","created_by":"RUN |1 VERSION=v0.7.4 /bin/sh -c ls -al # buildkit","comment":"buildkit.dockerfile.v0"},{"created":"2022-12-21T11:04:49Z","created_by":"ENTRYPOINT [\"./server\"]","comment":"buildkit.dockerfile.v0","empty_layer":true}],"os":"linux","rootfs":{"type":"layers","diff_ids":["sha256:ded7a220bb058e28ee3254fbba04ca90b679070424424761a53a043b93b612bf","sha256:34d9e0b0553510b6ed4548635e493c902933196b420c4b5f30faba8ed82fc935","sha256:044e6c0625c1e9101ddd9123f17c8b55ca82cb2f124dc8b832ce9a0b26b7e120","sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef","sha256:323ce44d4082cbe6e3fe6c28b2e26e54fbd363c767348aed5902593517aff3f9","sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005","sha256:4d59e050d0e30080199048ad653abdf4d50088a6562e4f4111d36a7d3a15e7a4","sha256:08d1cc6fa7f03092dbea33c4e6874265fc36f1ac51702b1f01e8947bbfb1adea","sha256:5f078aa540d00cbde7ab87f86ce2476fd31dc0726931ac278e1959637be5ec81","sha256:5f078aa540d00cbde7ab87f86ce2476fd31dc0726931ac278e1959637be5ec81"]},"config":{"Entrypoint":["./server"],"Env":["PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/gcloud/google-cloud-sdk/bin/:/app/bin/","CLOUDSDK_INSTALL_DIR=/gcloud/"],"Labels":{"artomator.version":"v0.7.4"},"WorkingDir":"/app"}}},"Results":[{"Target":"us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:a4951ed5e60d05b418a57085c297344fa21f98c5e9aebbd74f70f61c4b697a9c (alpine 3.17.0)","Class":"os-pkgs","Type":"alpine"},{"Target":"gcloud/google-cloud-sdk/bin/anthoscli","Class":"lang-pkgs","Type":"gobinary","Vulnerabilities":[{"VulnerabilityID":"CVE-2020-8911","PkgName":"github.com/aws/aws-sdk-go","InstalledVersion":"v1.25.3","Layer":{"DiffID":"sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005"},"SeveritySource":"nvd","PrimaryURL":"https://avd.aquasec.com/nvd/cve-2020-8911","DataSource":{"ID":"go-vulndb","Name":"The Go Vulnerability Database","URL":"https://github.com/golang/vulndb"},"Title":"aws/aws-sdk-go: CBC padding oracle issue in AWS S3 Crypto SDK for golang","Description":"A padding oracle vulnerability exists in the AWS S3 Crypto SDK for GoLang versions prior to V2. The SDK allows users to encrypt files with AES-CBC without computing a Message Authentication Code (MAC), which then allows an attacker who has write access to the target's S3 bucket and can observe whether or not an endpoint with access to the key can decrypt a file, they can reconstruct the plaintext with (on average) 128*length (plaintext) queries to the endpoint, by exploiting CBC's ability to manipulate the bytes of the next block and PKCS5 padding errors. It is recommended to update your SDK to V2 or later, and re-encrypt your files.","Severity":"MEDIUM","CweIDs":["CWE-327"],"CVSS":{"ghsa":{"V3Vector":"CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N","V3Score":5.6},"nvd":{"V2Vector":"AV:L/AC:L/Au:N/C:P/I:N/A:N","V3Vector":"CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N","V2Score":2.1,"V3Score":5.6},"redhat":{"V3Vector":"CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N","V3Score":5.6}},"References":["https://access.redhat.com/security/cve/CVE-2020-8911","https://aws.amazon.com/blogs/developer/updates-to-the-amazon-s3-encryption-client/?s=09","https://bugzilla.redhat.com/show_bug.cgi?id=1869800","https://github.com/advisories/GHSA-f5pg-7wfw-84q9","https://github.com/aws/aws-sdk-go/commit/1e84382fa1c0086362b5a4b68e068d4f8518d40e","https://github.com/aws/aws-sdk-go/commit/ae9b9fd92af132cfd8d879809d8611825ba135f4","https://github.com/aws/aws-sdk-go/pull/3403","https://github.com/google/security-research/security/advisories/GHSA-f5pg-7wfw-84q9","https://github.com/sophieschmieg/exploits/tree/master/aws_s3_crypto_poc","https://nvd.nist.gov/vuln/detail/CVE-2020-8911","https://pkg.go.dev/vuln/GO-2022-0646"],"PublishedDate":"2020-08-11T20:15:00Z","LastModifiedDate":"2020-08-18T13:37:00Z"},{"VulnerabilityID":"CVE-2022-27664","PkgName":"golang.org/x/net","InstalledVersion":"v0.0.0-20220127200216-cd36cc0744dd","FixedVersion":"0.0.0-20220906165146-f3363e06e74c","Layer":{"DiffID":"sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005"},"SeveritySource":"nvd","PrimaryURL":"https://avd.aquasec.com/nvd/cve-2022-27664","DataSource":{"ID":"go-vulndb","Name":"The Go Vulnerability Database","URL":"https://github.com/golang/vulndb"},"Title":"golang: net/http: handle server errors after sending GOAWAY","Description":"In net/http in Go before 1.18.6 and 1.19.x before 1.19.1, attackers can cause a denial of service because an HTTP/2 connection can hang during closing if shutdown were preempted by a fatal error.","Severity":"HIGH","CVSS":{"nvd":{"V3Vector":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H","V3Score":7.5},"redhat":{"V3Vector":"CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H","V3Score":6.5}},"References":["https://access.redhat.com/errata/RHSA-2022:7129","https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2022-27664.json","https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2022-32189.json","https://access.redhat.com/security/cve/CVE-2022-27664","https://bugzilla.redhat.com/1913333","https://bugzilla.redhat.com/1913338","https://bugzilla.redhat.com/2107371","https://bugzilla.redhat.com/2107374","https://bugzilla.redhat.com/2107383","https://bugzilla.redhat.com/2107386","https://bugzilla.redhat.com/2107388","https://bugzilla.redhat.com/2113814","https://bugzilla.redhat.com/2124669","https://errata.almalinux.org/8/ALSA-2022-7129.html","https://go.dev/cl/428735","https://go.dev/issue/54658","https://groups.google.com/g/golang-announce","https://groups.google.com/g/golang-announce/c/x49AQzIVX-s","https://groups.google.com/g/golang-announce/c/x49AQzIVX-s/m/0tgO0pjiBQAJ","https://linux.oracle.com/cve/CVE-2022-27664.html","https://linux.oracle.com/errata/ELSA-2022-7129.html","https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/JXKTHIGE5F576MAPFYCIJXNRGBSPISUF/","https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/TXS2OQ57KZC5XZKK5UW4SYKPVQAHIOJX/","https://nvd.nist.gov/vuln/detail/CVE-2022-27664","https://pkg.go.dev/vuln/GO-2022-0969","https://security.gentoo.org/glsa/202209-26","https://security.netapp.com/advisory/ntap-20220923-0004/"],"PublishedDate":"2022-09-06T18:15:00Z","LastModifiedDate":"2022-10-28T12:42:00Z"},{"VulnerabilityID":"CVE-2022-41717","PkgName":"golang.org/x/net","InstalledVersion":"v0.0.0-20220127200216-cd36cc0744dd","FixedVersion":"0.4.0","Layer":{"DiffID":"sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005"},"SeveritySource":"nvd","PrimaryURL":"https://avd.aquasec.com/nvd/cve-2022-41717","DataSource":{"ID":"go-vulndb","Name":"The Go Vulnerability Database","URL":"https://github.com/golang/vulndb"},"Title":"An attacker can cause excessive memory growth in a Go server accepting ...","Description":"An attacker can cause excessive memory growth in a Go server accepting HTTP/2 requests. HTTP/2 server connections contain a cache of HTTP header keys sent by the client. While the total number of entries in this cache is capped, an attacker sending very large keys can cause the server to allocate approximately 64 MiB per open connection.","Severity":"MEDIUM","CweIDs":["CWE-770"],"CVSS":{"nvd":{"V3Vector":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L","V3Score":5.3}},"References":["https://go.dev/cl/455635","https://go.dev/cl/455717","https://go.dev/issue/56350","https://groups.google.com/g/golang-announce/c/L_3rmdT0BMU/m/yZDrXjIiBQAJ","https://nvd.nist.gov/vuln/detail/CVE-2022-41717","https://pkg.go.dev/vuln/GO-2022-1144"],"PublishedDate":"2022-12-08T20:15:00Z","LastModifiedDate":"2022-12-12T17:50:00Z"},{"VulnerabilityID":"CVE-2022-32149","PkgName":"golang.org/x/text","InstalledVersion":"v0.3.7","FixedVersion":"0.3.8","Layer":{"DiffID":"sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005"},"SeveritySource":"nvd","PrimaryURL":"https://avd.aquasec.com/nvd/cve-2022-32149","DataSource":{"ID":"go-vulndb","Name":"The Go Vulnerability Database","URL":"https://github.com/golang/vulndb"},"Title":"golang: golang.org/x/text/language: ParseAcceptLanguage takes a long time to parse complex tags","Description":"An attacker may cause a denial of service by crafting an Accept-Language header which ParseAcceptLanguage will take significant time to parse.","Severity":"HIGH","CweIDs":["CWE-772"],"CVSS":{"ghsa":{"V3Vector":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H","V3Score":7.5},"nvd":{"V3Vector":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H","V3Score":7.5},"redhat":{"V3Vector":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H","V3Score":7.5}},"References":["https://access.redhat.com/security/cve/CVE-2022-32149","https://github.com/advisories/GHSA-69ch-w2m2-3vjp","https://github.com/golang/go/issues/56152","https://github.com/golang/text/commit/434eadcdbc3b0256971992e8c70027278364c72c","https://go.dev/cl/442235","https://go.dev/issue/56152","https://groups.google.com/g/golang-announce/c/-hjNw559_tE/m/KlGTfid5CAAJ","https://groups.google.com/g/golang-dev/c/qfPIly0X7aU","https://nvd.nist.gov/vuln/detail/CVE-2022-32149","https://pkg.go.dev/vuln/GO-2022-1059"],"PublishedDate":"2022-10-14T15:15:00Z","LastModifiedDate":"2022-10-18T17:41:00Z"}]},{"Target":"usr/local/bin/syft","Class":"lang-pkgs","Type":"gobinary","Vulnerabilities":[{"VulnerabilityID":"CVE-2022-41717","PkgName":"golang.org/x/net","InstalledVersion":"v0.0.0-20221012135044-0b7e1fb9d458","FixedVersion":"0.4.0","Layer":{"DiffID":"sha256:4d59e050d0e30080199048ad653abdf4d50088a6562e4f4111d36a7d3a15e7a4"},"SeveritySource":"nvd","PrimaryURL":"https://avd.aquasec.com/nvd/cve-2022-41717","DataSource":{"ID":"go-vulndb","Name":"The Go Vulnerability Database","URL":"https://github.com/golang/vulndb"},"Title":"An attacker can cause excessive memory growth in a Go server accepting ...","Description":"An attacker can cause excessive memory growth in a Go server accepting HTTP/2 requests. HTTP/2 server connections contain a cache of HTTP header keys sent by the client. While the total number of entries in this cache is capped, an attacker sending very large keys can cause the server to allocate approximately 64 MiB per open connection.","Severity":"MEDIUM","CweIDs":["CWE-770"],"CVSS":{"nvd":{"V3Vector":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L","V3Score":5.3}},"References":["https://go.dev/cl/455635","https://go.dev/cl/455717","https://go.dev/issue/56350","https://groups.google.com/g/golang-announce/c/L_3rmdT0BMU/m/yZDrXjIiBQAJ","https://nvd.nist.gov/vuln/detail/CVE-2022-41717","https://pkg.go.dev/vuln/GO-2022-1144"],"PublishedDate":"2022-12-08T20:15:00Z","LastModifiedDate":"2022-12-12T17:50:00Z"},{"VulnerabilityID":"CVE-2022-32149","PkgName":"golang.org/x/text","InstalledVersion":"v0.3.8-0.20211004125949-5bd84dd9b33b","FixedVersion":"0.3.8","Layer":{"DiffID":"sha256:4d59e050d0e30080199048ad653abdf4d50088a6562e4f4111d36a7d3a15e7a4"},"SeveritySource":"nvd","PrimaryURL":"https://avd.aquasec.com/nvd/cve-2022-32149","DataSource":{"ID":"go-vulndb","Name":"The Go Vulnerability Database","URL":"https://github.com/golang/vulndb"},"Title":"golang: golang.org/x/text/language: ParseAcceptLanguage takes a long time to parse complex tags","Description":"An attacker may cause a denial of service by crafting an Accept-Language header which ParseAcceptLanguage will take significant time to parse.","Severity":"HIGH","CweIDs":["CWE-772"],"CVSS":{"ghsa":{"V3Vector":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H","V3Score":7.5},"nvd":{"V3Vector":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H","V3Score":7.5},"redhat":{"V3Vector":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H","V3Score":7.5}},"References":["https://access.redhat.com/security/cve/CVE-2022-32149","https://github.com/advisories/GHSA-69ch-w2m2-3vjp","https://github.com/golang/go/issues/56152","https://github.com/golang/text/commit/434eadcdbc3b0256971992e8c70027278364c72c","https://go.dev/cl/442235","https://go.dev/issue/56152","https://groups.google.com/g/golang-announce/c/-hjNw559_tE/m/KlGTfid5CAAJ","https://groups.google.com/g/golang-dev/c/qfPIly0X7aU","https://nvd.nist.gov/vuln/detail/CVE-2022-32149","https://pkg.go.dev/vuln/GO-2022-1059"],"PublishedDate":"2022-10-14T15:15:00Z","LastModifiedDate":"2022-10-18T17:41:00Z"}]},{"Target":"usr/local/bin/trivy","Class":"lang-pkgs","Type":"gobinary","Vulnerabilities":[{"VulnerabilityID":"CVE-2020-8911","PkgName":"github.com/aws/aws-sdk-go","InstalledVersion":"v1.44.136","Layer":{"DiffID":"sha256:08d1cc6fa7f03092dbea33c4e6874265fc36f1ac51702b1f01e8947bbfb1adea"},"SeveritySource":"nvd","PrimaryURL":"https://avd.aquasec.com/nvd/cve-2020-8911","DataSource":{"ID":"go-vulndb","Name":"The Go Vulnerability Database","URL":"https://github.com/golang/vulndb"},"Title":"aws/aws-sdk-go: CBC padding oracle issue in AWS S3 Crypto SDK for golang","Description":"A padding oracle vulnerability exists in the AWS S3 Crypto SDK for GoLang versions prior to V2. The SDK allows users to encrypt files with AES-CBC without computing a Message Authentication Code (MAC), which then allows an attacker who has write access to the target's S3 bucket and can observe whether or not an endpoint with access to the key can decrypt a file, they can reconstruct the plaintext with (on average) 128*length (plaintext) queries to the endpoint, by exploiting CBC's ability to manipulate the bytes of the next block and PKCS5 padding errors. It is recommended to update your SDK to V2 or later, and re-encrypt your files.","Severity":"MEDIUM","CweIDs":["CWE-327"],"CVSS":{"ghsa":{"V3Vector":"CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N","V3Score":5.6},"nvd":{"V2Vector":"AV:L/AC:L/Au:N/C:P/I:N/A:N","V3Vector":"CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N","V2Score":2.1,"V3Score":5.6},"redhat":{"V3Vector":"CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N","V3Score":5.6}},"References":["https://access.redhat.com/security/cve/CVE-2020-8911","https://aws.amazon.com/blogs/developer/updates-to-the-amazon-s3-encryption-client/?s=09","https://bugzilla.redhat.com/show_bug.cgi?id=1869800","https://github.com/advisories/GHSA-f5pg-7wfw-84q9","https://github.com/aws/aws-sdk-go/commit/1e84382fa1c0086362b5a4b68e068d4f8518d40e","https://github.com/aws/aws-sdk-go/commit/ae9b9fd92af132cfd8d879809d8611825ba135f4","https://github.com/aws/aws-sdk-go/pull/3403","https://github.com/google/security-research/security/advisories/GHSA-f5pg-7wfw-84q9","https://github.com/sophieschmieg/exploits/tree/master/aws_s3_crypto_poc","https://nvd.nist.gov/vuln/detail/CVE-2020-8911","https://pkg.go.dev/vuln/GO-2022-0646"],"PublishedDate":"2020-08-11T20:15:00Z","LastModifiedDate":"2020-08-18T13:37:00Z"},{"VulnerabilityID":"CVE-2022-41717","PkgName":"golang.org/x/net","InstalledVersion":"v0.1.0","FixedVersion":"0.4.0","Layer":{"DiffID":"sha256:08d1cc6fa7f03092dbea33c4e6874265fc36f1ac51702b1f01e8947bbfb1adea"},"SeveritySource":"nvd","PrimaryURL":"https://avd.aquasec.com/nvd/cve-2022-41717","DataSource":{"ID":"go-vulndb","Name":"The Go Vulnerability Database","URL":"https://github.com/golang/vulndb"},"Title":"An attacker can cause excessive memory growth in a Go server accepting ...","Description":"An attacker can cause excessive memory growth in a Go server accepting HTTP/2 requests. HTTP/2 server connections contain a cache of HTTP header keys sent by the client. While the total number of entries in this cache is capped, an attacker sending very large keys can cause the server to allocate approximately 64 MiB per open connection.","Severity":"MEDIUM","CweIDs":["CWE-770"],"CVSS":{"nvd":{"V3Vector":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L","V3Score":5.3}},"References":["https://go.dev/cl/455635","https://go.dev/cl/455717","https://go.dev/issue/56350","https://groups.google.com/g/golang-announce/c/L_3rmdT0BMU/m/yZDrXjIiBQAJ","https://nvd.nist.gov/vuln/detail/CVE-2022-41717","https://pkg.go.dev/vuln/GO-2022-1144"],"PublishedDate":"2022-12-08T20:15:00Z","LastModifiedDate":"2022-12-12T17:50:00Z"}]}]}
+{
+    "SchemaVersion": 2,
+    "ArtifactName": "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:a4951ed5e60d05b418a57085c297344fa21f98c5e9aebbd74f70f61c4b697a9c",
+    "ArtifactType": "container_image",
+    "Metadata": {
+        "OS": {
+            "Family": "alpine",
+            "Name": "3.17.0"
+        },
+        "ImageID": "sha256:88c1811158df211a3a5c36e69857fcd9ed3dd4a9a6ee93607155006380bc39f7",
+        "DiffIDs": [
+            "sha256:ded7a220bb058e28ee3254fbba04ca90b679070424424761a53a043b93b612bf",
+            "sha256:34d9e0b0553510b6ed4548635e493c902933196b420c4b5f30faba8ed82fc935",
+            "sha256:044e6c0625c1e9101ddd9123f17c8b55ca82cb2f124dc8b832ce9a0b26b7e120",
+            "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+            "sha256:323ce44d4082cbe6e3fe6c28b2e26e54fbd363c767348aed5902593517aff3f9",
+            "sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005",
+            "sha256:4d59e050d0e30080199048ad653abdf4d50088a6562e4f4111d36a7d3a15e7a4",
+            "sha256:08d1cc6fa7f03092dbea33c4e6874265fc36f1ac51702b1f01e8947bbfb1adea",
+            "sha256:5f078aa540d00cbde7ab87f86ce2476fd31dc0726931ac278e1959637be5ec81",
+            "sha256:5f078aa540d00cbde7ab87f86ce2476fd31dc0726931ac278e1959637be5ec81"
+        ],
+        "RepoTags": [
+            "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator:v0.7.4"
+        ],
+        "RepoDigests": [
+            "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:a4951ed5e60d05b418a57085c297344fa21f98c5e9aebbd74f70f61c4b697a9c"
+        ],
+        "ImageConfig": {
+            "architecture": "amd64",
+            "created": "2022-12-21T11:04:49.94886218Z",
+            "history": [
+                {
+                    "created": "2022-11-22T22:19:28Z",
+                    "created_by": "/bin/sh -c #(nop) ADD file:587cae71969871d3c6456d844a8795df9b64b12c710c275295a1182b46f630e7 in / "
+                },
+                {
+                    "created": "2022-11-22T22:19:29Z",
+                    "created_by": "/bin/sh -c #(nop)  CMD [\"/bin/sh\"]",
+                    "empty_layer": true
+                },
+                {
+                    "created": "2022-12-21T11:01:52Z",
+                    "created_by": "ARG VERSION",
+                    "comment": "buildkit.dockerfile.v0",
+                    "empty_layer": true
+                },
+                {
+                    "created": "2022-12-21T11:01:52Z",
+                    "created_by": "LABEL artomator.version=v0.7.4",
+                    "comment": "buildkit.dockerfile.v0",
+                    "empty_layer": true
+                },
+                {
+                    "created": "2022-12-21T11:01:52Z",
+                    "created_by": "COPY /src/server /app/ # buildkit",
+                    "comment": "buildkit.dockerfile.v0"
+                },
+                {
+                    "created": "2022-12-21T11:01:52Z",
+                    "created_by": "COPY /src/bin/ /app/bin/ # buildkit",
+                    "comment": "buildkit.dockerfile.v0"
+                },
+                {
+                    "created": "2022-12-21T11:01:52Z",
+                    "created_by": "WORKDIR /app",
+                    "comment": "buildkit.dockerfile.v0"
+                },
+                {
+                    "created": "2022-12-21T11:02:02Z",
+                    "created_by": "RUN |1 VERSION=v0.7.4 /bin/sh -c apk add --update bash curl jq cosign ca-certificates python3 # buildkit",
+                    "comment": "buildkit.dockerfile.v0"
+                },
+                {
+                    "created": "2022-12-21T11:02:02Z",
+                    "created_by": "ENV CLOUDSDK_INSTALL_DIR=/gcloud/",
+                    "comment": "buildkit.dockerfile.v0",
+                    "empty_layer": true
+                },
+                {
+                    "created": "2022-12-21T11:04:25Z",
+                    "created_by": "RUN |1 VERSION=v0.7.4 /bin/sh -c curl -sSL https://sdk.cloud.google.com | bash # buildkit",
+                    "comment": "buildkit.dockerfile.v0"
+                },
+                {
+                    "created": "2022-12-21T11:04:25Z",
+                    "created_by": "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/gcloud/google-cloud-sdk/bin/:/app/bin/",
+                    "comment": "buildkit.dockerfile.v0",
+                    "empty_layer": true
+                },
+                {
+                    "created": "2022-12-21T11:04:36Z",
+                    "created_by": "RUN |1 VERSION=v0.7.4 /bin/sh -c curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh     | sh -s -- -b /usr/local/bin # buildkit",
+                    "comment": "buildkit.dockerfile.v0"
+                },
+                {
+                    "created": "2022-12-21T11:04:49Z",
+                    "created_by": "RUN |1 VERSION=v0.7.4 /bin/sh -c curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh     | sh -s -- -b /usr/local/bin # buildkit",
+                    "comment": "buildkit.dockerfile.v0"
+                },
+                {
+                    "created": "2022-12-21T11:04:49Z",
+                    "created_by": "RUN |1 VERSION=v0.7.4 /bin/sh -c echo $PATH # buildkit",
+                    "comment": "buildkit.dockerfile.v0"
+                },
+                {
+                    "created": "2022-12-21T11:04:49Z",
+                    "created_by": "RUN |1 VERSION=v0.7.4 /bin/sh -c ls -al # buildkit",
+                    "comment": "buildkit.dockerfile.v0"
+                },
+                {
+                    "created": "2022-12-21T11:04:49Z",
+                    "created_by": "ENTRYPOINT [\"./server\"]",
+                    "comment": "buildkit.dockerfile.v0",
+                    "empty_layer": true
+                }
+            ],
+            "os": "linux",
+            "rootfs": {
+                "type": "layers",
+                "diff_ids": [
+                    "sha256:ded7a220bb058e28ee3254fbba04ca90b679070424424761a53a043b93b612bf",
+                    "sha256:34d9e0b0553510b6ed4548635e493c902933196b420c4b5f30faba8ed82fc935",
+                    "sha256:044e6c0625c1e9101ddd9123f17c8b55ca82cb2f124dc8b832ce9a0b26b7e120",
+                    "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+                    "sha256:323ce44d4082cbe6e3fe6c28b2e26e54fbd363c767348aed5902593517aff3f9",
+                    "sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005",
+                    "sha256:4d59e050d0e30080199048ad653abdf4d50088a6562e4f4111d36a7d3a15e7a4",
+                    "sha256:08d1cc6fa7f03092dbea33c4e6874265fc36f1ac51702b1f01e8947bbfb1adea",
+                    "sha256:5f078aa540d00cbde7ab87f86ce2476fd31dc0726931ac278e1959637be5ec81",
+                    "sha256:5f078aa540d00cbde7ab87f86ce2476fd31dc0726931ac278e1959637be5ec81"
+                ]
+            },
+            "config": {
+                "Entrypoint": [
+                    "./server"
+                ],
+                "Env": [
+                    "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/gcloud/google-cloud-sdk/bin/:/app/bin/",
+                    "CLOUDSDK_INSTALL_DIR=/gcloud/"
+                ],
+                "Labels": {
+                    "artomator.version": "v0.7.4"
+                },
+                "WorkingDir": "/app"
+            }
+        }
+    },
+    "Results": [
+        {
+            "Target": "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:a4951ed5e60d05b418a57085c297344fa21f98c5e9aebbd74f70f61c4b697a9c (alpine 3.17.0)",
+            "Class": "os-pkgs",
+            "Type": "alpine"
+        },
+        {
+            "Target": "gcloud/google-cloud-sdk/bin/anthoscli",
+            "Class": "lang-pkgs",
+            "Type": "gobinary",
+            "Vulnerabilities": [
+                {
+                    "VulnerabilityID": "CVE-2020-8911",
+                    "PkgName": "github.com/aws/aws-sdk-go",
+                    "InstalledVersion": "v1.25.3",
+                    "Layer": {
+                        "DiffID": "sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005"
+                    },
+                    "SeveritySource": "nvd",
+                    "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2020-8911",
+                    "DataSource": {
+                        "ID": "go-vulndb",
+                        "Name": "The Go Vulnerability Database",
+                        "URL": "https://github.com/golang/vulndb"
+                    },
+                    "Title": "aws/aws-sdk-go: CBC padding oracle issue in AWS S3 Crypto SDK for golang",
+                    "Description": "A padding oracle vulnerability exists in the AWS S3 Crypto SDK for GoLang versions prior to V2. The SDK allows users to encrypt files with AES-CBC without computing a Message Authentication Code (MAC), which then allows an attacker who has write access to the target's S3 bucket and can observe whether or not an endpoint with access to the key can decrypt a file, they can reconstruct the plaintext with (on average) 128*length (plaintext) queries to the endpoint, by exploiting CBC's ability to manipulate the bytes of the next block and PKCS5 padding errors. It is recommended to update your SDK to V2 or later, and re-encrypt your files.",
+                    "Severity": "MEDIUM",
+                    "CweIDs": [
+                        "CWE-327"
+                    ],
+                    "CVSS": {
+                        "ghsa": {
+                            "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
+                            "V3Score": 5.6
+                        },
+                        "nvd": {
+                            "V2Vector": "AV:L/AC:L/Au:N/C:P/I:N/A:N",
+                            "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
+                            "V2Score": 2.1,
+                            "V3Score": 5.6
+                        },
+                        "redhat": {
+                            "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
+                            "V3Score": 5.6
+                        }
+                    },
+                    "References": [
+                        "https://access.redhat.com/security/cve/CVE-2020-8911",
+                        "https://aws.amazon.com/blogs/developer/updates-to-the-amazon-s3-encryption-client/?s=09",
+                        "https://bugzilla.redhat.com/show_bug.cgi?id=1869800",
+                        "https://github.com/advisories/GHSA-f5pg-7wfw-84q9",
+                        "https://github.com/aws/aws-sdk-go/commit/1e84382fa1c0086362b5a4b68e068d4f8518d40e",
+                        "https://github.com/aws/aws-sdk-go/commit/ae9b9fd92af132cfd8d879809d8611825ba135f4",
+                        "https://github.com/aws/aws-sdk-go/pull/3403",
+                        "https://github.com/google/security-research/security/advisories/GHSA-f5pg-7wfw-84q9",
+                        "https://github.com/sophieschmieg/exploits/tree/master/aws_s3_crypto_poc",
+                        "https://nvd.nist.gov/vuln/detail/CVE-2020-8911",
+                        "https://pkg.go.dev/vuln/GO-2022-0646"
+                    ],
+                    "PublishedDate": "2020-08-11T20:15:00Z",
+                    "LastModifiedDate": "2020-08-18T13:37:00Z"
+                },
+                {
+                    "VulnerabilityID": "CVE-2022-27664",
+                    "PkgName": "golang.org/x/net",
+                    "InstalledVersion": "v0.0.0-20220127200216-cd36cc0744dd",
+                    "FixedVersion": "0.0.0-20220906165146-f3363e06e74c",
+                    "Layer": {
+                        "DiffID": "sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005"
+                    },
+                    "SeveritySource": "nvd",
+                    "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-27664",
+                    "DataSource": {
+                        "ID": "go-vulndb",
+                        "Name": "The Go Vulnerability Database",
+                        "URL": "https://github.com/golang/vulndb"
+                    },
+                    "Title": "golang: net/http: handle server errors after sending GOAWAY",
+                    "Description": "In net/http in Go before 1.18.6 and 1.19.x before 1.19.1, attackers can cause a denial of service because an HTTP/2 connection can hang during closing if shutdown were preempted by a fatal error.",
+                    "Severity": "HIGH",
+                    "CVSS": {
+                        "nvd": {
+                            "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                            "V3Score": 7.5
+                        },
+                        "redhat": {
+                            "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H",
+                            "V3Score": 6.5
+                        }
+                    },
+                    "References": [
+                        "https://access.redhat.com/errata/RHSA-2022:7129",
+                        "https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2022-27664.json",
+                        "https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2022-32189.json",
+                        "https://access.redhat.com/security/cve/CVE-2022-27664",
+                        "https://bugzilla.redhat.com/1913333",
+                        "https://bugzilla.redhat.com/1913338",
+                        "https://bugzilla.redhat.com/2107371",
+                        "https://bugzilla.redhat.com/2107374",
+                        "https://bugzilla.redhat.com/2107383",
+                        "https://bugzilla.redhat.com/2107386",
+                        "https://bugzilla.redhat.com/2107388",
+                        "https://bugzilla.redhat.com/2113814",
+                        "https://bugzilla.redhat.com/2124669",
+                        "https://errata.almalinux.org/8/ALSA-2022-7129.html",
+                        "https://go.dev/cl/428735",
+                        "https://go.dev/issue/54658",
+                        "https://groups.google.com/g/golang-announce",
+                        "https://groups.google.com/g/golang-announce/c/x49AQzIVX-s",
+                        "https://groups.google.com/g/golang-announce/c/x49AQzIVX-s/m/0tgO0pjiBQAJ",
+                        "https://linux.oracle.com/cve/CVE-2022-27664.html",
+                        "https://linux.oracle.com/errata/ELSA-2022-7129.html",
+                        "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/JXKTHIGE5F576MAPFYCIJXNRGBSPISUF/",
+                        "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/TXS2OQ57KZC5XZKK5UW4SYKPVQAHIOJX/",
+                        "https://nvd.nist.gov/vuln/detail/CVE-2022-27664",
+                        "https://pkg.go.dev/vuln/GO-2022-0969",
+                        "https://security.gentoo.org/glsa/202209-26",
+                        "https://security.netapp.com/advisory/ntap-20220923-0004/"
+                    ],
+                    "PublishedDate": "2022-09-06T18:15:00Z",
+                    "LastModifiedDate": "2022-10-28T12:42:00Z"
+                },
+                {
+                    "VulnerabilityID": "CVE-2022-41717",
+                    "PkgName": "golang.org/x/net",
+                    "InstalledVersion": "v0.0.0-20220127200216-cd36cc0744dd",
+                    "FixedVersion": "0.4.0",
+                    "Layer": {
+                        "DiffID": "sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005"
+                    },
+                    "SeveritySource": "nvd",
+                    "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-41717",
+                    "DataSource": {
+                        "ID": "go-vulndb",
+                        "Name": "The Go Vulnerability Database",
+                        "URL": "https://github.com/golang/vulndb"
+                    },
+                    "Title": "An attacker can cause excessive memory growth in a Go server accepting ...",
+                    "Description": "An attacker can cause excessive memory growth in a Go server accepting HTTP/2 requests. HTTP/2 server connections contain a cache of HTTP header keys sent by the client. While the total number of entries in this cache is capped, an attacker sending very large keys can cause the server to allocate approximately 64 MiB per open connection.",
+                    "Severity": "MEDIUM",
+                    "CweIDs": [
+                        "CWE-770"
+                    ],
+                    "CVSS": {
+                        "nvd": {
+                            "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
+                            "V3Score": 5.3
+                        }
+                    },
+                    "References": [
+                        "https://go.dev/cl/455635",
+                        "https://go.dev/cl/455717",
+                        "https://go.dev/issue/56350",
+                        "https://groups.google.com/g/golang-announce/c/L_3rmdT0BMU/m/yZDrXjIiBQAJ",
+                        "https://nvd.nist.gov/vuln/detail/CVE-2022-41717",
+                        "https://pkg.go.dev/vuln/GO-2022-1144"
+                    ],
+                    "PublishedDate": "2022-12-08T20:15:00Z",
+                    "LastModifiedDate": "2022-12-12T17:50:00Z"
+                },
+                {
+                    "VulnerabilityID": "CVE-2022-32149",
+                    "PkgName": "golang.org/x/text",
+                    "InstalledVersion": "v0.3.7",
+                    "FixedVersion": "0.3.8",
+                    "Layer": {
+                        "DiffID": "sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005"
+                    },
+                    "SeveritySource": "nvd",
+                    "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-32149",
+                    "DataSource": {
+                        "ID": "go-vulndb",
+                        "Name": "The Go Vulnerability Database",
+                        "URL": "https://github.com/golang/vulndb"
+                    },
+                    "Title": "golang: golang.org/x/text/language: ParseAcceptLanguage takes a long time to parse complex tags",
+                    "Description": "An attacker may cause a denial of service by crafting an Accept-Language header which ParseAcceptLanguage will take significant time to parse.",
+                    "Severity": "HIGH",
+                    "CweIDs": [
+                        "CWE-772"
+                    ],
+                    "CVSS": {
+                        "ghsa": {
+                            "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                            "V3Score": 7.5
+                        },
+                        "nvd": {
+                            "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                            "V3Score": 7.5
+                        },
+                        "redhat": {
+                            "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                            "V3Score": 7.5
+                        }
+                    },
+                    "References": [
+                        "https://access.redhat.com/security/cve/CVE-2022-32149",
+                        "https://github.com/advisories/GHSA-69ch-w2m2-3vjp",
+                        "https://github.com/golang/go/issues/56152",
+                        "https://github.com/golang/text/commit/434eadcdbc3b0256971992e8c70027278364c72c",
+                        "https://go.dev/cl/442235",
+                        "https://go.dev/issue/56152",
+                        "https://groups.google.com/g/golang-announce/c/-hjNw559_tE/m/KlGTfid5CAAJ",
+                        "https://groups.google.com/g/golang-dev/c/qfPIly0X7aU",
+                        "https://nvd.nist.gov/vuln/detail/CVE-2022-32149",
+                        "https://pkg.go.dev/vuln/GO-2022-1059"
+                    ],
+                    "PublishedDate": "2022-10-14T15:15:00Z",
+                    "LastModifiedDate": "2022-10-18T17:41:00Z"
+                }
+            ]
+        },
+        {
+            "Target": "usr/local/bin/syft",
+            "Class": "lang-pkgs",
+            "Type": "gobinary",
+            "Vulnerabilities": [
+                {
+                    "VulnerabilityID": "CVE-2022-41717",
+                    "PkgName": "golang.org/x/net",
+                    "InstalledVersion": "v0.0.0-20221012135044-0b7e1fb9d458",
+                    "FixedVersion": "0.4.0",
+                    "Layer": {
+                        "DiffID": "sha256:4d59e050d0e30080199048ad653abdf4d50088a6562e4f4111d36a7d3a15e7a4"
+                    },
+                    "SeveritySource": "nvd",
+                    "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-41717",
+                    "DataSource": {
+                        "ID": "go-vulndb",
+                        "Name": "The Go Vulnerability Database",
+                        "URL": "https://github.com/golang/vulndb"
+                    },
+                    "Title": "An attacker can cause excessive memory growth in a Go server accepting ...",
+                    "Description": "An attacker can cause excessive memory growth in a Go server accepting HTTP/2 requests. HTTP/2 server connections contain a cache of HTTP header keys sent by the client. While the total number of entries in this cache is capped, an attacker sending very large keys can cause the server to allocate approximately 64 MiB per open connection.",
+                    "Severity": "MEDIUM",
+                    "CweIDs": [
+                        "CWE-770"
+                    ],
+                    "CVSS": {
+                        "nvd": {
+                            "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
+                            "V3Score": 5.3
+                        }
+                    },
+                    "References": [
+                        "https://go.dev/cl/455635",
+                        "https://go.dev/cl/455717",
+                        "https://go.dev/issue/56350",
+                        "https://groups.google.com/g/golang-announce/c/L_3rmdT0BMU/m/yZDrXjIiBQAJ",
+                        "https://nvd.nist.gov/vuln/detail/CVE-2022-41717",
+                        "https://pkg.go.dev/vuln/GO-2022-1144"
+                    ],
+                    "PublishedDate": "2022-12-08T20:15:00Z",
+                    "LastModifiedDate": "2022-12-12T17:50:00Z"
+                },
+                {
+                    "VulnerabilityID": "CVE-2022-32149",
+                    "PkgName": "golang.org/x/text",
+                    "InstalledVersion": "v0.3.8-0.20211004125949-5bd84dd9b33b",
+                    "FixedVersion": "0.3.8",
+                    "Layer": {
+                        "DiffID": "sha256:4d59e050d0e30080199048ad653abdf4d50088a6562e4f4111d36a7d3a15e7a4"
+                    },
+                    "SeveritySource": "nvd",
+                    "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-32149",
+                    "DataSource": {
+                        "ID": "go-vulndb",
+                        "Name": "The Go Vulnerability Database",
+                        "URL": "https://github.com/golang/vulndb"
+                    },
+                    "Title": "golang: golang.org/x/text/language: ParseAcceptLanguage takes a long time to parse complex tags",
+                    "Description": "An attacker may cause a denial of service by crafting an Accept-Language header which ParseAcceptLanguage will take significant time to parse.",
+                    "Severity": "HIGH",
+                    "CweIDs": [
+                        "CWE-772"
+                    ],
+                    "CVSS": {
+                        "ghsa": {
+                            "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                            "V3Score": 7.5
+                        },
+                        "nvd": {
+                            "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                            "V3Score": 7.5
+                        },
+                        "redhat": {
+                            "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                            "V3Score": 7.5
+                        }
+                    },
+                    "References": [
+                        "https://access.redhat.com/security/cve/CVE-2022-32149",
+                        "https://github.com/advisories/GHSA-69ch-w2m2-3vjp",
+                        "https://github.com/golang/go/issues/56152",
+                        "https://github.com/golang/text/commit/434eadcdbc3b0256971992e8c70027278364c72c",
+                        "https://go.dev/cl/442235",
+                        "https://go.dev/issue/56152",
+                        "https://groups.google.com/g/golang-announce/c/-hjNw559_tE/m/KlGTfid5CAAJ",
+                        "https://groups.google.com/g/golang-dev/c/qfPIly0X7aU",
+                        "https://nvd.nist.gov/vuln/detail/CVE-2022-32149",
+                        "https://pkg.go.dev/vuln/GO-2022-1059"
+                    ],
+                    "PublishedDate": "2022-10-14T15:15:00Z",
+                    "LastModifiedDate": "2022-10-18T17:41:00Z"
+                }
+            ]
+        },
+        {
+            "Target": "usr/local/bin/trivy",
+            "Class": "lang-pkgs",
+            "Type": "gobinary",
+            "Vulnerabilities": [
+                {
+                    "VulnerabilityID": "CVE-2020-8911",
+                    "PkgName": "github.com/aws/aws-sdk-go",
+                    "InstalledVersion": "v1.44.136",
+                    "Layer": {
+                        "DiffID": "sha256:08d1cc6fa7f03092dbea33c4e6874265fc36f1ac51702b1f01e8947bbfb1adea"
+                    },
+                    "SeveritySource": "nvd",
+                    "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2020-8911",
+                    "DataSource": {
+                        "ID": "go-vulndb",
+                        "Name": "The Go Vulnerability Database",
+                        "URL": "https://github.com/golang/vulndb"
+                    },
+                    "Title": "aws/aws-sdk-go: CBC padding oracle issue in AWS S3 Crypto SDK for golang",
+                    "Description": "A padding oracle vulnerability exists in the AWS S3 Crypto SDK for GoLang versions prior to V2. The SDK allows users to encrypt files with AES-CBC without computing a Message Authentication Code (MAC), which then allows an attacker who has write access to the target's S3 bucket and can observe whether or not an endpoint with access to the key can decrypt a file, they can reconstruct the plaintext with (on average) 128*length (plaintext) queries to the endpoint, by exploiting CBC's ability to manipulate the bytes of the next block and PKCS5 padding errors. It is recommended to update your SDK to V2 or later, and re-encrypt your files.",
+                    "Severity": "MEDIUM",
+                    "CweIDs": [
+                        "CWE-327"
+                    ],
+                    "CVSS": {
+                        "ghsa": {
+                            "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
+                            "V3Score": 5.6
+                        },
+                        "nvd": {
+                            "V2Vector": "AV:L/AC:L/Au:N/C:P/I:N/A:N",
+                            "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
+                            "V2Score": 2.1,
+                            "V3Score": 5.6
+                        },
+                        "redhat": {
+                            "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
+                            "V3Score": 5.6
+                        }
+                    },
+                    "References": [
+                        "https://access.redhat.com/security/cve/CVE-2020-8911",
+                        "https://aws.amazon.com/blogs/developer/updates-to-the-amazon-s3-encryption-client/?s=09",
+                        "https://bugzilla.redhat.com/show_bug.cgi?id=1869800",
+                        "https://github.com/advisories/GHSA-f5pg-7wfw-84q9",
+                        "https://github.com/aws/aws-sdk-go/commit/1e84382fa1c0086362b5a4b68e068d4f8518d40e",
+                        "https://github.com/aws/aws-sdk-go/commit/ae9b9fd92af132cfd8d879809d8611825ba135f4",
+                        "https://github.com/aws/aws-sdk-go/pull/3403",
+                        "https://github.com/google/security-research/security/advisories/GHSA-f5pg-7wfw-84q9",
+                        "https://github.com/sophieschmieg/exploits/tree/master/aws_s3_crypto_poc",
+                        "https://nvd.nist.gov/vuln/detail/CVE-2020-8911",
+                        "https://pkg.go.dev/vuln/GO-2022-0646"
+                    ],
+                    "PublishedDate": "2020-08-11T20:15:00Z",
+                    "LastModifiedDate": "2020-08-18T13:37:00Z"
+                },
+                {
+                    "VulnerabilityID": "CVE-2022-41717",
+                    "PkgName": "golang.org/x/net",
+                    "InstalledVersion": "v0.1.0",
+                    "FixedVersion": "0.4.0",
+                    "Layer": {
+                        "DiffID": "sha256:08d1cc6fa7f03092dbea33c4e6874265fc36f1ac51702b1f01e8947bbfb1adea"
+                    },
+                    "SeveritySource": "nvd",
+                    "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-41717",
+                    "DataSource": {
+                        "ID": "go-vulndb",
+                        "Name": "The Go Vulnerability Database",
+                        "URL": "https://github.com/golang/vulndb"
+                    },
+                    "Title": "An attacker can cause excessive memory growth in a Go server accepting ...",
+                    "Description": "An attacker can cause excessive memory growth in a Go server accepting HTTP/2 requests. HTTP/2 server connections contain a cache of HTTP header keys sent by the client. While the total number of entries in this cache is capped, an attacker sending very large keys can cause the server to allocate approximately 64 MiB per open connection.",
+                    "Severity": "MEDIUM",
+                    "CweIDs": [
+                        "CWE-770"
+                    ],
+                    "CVSS": {
+                        "nvd": {
+                            "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
+                            "V3Score": 5.3
+                        }
+                    },
+                    "References": [
+                        "https://go.dev/cl/455635",
+                        "https://go.dev/cl/455717",
+                        "https://go.dev/issue/56350",
+                        "https://groups.google.com/g/golang-announce/c/L_3rmdT0BMU/m/yZDrXjIiBQAJ",
+                        "https://nvd.nist.gov/vuln/detail/CVE-2022-41717",
+                        "https://pkg.go.dev/vuln/GO-2022-1144"
+                    ],
+                    "PublishedDate": "2022-12-08T20:15:00Z",
+                    "LastModifiedDate": "2022-12-12T17:50:00Z"
+                }
+            ]
+        }
+    ]
+}
