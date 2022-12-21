@@ -18,6 +18,12 @@ resource "google_kms_crypto_key" "key" {
 }
 
 
+resource "google_kms_crypto_key_iam_member" "crypto_key_member" {
+  crypto_key_id = google_kms_crypto_key.key.id
+  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  member        = "serviceAccount:${google_service_account.github_actions_user.email}"
+}
+
 resource "google_kms_crypto_key_iam_binding" "crypto_key_bind" {
   crypto_key_id = google_kms_crypto_key.key.id
   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
