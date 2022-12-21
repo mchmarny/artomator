@@ -17,16 +17,30 @@ resource "google_kms_crypto_key" "key" {
 }
 
 
+resource "google_kms_crypto_key_iam_member" "crypto_key_member" {
+  crypto_key_id = google_kms_crypto_key.key.id
+  role = "roles/cloudkms.cryptoKeyEncrypter"
+  member = "serviceAccount:${google_service_account.github_actions_user.email}"
+}
+
 resource "google_kms_crypto_key_iam_binding" "crypto_key_binding" {
   crypto_key_id = google_kms_crypto_key.key.id
   role          = "roles/cloudkms.cryptoKeyEncrypter"
-
   members = [
     "serviceAccount:${google_service_account.github_actions_user.email}",
   ]
 }
 
-# resource "google_kms_crypto_key_iam_policy" "crypto_key" {
-#   crypto_key_id = google_kms_crypto_key.key.id
-#   policy_data = data.google_iam_policy.crypto_key_binding.policy_data
-# }
+resource "google_kms_crypto_key_iam_member" "signer_key_member" {
+  crypto_key_id = google_kms_crypto_key.key.id
+  role = "roles/cloudkms.signerVerifier"
+  member = "serviceAccount:${google_service_account.github_actions_user.email}"
+}
+
+resource "google_kms_crypto_key_iam_binding" "signer_key_binding" {
+  crypto_key_id = google_kms_crypto_key.key.id
+  role          = "roles/cloudkms.signerVerifier"
+  members = [
+    "serviceAccount:${google_service_account.github_actions_user.email}",
+  ]
+}
