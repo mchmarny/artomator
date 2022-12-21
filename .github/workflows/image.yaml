@@ -73,8 +73,8 @@ jobs:
       uses: google-github-actions/auth@v1
       with:
           token_format: "access_token"
-          workload_identity_provider: ${{ secrets.id_provider }}
-          service_account: ${{ secrets.service_account }}
+          workload_identity_provider: ${{ inputs.id_provider }}
+          service_account: ${{ inputs.service_account }}
     
     - name: Define Metadata
       id: meta
@@ -89,7 +89,7 @@ jobs:
     - name: Registry Auth
       uses: docker/login-action@v2
       with:
-        registry: ${{ secrets.registry }}
+        registry: ${{ inputs.registry }}
         username: oauth2accesstoken
         password: ${{ steps.auth.outputs.access_token }}
     
