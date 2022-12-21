@@ -11,13 +11,14 @@ on:
         default: '1.19.4'
         required: false
         type: string
-    
+
 jobs:
 
   test:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      security-events: write 
     steps:
 
     - name: Setup Go
@@ -75,4 +76,3 @@ jobs:
       uses: github/codeql-action/upload-sarif@v2
       with:
         sarif_file: 'trivy-results.sarif'
-
