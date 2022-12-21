@@ -6,14 +6,16 @@ variable "project_id" {
   nullable    = false
 }
 
-variable "registry_location" {
-  description = "Location of the Artifact Registry"
+variable "name" {
+  description = "Base name to derive everythign else from"
+  default     = "artomator"
   type        = string
-  nullable    = false
+  nullable    = true
 }
 
-variable "registry_name" {
-  description = "Name (ID) of the Artifact Registry"
+variable "location" {
+  description = "Deployment location"
+  default     = "us-west1"
   type        = string
   nullable    = false
 }

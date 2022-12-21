@@ -1,47 +1,35 @@
 locals {
   # List of roles that will be assigned to the pulbisher service account
   publisher_roles = toset([
+    "roles/artifactregistry.writer",
+    "roles/cloudkms.cryptoKeyEncrypterDecrypter",
+    "roles/cloudkms.signerVerifier",
+    "roles/cloudkms.viewer",
     "roles/storage.objectCreator",
     "roles/storage.objectViewer",
-    "roles/artifactregistry.writer",
-    "roles/cloudkms.viewer",
-    "roles/cloudkms.signerVerifier",
-    "roles/cloudkms.cryptoKeyEncrypterDecrypter",
   ])
 }
 
-# GCR registry 
-data "google_artifact_registry_repository" "registry" {
-  provider = google-beta
-  project = var.project_id
-  location = var.registry_location
-  repository_id = var.registry_name
-}
-
-# Service account to be used for federated auth to publish to GCR
-
-# resource "google_artifact_registry_repository" "registry" {
-#   provider = google-beta
-#   project = var.project_id
-
-#   description = "Artifacts registry"
-#   location = var.registry_location
-#   repository_id = var.registry_name
-#   format = "DOCKER"
-# }
-
 # Service account to be used for federated auth to publish to GCR (existing)
 resource "google_service_account" "github_actions_user" {
-  account_id   = "${var.registry_name}-github-actions-user"
+  account_id   = "${var.name}-github-actions-user"
   display_name = "Service Account impersonated in ${var.git_repo} GitHub Actions"
+}
+
+# Role binding to allow publisher to publish images
+resource "google_project_iam_member" "github_actions_user_role_binding" {
+  for_each = local.publisher_roles
+  project  = var.project_id
+  role     = each.value
+  member   = "serviceAccount:${google_service_account.github_actions_user.email}"
 }
 
 # Role binding to allow publisher to publish images
 resource "google_artifact_registry_repository_iam_member" "github_actions_user_storage_role_binding" {
   provider   = google-beta
   project    = var.project_id
-  location   = var.registry_location
-  repository = data.google_artifact_registry_repository.registry.name
+  location   = var.location
+  repository = google_artifact_registry_repository.registry.name
   role       = "roles/artifactregistry.writer"
   member     = "serviceAccount:${google_service_account.github_actions_user.email}"
 }
@@ -49,7 +37,7 @@ resource "google_artifact_registry_repository_iam_member" "github_actions_user_s
 # Identiy pool for GitHub action based identity's access to Google Cloud resources
 resource "google_iam_workload_identity_pool" "github_pool" {
   provider                  = google-beta
-  workload_identity_pool_id = "${var.registry_name}-github-pool"
+  workload_identity_pool_id = "${var.name}-github-pool"
 }
 
 # Configuration for GitHub identiy provider

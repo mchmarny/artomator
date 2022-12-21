@@ -15,12 +15,7 @@ output "IDENTITY_PROVIDER" {
   description = "Provider ID to use in Auth action for GCP in GitHub."
 }
 
-output "ARTIFACT_REGISTRY" {
-  value       = data.google_artifact_registry_repository.registry.name
-  description = "Artifact Registry name."
-}
-
-output "REGISTRY_LOCATION" {
-  value       = data.google_artifact_registry_repository.registry.location
+output "REGISTRY_URI" {
+  value       = "${google_artifact_registry_repository.registry.location}-docker.pkg.dev/${data.google_project.project.name}/${google_artifact_registry_repository.registry.name}"
   description = "Artifact Registry location."
 }

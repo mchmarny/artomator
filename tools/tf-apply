@@ -1,0 +1,25 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+set -o errexit
+set -o pipefail
+
+TAG=$(cat .version)
+
+echo "Checking for image $TAG in registry..."
+
+REP_TAG=$(gcloud container images list-tags $IMAGE_REG \
+			--filter "tags:$TAG" --format json  | jq -r '.[].digest')
+
+if [ "$REP_TAG" != "$REP_TAG" ]; then
+  echo "Tag $TAG not found in registry, aborting\n"
+  exit 1
+fi
+
+printf "\nApplying terraform..."
+terraform -chdir=./config apply -auto-approve
+
+
+
