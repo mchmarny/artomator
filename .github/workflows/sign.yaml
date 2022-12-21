@@ -46,14 +46,24 @@ jobs:
     - name: Input Digest
       run: |
         echo "${{ inputs.digest }}"
+
+    - name: Scan canner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: "${{ inputs.digest }}"
+        format: 'json'
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
     
     - id: auth
       name: Get GCP token
       uses: google-github-actions/auth@v1
       with:
           token_format: "access_token"
-          workload_identity_provider: ${{ secrets.id_provider }}
-          service_account: ${{ secrets.service_account }}
+          workload_identity_provider: ${{ inputs.id_provider }}
+          service_account: ${{ inputs.service_account }}
     
     - name: Install Cosign
       uses: sigstore/cosign-installer@main
@@ -63,15 +73,15 @@ jobs:
     - name: Auth Cosign
       run: |
         cosign version
-        cosign login ${{ secrets.registry }} --username=oauth2accesstoken --password=${{ steps.auth.outputs.access_token }}
+        cosign login ${{ inputs.registry }} --username=oauth2accesstoken --password=${{ steps.auth.outputs.access_token }}
     
     - name: Get KMS Key
       run: |
-        cosign generate-key-pair --kms ${{ secrets.key }}
+        cosign generate-key-pair --kms ${{ inputs.key }}
     
     - name: Sign Image
       run: |
-        cosign sign --force --key ${{ secrets.key }} ${{ inputs.digest }}
+        cosign sign --force --key ${{ inputs.key }} ${{ inputs.digest }}
       env:
         COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
 
@@ -85,30 +95,9 @@ jobs:
         output-file: ./sbom.spdx.json
         format: spdx-json
 
-    - name: List Dir
-      run: ls
-
-    - name: Download Vulnerability Scanner
-      uses: anchore/scan-action/download-grype@v3
-      id: grype
-
-    - name: Scan SBOM
-      run: |
-        # Add -f ${{ inputs.vuln_severity_cutoff }}
-        ${{steps.grype.outputs.cmd}} sbom:sbom.spdx.json --file vulns.grype.json
-
-    - name: Print Vulnerability Report
-      run: |
-        cat vulns.grype.json
-
-    - name: Attest Vulnerability
-      run: |
-        cosign attest --predicate vulns.grype.json --type vuln --key ${{ secrets.key }} ${{ inputs.digest }}
-      env:
-        COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
       
     - name: Verify Image
       run: |
-        cosign verify-attestation --type=vuln --key ${{ secrets.key }} ${{ inputs.digest }}
+        cosign verify-attestation --type spdx-json --key ${{ inputs.key }} ${{ inputs.digest }}
       env:
         COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
