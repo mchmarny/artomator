@@ -23,11 +23,10 @@ jobs:
   sign:
     uses: ./.github/workflows/sign.yaml
     needs: image
-    secrets:
+    with:
       registry: us-west1-docker.pkg.dev
       id_provider: projects/799736955886/locations/global/workloadIdentityPools/artomator-github-pool/providers/github-provider
       service_account: artomator-github-actions-user@cloudy-demos.iam.gserviceaccount.com
       key: gcpkms://projects/cloudy-demos/locations/us-west1/keyRings/artomator/cryptoKeys/artomator-signer/cryptoKeyVersions/1
-    with:
       digest: ${{ needs.image.outputs.digest }}
 
