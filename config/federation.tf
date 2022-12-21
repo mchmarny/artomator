@@ -6,6 +6,7 @@ locals {
     "roles/artifactregistry.writer",
     "roles/cloudkms.viewer",
     "roles/cloudkms.signerVerifier",
+    "roles/cloudkms.cryptoKeyEncrypterDecrypter",
   ])
 }
 
