@@ -104,10 +104,10 @@ jobs:
         image: ${{ inputs.digest }}
         registry-username: oauth2accesstoken
         registry-password: ${{ steps.auth.outputs.access_token }}
-        artifact-name: sbom.spdx.json
-        output-file: ./sbom.spdx.json
+        artifact-name: sbom.spdx
+        output-file: ./sbom.spdx
         format: spdx-json
-
+        sbom-artifact-match: ".*\\.spdx$"
       
     - name: Verify Image
       run: |
