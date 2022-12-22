@@ -40,10 +40,15 @@ jobs:
       digest: ${{ steps.image.outputs.digest }}
     steps:
 
+    - name: Print Inputs
+      run: |
+        echo "${{ inputs.go_version }}"
+        echo "${{ inputs.image }}"
+
     - name: Setup Go
       uses: actions/setup-go@v3
       with:
-        go-version: '${{ inputs.go_version }}'
+        go-version: ${{ inputs.go_version }}
     
     - run: go version
     
