@@ -108,9 +108,11 @@ jobs:
         output-file: ./sbom.spdx
         format: spdx-json
 
-    - uses: anchore/sbom-action/publish-sbom@v0
-      with:
-        sbom-artifact-match: ".*\\.spdx$"
+    - name: Create Attestation
+      run: |
+        cosign attest --predicate ./sbom.spdx --type spdx-json --key ${{ inputs.key }} ${{ inputs.digest }}
+      env:
+        COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
       
     - name: Verify Image
       run: |
