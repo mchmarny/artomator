@@ -21,6 +21,7 @@ LABEL artomator.version="${VERSION}"
 COPY --from=builder /src/server /app/
 COPY --from=builder /src/bin/ /app/bin/
 WORKDIR /app
+RUN echo http://dl-cdn.alpinelinux.org/alpine/v3.17/community >> /etc/apk/repositories
 RUN apk add --update bash curl jq cosign ca-certificates python3
 # gcloud
 ENV CLOUDSDK_INSTALL_DIR /gcloud/
