@@ -70,3 +70,5 @@ cosign.*
 
 # docker 
 digest.txt
+sbom.json
+vuln.json

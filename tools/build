@@ -9,7 +9,8 @@ set -o pipefail
 DIRTY_IMG="$IMAGE_URI-dirty"
 
 # Build and push image
-docker build --build-arg VERSION="${VERSION}-dirty" \
+docker build -f deployment/Dockerfile \
+             --build-arg VERSION="${VERSION}-dirty" \
              --platform linux/amd64 \
              -t $DIRTY_IMG \
              .
