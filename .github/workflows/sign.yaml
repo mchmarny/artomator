@@ -107,6 +107,9 @@ jobs:
         artifact-name: sbom.spdx
         output-file: ./sbom.spdx
         format: spdx-json
+
+    - uses: anchore/sbom-action/publish-sbom@v0
+      with:
         sbom-artifact-match: ".*\\.spdx$"
       
     - name: Verify Image
