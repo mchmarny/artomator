@@ -14,7 +14,6 @@ jobs:
 
   config:
     uses: ./.github/workflows/image.yaml
-    needs: test
     with:
       registry_uri: us-west1-docker.pkg.dev
       project_id: cloudy-demos/
