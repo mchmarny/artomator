@@ -10,7 +10,7 @@ variable "name" {
   description = "Base name to derive everythign else from"
   default     = "artomator"
   type        = string
-  nullable    = true
+  nullable    = false
 }
 
 variable "location" {
@@ -22,6 +22,13 @@ variable "location" {
 
 variable "git_repo" {
   description = "GitHub Repo"
+  type        = string
+  nullable    = false
+}
+
+variable "image" {
+  description = "Image URI"
+  default     = "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator"
   type        = string
   nullable    = false
 }

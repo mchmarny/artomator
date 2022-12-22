@@ -45,9 +45,7 @@ resource "google_cloud_run_service" "app" {
   template {
     spec {
       containers {
-        # image = "${google_artifact_registry_repository.registry.location}-docker.pkg.dev/${data.google_project.project.name}/${google_artifact_registry_repository.registry.name}/artomator:${data.template_file.version.rendered}"
-
-        image = "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator:v0.7.19"
+        image = "${var.image}:${data.template_file.version.rendered}"
 
         ports {
           name           = "http1"
