@@ -44,7 +44,6 @@ jobs:
     with:
       digest: ${{ needs.image.outputs.digest }}
       registry: ${{ needs.config.outputs.registry_uri }}
-      image: ${{ needs.config.outputs.image_uri }}
       id_provider: ${{ needs.config.outputs.id_provider }}
       service_account: ${{ needs.config.outputs.service_account }}
       key: ${{ needs.config.outputs.kms_key }}
