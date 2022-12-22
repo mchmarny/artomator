@@ -151,6 +151,12 @@ tagless: ## Delete the current release tag
 	git push --delete origin $(VERSION)
 .PHONY: tagless
 
+release: test lint tag ## Runs test, lint, and tag before release
+	@echo "Releasing: $(VERSION)"
+	tools/gh-wait
+	tools/tf-apply
+.PHONY: release
+
 help: ## Display available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk \
 		'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

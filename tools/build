@@ -6,19 +6,16 @@ DIR="$(dirname "$0")"
 set -o errexit
 set -o pipefail
 
-# generate public key-pair from KMS if one does not exist 
-if [ ! -f cosign.pub ]; then
-    cosign generate-key-pair --kms $SIGN_KEY
-fi
+DIRTY_IMG="$IMAGE_URI-dirty"
 
 # Build and push image
-docker build --build-arg VERSION=$VERSION \
+docker build --build-arg VERSION="${VERSION}-dirty" \
              --platform linux/amd64 \
-             -t $IMAGE_URI \
+             -t $DIRTY_IMG \
              .
-docker push $IMAGE_URI
+docker push $DIRTY_IMG
 
-IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $IMAGE_URI)
+IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $DIRTY_IMG)
 echo "IMAGE_SHA: ${IMAGE_DIGEST}\n"
 
 # Sign and verify image

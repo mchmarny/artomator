@@ -15,6 +15,7 @@ import (
 
 const (
 	CommandNameEvent = "event"
+	ImageURISelf     = "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator"
 )
 
 func (h *Handler) EventHandler(w http.ResponseWriter, r *http.Request) {
@@ -61,6 +62,11 @@ func (h *Handler) EventHandler(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) processEvent(ctx context.Context, digest string) error {
 	log.Printf("processing digest: %s", digest)
+
+	if strings.HasPrefix(digest, ImageURISelf) {
+		log.Printf("digest of image used in this service, skilling: %s\n", digest)
+		return nil
+	}
 
 	ri, err := getRegInfo(digest)
 	if err != nil {

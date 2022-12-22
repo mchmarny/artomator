@@ -1,115 +1,118 @@
 {
     "SchemaVersion": 2,
-    "ArtifactName": "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:a4951ed5e60d05b418a57085c297344fa21f98c5e9aebbd74f70f61c4b697a9c",
+    "ArtifactName": "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:2b9458efeb7955965b3f068c433185d25cef1036dd5a5f6fdb768c6c197b53ea",
     "ArtifactType": "container_image",
     "Metadata": {
         "OS": {
             "Family": "alpine",
             "Name": "3.17.0"
         },
-        "ImageID": "sha256:88c1811158df211a3a5c36e69857fcd9ed3dd4a9a6ee93607155006380bc39f7",
+        "ImageID": "sha256:0b12595f490d70b08d296bdac93e3d46276c939c9a077356e412993c16bb0b7a",
         "DiffIDs": [
-            "sha256:ded7a220bb058e28ee3254fbba04ca90b679070424424761a53a043b93b612bf",
-            "sha256:34d9e0b0553510b6ed4548635e493c902933196b420c4b5f30faba8ed82fc935",
-            "sha256:044e6c0625c1e9101ddd9123f17c8b55ca82cb2f124dc8b832ce9a0b26b7e120",
+            "sha256:ba85ec17f04d460522706dd0c4d336ecb5f6521cc78c80a36b5aa4193c0dfe83",
+            "sha256:df90b2fa61123c89f0861987f99cc6bc99c6a323b5134bb387f4af8104d92667",
+            "sha256:f80f92d660a0b6c9a4a28cfaad278c110f240fe21281a174a426779b012aff15",
             "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
-            "sha256:323ce44d4082cbe6e3fe6c28b2e26e54fbd363c767348aed5902593517aff3f9",
-            "sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005",
-            "sha256:4d59e050d0e30080199048ad653abdf4d50088a6562e4f4111d36a7d3a15e7a4",
-            "sha256:08d1cc6fa7f03092dbea33c4e6874265fc36f1ac51702b1f01e8947bbfb1adea",
-            "sha256:5f078aa540d00cbde7ab87f86ce2476fd31dc0726931ac278e1959637be5ec81",
-            "sha256:5f078aa540d00cbde7ab87f86ce2476fd31dc0726931ac278e1959637be5ec81"
+            "sha256:00e7cf4a01db380bf03fbc098946b4b5660c0dd5dd2633035e101f4ba8d50292",
+            "sha256:1852a3b4392869e3db0ae2adec96fbaeff5779445f0b27b943b6cf8fd00ea8e6",
+            "sha256:c149d66d5c845617833ce5023d756da13d0255f3d87f64e62c01ba80d936e29f",
+            "sha256:ae5dd345d3029cb6314add8e62c07b629ca45b9fb027815ef8f08be1344e753e",
+            "sha256:213739ed5f03d7e02ceb8961e2b91305f8b562117a0b534bc45e0e7f8ce43dca",
+            "sha256:9ac73e874df495e39e18f24b230ef5839d2017eddc76fba08e6a99bdb092ecc0",
+            "sha256:9ac73e874df495e39e18f24b230ef5839d2017eddc76fba08e6a99bdb092ecc0"
         ],
         "RepoTags": [
-            "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator:v0.7.4"
+            "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator:v0.7.60-dirty"
         ],
         "RepoDigests": [
-            "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:a4951ed5e60d05b418a57085c297344fa21f98c5e9aebbd74f70f61c4b697a9c"
+            "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:2b9458efeb7955965b3f068c433185d25cef1036dd5a5f6fdb768c6c197b53ea"
         ],
         "ImageConfig": {
             "architecture": "amd64",
-            "created": "2022-12-21T11:04:49.94886218Z",
+            "author": "github.com/chainguard-dev/apko",
+            "created": "2022-12-22T16:44:42.530844004Z",
             "history": [
                 {
-                    "created": "2022-11-22T22:19:28Z",
-                    "created_by": "/bin/sh -c #(nop) ADD file:587cae71969871d3c6456d844a8795df9b64b12c710c275295a1182b46f630e7 in / "
+                    "created": "2022-12-22T00:08:13Z",
+                    "created_by": "apko",
+                    "comment": "This is an apko single-layer image"
                 },
                 {
-                    "created": "2022-11-22T22:19:29Z",
-                    "created_by": "/bin/sh -c #(nop)  CMD [\"/bin/sh\"]",
-                    "empty_layer": true
-                },
-                {
-                    "created": "2022-12-21T11:01:52Z",
+                    "created": "2022-12-22T16:41:27Z",
                     "created_by": "ARG VERSION",
                     "comment": "buildkit.dockerfile.v0",
                     "empty_layer": true
                 },
                 {
-                    "created": "2022-12-21T11:01:52Z",
-                    "created_by": "LABEL artomator.version=v0.7.4",
+                    "created": "2022-12-22T16:41:27Z",
+                    "created_by": "LABEL artomator.version=v0.7.60-dirty",
                     "comment": "buildkit.dockerfile.v0",
                     "empty_layer": true
                 },
                 {
-                    "created": "2022-12-21T11:01:52Z",
+                    "created": "2022-12-22T16:41:27Z",
                     "created_by": "COPY /src/server /app/ # buildkit",
                     "comment": "buildkit.dockerfile.v0"
                 },
                 {
-                    "created": "2022-12-21T11:01:52Z",
+                    "created": "2022-12-22T16:41:27Z",
                     "created_by": "COPY /src/bin/ /app/bin/ # buildkit",
                     "comment": "buildkit.dockerfile.v0"
                 },
                 {
-                    "created": "2022-12-21T11:01:52Z",
+                    "created": "2022-12-22T16:41:27Z",
                     "created_by": "WORKDIR /app",
                     "comment": "buildkit.dockerfile.v0"
                 },
                 {
-                    "created": "2022-12-21T11:02:02Z",
-                    "created_by": "RUN |1 VERSION=v0.7.4 /bin/sh -c apk add --update bash curl jq cosign ca-certificates python3 # buildkit",
+                    "created": "2022-12-22T16:41:27Z",
+                    "created_by": "RUN |1 VERSION=v0.7.60-dirty /bin/sh -c echo -e \"\\nhttp://dl-cdn.alpinelinux.org/alpine/v3.17/community\" >> /etc/apk/repositories # buildkit",
                     "comment": "buildkit.dockerfile.v0"
                 },
                 {
-                    "created": "2022-12-21T11:02:02Z",
+                    "created": "2022-12-22T16:41:39Z",
+                    "created_by": "RUN |1 VERSION=v0.7.60-dirty /bin/sh -c apk add --update bash curl jq cosign ca-certificates python3 # buildkit",
+                    "comment": "buildkit.dockerfile.v0"
+                },
+                {
+                    "created": "2022-12-22T16:41:39Z",
                     "created_by": "ENV CLOUDSDK_INSTALL_DIR=/gcloud/",
                     "comment": "buildkit.dockerfile.v0",
                     "empty_layer": true
                 },
                 {
-                    "created": "2022-12-21T11:04:25Z",
-                    "created_by": "RUN |1 VERSION=v0.7.4 /bin/sh -c curl -sSL https://sdk.cloud.google.com | bash # buildkit",
+                    "created": "2022-12-22T16:44:17Z",
+                    "created_by": "RUN |1 VERSION=v0.7.60-dirty /bin/sh -c curl -sSL https://sdk.cloud.google.com | bash # buildkit",
                     "comment": "buildkit.dockerfile.v0"
                 },
                 {
-                    "created": "2022-12-21T11:04:25Z",
+                    "created": "2022-12-22T16:44:17Z",
                     "created_by": "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/gcloud/google-cloud-sdk/bin/:/app/bin/",
                     "comment": "buildkit.dockerfile.v0",
                     "empty_layer": true
                 },
                 {
-                    "created": "2022-12-21T11:04:36Z",
-                    "created_by": "RUN |1 VERSION=v0.7.4 /bin/sh -c curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh     | sh -s -- -b /usr/local/bin # buildkit",
+                    "created": "2022-12-22T16:44:28Z",
+                    "created_by": "RUN |1 VERSION=v0.7.60-dirty /bin/sh -c curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh     | sh -s -- -b /usr/local/bin # buildkit",
                     "comment": "buildkit.dockerfile.v0"
                 },
                 {
-                    "created": "2022-12-21T11:04:49Z",
-                    "created_by": "RUN |1 VERSION=v0.7.4 /bin/sh -c curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh     | sh -s -- -b /usr/local/bin # buildkit",
+                    "created": "2022-12-22T16:44:41Z",
+                    "created_by": "RUN |1 VERSION=v0.7.60-dirty /bin/sh -c curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh     | sh -s -- -b /usr/local/bin # buildkit",
                     "comment": "buildkit.dockerfile.v0"
                 },
                 {
-                    "created": "2022-12-21T11:04:49Z",
-                    "created_by": "RUN |1 VERSION=v0.7.4 /bin/sh -c echo $PATH # buildkit",
+                    "created": "2022-12-22T16:44:42Z",
+                    "created_by": "RUN |1 VERSION=v0.7.60-dirty /bin/sh -c echo $PATH # buildkit",
                     "comment": "buildkit.dockerfile.v0"
                 },
                 {
-                    "created": "2022-12-21T11:04:49Z",
-                    "created_by": "RUN |1 VERSION=v0.7.4 /bin/sh -c ls -al # buildkit",
+                    "created": "2022-12-22T16:44:42Z",
+                    "created_by": "RUN |1 VERSION=v0.7.60-dirty /bin/sh -c ls -al # buildkit",
                     "comment": "buildkit.dockerfile.v0"
                 },
                 {
-                    "created": "2022-12-21T11:04:49Z",
+                    "created": "2022-12-22T16:44:42Z",
                     "created_by": "ENTRYPOINT [\"./server\"]",
                     "comment": "buildkit.dockerfile.v0",
                     "empty_layer": true
@@ -119,16 +122,17 @@
             "rootfs": {
                 "type": "layers",
                 "diff_ids": [
-                    "sha256:ded7a220bb058e28ee3254fbba04ca90b679070424424761a53a043b93b612bf",
-                    "sha256:34d9e0b0553510b6ed4548635e493c902933196b420c4b5f30faba8ed82fc935",
-                    "sha256:044e6c0625c1e9101ddd9123f17c8b55ca82cb2f124dc8b832ce9a0b26b7e120",
+                    "sha256:ba85ec17f04d460522706dd0c4d336ecb5f6521cc78c80a36b5aa4193c0dfe83",
+                    "sha256:df90b2fa61123c89f0861987f99cc6bc99c6a323b5134bb387f4af8104d92667",
+                    "sha256:f80f92d660a0b6c9a4a28cfaad278c110f240fe21281a174a426779b012aff15",
                     "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
-                    "sha256:323ce44d4082cbe6e3fe6c28b2e26e54fbd363c767348aed5902593517aff3f9",
-                    "sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005",
-                    "sha256:4d59e050d0e30080199048ad653abdf4d50088a6562e4f4111d36a7d3a15e7a4",
-                    "sha256:08d1cc6fa7f03092dbea33c4e6874265fc36f1ac51702b1f01e8947bbfb1adea",
-                    "sha256:5f078aa540d00cbde7ab87f86ce2476fd31dc0726931ac278e1959637be5ec81",
-                    "sha256:5f078aa540d00cbde7ab87f86ce2476fd31dc0726931ac278e1959637be5ec81"
+                    "sha256:00e7cf4a01db380bf03fbc098946b4b5660c0dd5dd2633035e101f4ba8d50292",
+                    "sha256:1852a3b4392869e3db0ae2adec96fbaeff5779445f0b27b943b6cf8fd00ea8e6",
+                    "sha256:c149d66d5c845617833ce5023d756da13d0255f3d87f64e62c01ba80d936e29f",
+                    "sha256:ae5dd345d3029cb6314add8e62c07b629ca45b9fb027815ef8f08be1344e753e",
+                    "sha256:213739ed5f03d7e02ceb8961e2b91305f8b562117a0b534bc45e0e7f8ce43dca",
+                    "sha256:9ac73e874df495e39e18f24b230ef5839d2017eddc76fba08e6a99bdb092ecc0",
+                    "sha256:9ac73e874df495e39e18f24b230ef5839d2017eddc76fba08e6a99bdb092ecc0"
                 ]
             },
             "config": {
@@ -137,10 +141,11 @@
                 ],
                 "Env": [
                     "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/gcloud/google-cloud-sdk/bin/:/app/bin/",
+                    "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt",
                     "CLOUDSDK_INSTALL_DIR=/gcloud/"
                 ],
                 "Labels": {
-                    "artomator.version": "v0.7.4"
+                    "artomator.version": "v0.7.60-dirty"
                 },
                 "WorkingDir": "/app"
             }
@@ -148,7 +153,7 @@
     },
     "Results": [
         {
-            "Target": "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:a4951ed5e60d05b418a57085c297344fa21f98c5e9aebbd74f70f61c4b697a9c (alpine 3.17.0)",
+            "Target": "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:2b9458efeb7955965b3f068c433185d25cef1036dd5a5f6fdb768c6c197b53ea (alpine 3.17.0)",
             "Class": "os-pkgs",
             "Type": "alpine"
         },
@@ -162,7 +167,7 @@
                     "PkgName": "github.com/aws/aws-sdk-go",
                     "InstalledVersion": "v1.25.3",
                     "Layer": {
-                        "DiffID": "sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005"
+                        "DiffID": "sha256:c149d66d5c845617833ce5023d756da13d0255f3d87f64e62c01ba80d936e29f"
                     },
                     "SeveritySource": "nvd",
                     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2020-8911",
@@ -215,7 +220,7 @@
                     "InstalledVersion": "v0.0.0-20220127200216-cd36cc0744dd",
                     "FixedVersion": "0.0.0-20220906165146-f3363e06e74c",
                     "Layer": {
-                        "DiffID": "sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005"
+                        "DiffID": "sha256:c149d66d5c845617833ce5023d756da13d0255f3d87f64e62c01ba80d936e29f"
                     },
                     "SeveritySource": "nvd",
                     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-27664",
@@ -275,7 +280,7 @@
                     "InstalledVersion": "v0.0.0-20220127200216-cd36cc0744dd",
                     "FixedVersion": "0.4.0",
                     "Layer": {
-                        "DiffID": "sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005"
+                        "DiffID": "sha256:c149d66d5c845617833ce5023d756da13d0255f3d87f64e62c01ba80d936e29f"
                     },
                     "SeveritySource": "nvd",
                     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-41717",
@@ -313,7 +318,7 @@
                     "InstalledVersion": "v0.3.7",
                     "FixedVersion": "0.3.8",
                     "Layer": {
-                        "DiffID": "sha256:58f1415816b496cd91380a3cf5ed102284efa9d730f977629181d4ea504db005"
+                        "DiffID": "sha256:c149d66d5c845617833ce5023d756da13d0255f3d87f64e62c01ba80d936e29f"
                     },
                     "SeveritySource": "nvd",
                     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-32149",
@@ -370,7 +375,7 @@
                     "InstalledVersion": "v0.0.0-20221012135044-0b7e1fb9d458",
                     "FixedVersion": "0.4.0",
                     "Layer": {
-                        "DiffID": "sha256:4d59e050d0e30080199048ad653abdf4d50088a6562e4f4111d36a7d3a15e7a4"
+                        "DiffID": "sha256:ae5dd345d3029cb6314add8e62c07b629ca45b9fb027815ef8f08be1344e753e"
                     },
                     "SeveritySource": "nvd",
                     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-41717",
@@ -408,7 +413,7 @@
                     "InstalledVersion": "v0.3.8-0.20211004125949-5bd84dd9b33b",
                     "FixedVersion": "0.3.8",
                     "Layer": {
-                        "DiffID": "sha256:4d59e050d0e30080199048ad653abdf4d50088a6562e4f4111d36a7d3a15e7a4"
+                        "DiffID": "sha256:ae5dd345d3029cb6314add8e62c07b629ca45b9fb027815ef8f08be1344e753e"
                     },
                     "SeveritySource": "nvd",
                     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-32149",
@@ -464,7 +469,7 @@
                     "PkgName": "github.com/aws/aws-sdk-go",
                     "InstalledVersion": "v1.44.136",
                     "Layer": {
-                        "DiffID": "sha256:08d1cc6fa7f03092dbea33c4e6874265fc36f1ac51702b1f01e8947bbfb1adea"
+                        "DiffID": "sha256:213739ed5f03d7e02ceb8961e2b91305f8b562117a0b534bc45e0e7f8ce43dca"
                     },
                     "SeveritySource": "nvd",
                     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2020-8911",
@@ -517,7 +522,7 @@
                     "InstalledVersion": "v0.1.0",
                     "FixedVersion": "0.4.0",
                     "Layer": {
-                        "DiffID": "sha256:08d1cc6fa7f03092dbea33c4e6874265fc36f1ac51702b1f01e8947bbfb1adea"
+                        "DiffID": "sha256:213739ed5f03d7e02ceb8961e2b91305f8b562117a0b534bc45e0e7f8ce43dca"
                     },
                     "SeveritySource": "nvd",
                     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-41717",
