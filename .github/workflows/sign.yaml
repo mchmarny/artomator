@@ -106,7 +106,7 @@ jobs:
 
     - name: Create Attestation
       run: |
-        cosign attest --predicate sbom.spdx --type spdx-json --key ${{ inputs.key }} ${{ inputs.digest }}
+        cosign attest --predicate sbom.spdx --type spdx --key ${{ inputs.key }} ${{ inputs.digest }}
       env:
         COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
       
