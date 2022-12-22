@@ -23,7 +23,6 @@ jobs:
       kms_key: projects/cloudy-demos/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer
       go_version: '^1.19.4'
       cosign_version: v1.13.1
-      vuln_severity_cutoff: medium
       
   test:
     uses: ./.github/workflows/test.yaml

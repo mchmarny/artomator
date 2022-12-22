@@ -28,11 +28,6 @@ on:
         default: v1.13.1
         required: false
         type: string
-      vuln_severity_cutoff:
-        description: 'Minimum vulnerability severity to trigger a failure'
-        default: medium
-        required: false
-        type: string
 
 jobs:
 
