@@ -1,26 +1,33 @@
 apiVersion: policy.sigstore.dev/v1alpha1
 kind: ClusterImagePolicy
 metadata:
-  name: artomator-attestation-sbom-spdxjson
+  name: artomator-sbom-attestation
 spec:
   images:
-  - glob: "*.pkg.dev/cloudy-demos/**"
+  - glob: "**"
   authorities:
   - name: signer-key
     key:
-      kms: gcpkms://projects/cloudy-demos/locations/us-west1/keyRings/artomator/cryptoKeys/artomator-signer/cryptoKeyVersions/1
+      kms: KEY_PATH
     ctlog:
       url: https://rekor.sigstore.dev
     attestations:
+    - name: must-have-spdxjson-sbom
+      predicateType: spdxjson
+      policy:
+        type: cue
+        data: |
+          predicateType: "https://spdx.dev/Document"
     - name: must-have-spdx-sbom
       predicateType: spdx
       policy:
         type: cue
         data: |
           predicateType: "https://spdx.dev/Document"
-    - name: must-have-culn-report
-      predicateType: vuln
+    - name: must-have-cyclonedx-sbom
+      predicateType: cyclonedx
       policy:
         type: cue
         data: |
-          predicateType: "cosign.sigstore.dev/attestation/vuln/v1"
+          predicateType: "https://cyclonedx.org/schema"
+

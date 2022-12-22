@@ -1,15 +1,15 @@
 #!/bin/bash
 
-. "tools/config"
+DIR="$(dirname "$0")"
+. "${DIR}/config"
 
 set -o errexit
 set -o pipefail
 
-
 # update the script as to ensure new image sha 
 sed -e "s=KEY_PATH=${SIGN_KEY}=" \
-    policy/sbom-attestation-policy-template.yaml > \
-    policy/sbom-attestation-policy.yaml
+    tests/policy/image-policy-template.yaml > \
+    tests/policy/image-policy.yaml
 
 
 

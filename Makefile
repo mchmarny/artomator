@@ -5,6 +5,7 @@ TEST_RPT =6379
 TEST_PRJ =cloudy-demos
 TEST_KEY =gcpkms://projects/cloudy-demos/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer
 TEST_BCT =artomator-cloudy-demos
+TEST_ADD =http://127.0.0.1:8080
 
 export PATH := bin:$(PATH)
 
@@ -55,31 +56,25 @@ server: ## Runs previsouly built server binary
 	./server 
 .PHONY: server
 
+disco: ## Runs disco on on local service
+	tools/run-disco $(TEST_ADD)
+.PHONY: disco
+
 event: ## Submits events test to local service
-	curl -i -X POST -H "Content-Type: application/json" \
-	     -s -d @tests/message.json \
-         "http://127.0.0.1:8080/event"
+	tools/run-event $(TEST_ADD)
 .PHONY: event-test
 
 verify-spdx: ## Submits verify spdx attestation test to local service
-	curl -sS -H "Content-Type: application/json" \
-         "http://127.0.0.1:8080/verify?type=spdx&digest=$(shell cat tests/test-digest.txt)" | jq -r .
+	tools/run-verify $(TEST_ADD) spdx
 .PHONY: verify-test
 
 verify-vuln: ## Submits verify vuln attestation test to local service
-	curl -sS -H "Content-Type: application/json" \
-         "http://127.0.0.1:8080/verify?type=vuln&digest=$(shell cat tests/test-digest.txt)" | jq -r .
+	tools/run-verify $(TEST_ADD) vuln
 .PHONY: verify-vuln
 
-verify-err: image ## Submits verify test for an invalid artifact to local service
-	curl -i -H "Content-Type: application/json" \
-         "http://127.0.0.1:8080/verify?type=spdx&digest=$(shell cat tests/test-digest.txt)"
-.PHONY: verify-test-err
-
 sbom: image ## Submits SBOM process request test to local service
-	curl -sS -H "Content-Type: application/json" \
-         "http://127.0.0.1:8080/sbom?digest=$(shell cat tests/test-digest.txt)" | jq -r .
-.PHONY: sbom-test
+	tools/run-sbom $(TEST_ADD)
+.PHONY: sbom-test 
 
 docker-run: ## Runs bash on latest artomator image
 	docker container run --rm -it --entrypoint /bin/bash $(IMG_URI)
@@ -109,12 +104,24 @@ release: test lint tag ## Runs test, lint, and tag before release
 	tools/tf-apply
 .PHONY: release
 
+attest: ## Checks attestation for the current image using cosign
+	cosign verify-attestation --key $(TEST_KEY) --type spdx \
+		$(shell cat tests/test-digest.txt) | \
+		jq -r .payload | base64 -D | jq .predicateType
+.PHONY: attest
+
 policy: ## Creates k8s admission policies based on the current config
-	policy/policy-from-template
+	tools/make-policy
 .PHONY: policy
 
+policy-controller: ## Downloads and configures latest policy controller
+	wget "https://github.com/sigstore/policy-controller/releases/download/v0.5.2/tester-darwin-arm64"
+	sudo mv tester-darwin-arm64 /usr/local/bin/policy-tester
+	sudo chmod +x /usr/local/bin/policy-tester
+.PHONY: policy-controller
+
 policy-test: ## Tests generated policy using policy tester
-	tools/policy-tester --policy policy/sbom-attestation-policy.yaml --image $(shell cat tests/test-digest.txt)
+	../policy-controller/policy-tester --policy tests/policy/image-policy.yaml --image $(shell cat tests/test-digest.txt)
 .PHONY: policy-test
 
 infra: ## Applies Terraform 

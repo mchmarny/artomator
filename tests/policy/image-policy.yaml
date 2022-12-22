@@ -1,0 +1,18 @@
+apiVersion: policy.sigstore.dev/v1beta1
+kind: ClusterImagePolicy
+metadata:
+  name: spdx-image-policy
+spec:
+  images:
+  - glob: "**"
+  authorities:
+  - name: artomator-signer
+    key:
+      kms: projects/cloudy-demos2/locations/us-west1/keyRings/artomator/cryptoKeys/artomator-signer
+    attestations:
+    - name: must-have-spdx-sbom
+      predicateType: spdx
+      policy:
+        type: cue
+        data: |
+          predicateType: "https://spdx.dev/Document"
