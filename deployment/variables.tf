@@ -35,6 +35,6 @@ variable "image" {
 
 variable "runtime_only" {
   description = "Whether or not deploy the development resoruces"
-  default     = false
+  default     = true
   type        = bool
 }

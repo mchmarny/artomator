@@ -18,6 +18,10 @@ jobs:
       security-events: write 
     steps:
 
+    - name: Print Inputs
+      run: |
+        echo "${{ inputs.go_version }}"
+
     - name: Setup Go
       uses: actions/setup-go@v3
       with:

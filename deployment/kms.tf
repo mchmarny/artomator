@@ -18,6 +18,7 @@ resource "google_kms_crypto_key" "key" {
 }
 
 resource "google_kms_crypto_key_iam_binding" "crypto_key_bindng" {
+  count      = var.runtime_only ? 0 : 1
   crypto_key_id = google_kms_crypto_key.key.id
   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
   members = [
@@ -26,6 +27,7 @@ resource "google_kms_crypto_key_iam_binding" "crypto_key_bindng" {
 }
 
 resource "google_kms_crypto_key_iam_binding" "crypto_key_viewer" {
+  count      = var.runtime_only ? 0 : 1
   crypto_key_id = google_kms_crypto_key.key.id
   role          = "roles/cloudkms.viewer"
   members = [
