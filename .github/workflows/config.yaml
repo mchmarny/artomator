@@ -48,10 +48,6 @@ on:
         value: ${{ jobs.conf.outputs.service_account }}
       kms_key:
         value: ${{ jobs.conf.outputs.kms_key }}
-      go_version:
-        value: ${{ jobs.conf.outputs.go_version }}
-      cosign_version:
-        value: ${{ jobs.conf.outputs.cosign_version }}
 
 jobs:
 
@@ -66,8 +62,6 @@ jobs:
       id_provider: ${{ steps.conf.outputs.id_provider }}
       service_account: ${{ steps.conf.outputs.service_account }}
       kms_key: ${{ steps.conf.outputs.kms_key }}
-      go_version: ${{ steps.conf.outputs.go_version }}
-      cosign_version: ${{ steps.conf.outputs.cosign_version }}
     steps:
     
     - name: Export Config
@@ -77,6 +71,4 @@ jobs:
         echo "image_uri=${{ inputs.registry_uri }}/${{ inputs.project_id }}/${{ inputs.registry_image }}" >> $GITHUB_OUTPUT
         echo "id_provider=${{ inputs.id_provider }}" >> $GITHUB_OUTPUT
         echo "service_account=${{ inputs.service_account }}" >> $GITHUB_OUTPUT
-        echo "go_version=${{ inputs.go_version }}" >> $GITHUB_OUTPUT
-        echo "cosign_version=${{ inputs.cosign_version }}" >> $GITHUB_OUTPUT
         echo "kms_key=gcpkms://${{ inputs.kms_key }}" >> $GITHUB_OUTPUT
