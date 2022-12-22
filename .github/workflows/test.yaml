@@ -5,7 +5,7 @@ on:
     inputs:
       go_version:
         description: 'Version of Go to use for tests'
-        default: '1.19.4'
+        default: ^1.19.4
         required: false
         type: string
 

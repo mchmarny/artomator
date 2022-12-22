@@ -29,7 +29,7 @@ on:
         type: string
       go_version:
         description: 'Version og Go to use for tests'
-        default: '^1.19.4'
+        default: ^1.19.4
         required: false
         type: string
       cosign_version:
@@ -77,6 +77,6 @@ jobs:
         echo "image_uri=${{ inputs.registry_uri }}/${{ inputs.project_id }}/${{ inputs.registry_image }}" >> $GITHUB_OUTPUT
         echo "id_provider=${{ inputs.id_provider }}" >> $GITHUB_OUTPUT
         echo "service_account=${{ inputs.service_account }}" >> $GITHUB_OUTPUT
-        echo "go_version='${{ inputs.go_version }}'" >> $GITHUB_OUTPUT
+        echo "go_version=${{ inputs.go_version }}" >> $GITHUB_OUTPUT
         echo "cosign_version=${{ inputs.cosign_version }}" >> $GITHUB_OUTPUT
         echo "kms_key=gcpkms://${{ inputs.kms_key }}" >> $GITHUB_OUTPUT

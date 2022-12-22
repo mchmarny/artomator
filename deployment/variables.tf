@@ -32,3 +32,9 @@ variable "image" {
   type        = string
   nullable    = false
 }
+
+variable "runtime_only" {
+  description = "Whether or not deploy the development resoruces"
+  default     = false
+  type        = bool
+}
