@@ -1,0 +1,14 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+set -o errexit
+set -o pipefail
+
+# gcloud pubsub subscriptions create gcr-sub-debug --topic gcr --ack-deadline 600
+
+gcloud pubsub subscriptions pull gcr-sub-debug --auto-ack --limit 10 \
+     --format="json(message.attributes, message.data.decode(\"base64\").decode(\"utf-8\"), message.messageId, message.publishTime)"
+
+# gcloud pubsub subscriptions delete gcr-sub-debug

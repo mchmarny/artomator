@@ -1,0 +1,39 @@
+#!/bin/bash
+
+. "tools/config"
+
+set -o errexit
+set -o pipefail
+
+SBOM_FORMAT_CYCLON=cyclonedx
+SBOM_FORMAT_SPDX=spdx
+
+FMT="${SBOM_FORMAT_SPDX}"
+NOW=$(date +%s)
+
+# update the script as to ensure new image sha 
+sed -e "s/REPLACE/${NOW}/" tests/app/template.js > tests/app/index.js
+
+TEST_IMAGE_URI="${IMAGE_REG}/tester:v1.2.${NOW}"
+echo $TEST_IMAGE_URI
+
+
+# Build and push image
+docker build -f tests/app/Dockerfile \
+             -t $TEST_IMAGE_URI \
+             --label artomator-sbom=$FMT \
+             --label artomator-vuln=true .
+docker push $TEST_IMAGE_URI
+
+TEST_IMAGE_SHA=$(docker inspect --format='{{index .RepoDigests 0}}' $TEST_IMAGE_URI)
+echo "IMAGE_SHA:  ${TEST_IMAGE_SHA}"
+echo "SBOM_LABEL: ${FMT}"
+
+echo $TEST_IMAGE_SHA > tests/test-digest.txt
+
+# parse new event data
+EVENT_DATA=$(sed -e "s=IMAGE_SHA=${TEST_IMAGE_SHA}=g" tests/event-template.json)
+EVENT_ENCODED_DAT=$(echo -ne ${EVENT_DATA} | base64)
+
+# update message 
+sed -e "s/EVENT_DATA/${EVENT_ENCODED_DAT}/g" tests/message-template.json > tests/message.json

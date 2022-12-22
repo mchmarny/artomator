@@ -16,7 +16,7 @@ output "IDENTITY_PROVIDER" {
 }
 
 output "KMS_KEY" {
-  value       = "gcpkms://${google_kms_crypto_key.key.id}"
+  value       = google_kms_crypto_key.key.id
   description = "Cosign-formated URI to the signing key."
 }
 
@@ -25,9 +25,19 @@ output "REGISTRY_URI" {
   description = "Artifact Registry location."
 }
 
+output "SERVING_IMAGE" {
+  value       = "${var.image}:${data.template_file.version.rendered}"
+  description = "Image currently being used in Cloud Run."
+}
+
 output "SERVICE_URL" {
   value       = google_cloud_run_service.app.status[0].url
   description = "Cloud Run service URL."
+}
+
+output "ARTIFACT_BUCKET" {
+  value       = google_storage_bucket.artifact_store.url
+  description = "GCS Bucket where exported artifacts will be saved"
 }
 
 

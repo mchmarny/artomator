@@ -7,25 +7,47 @@ on:
 
 jobs:
 
+# Note, these jobs are using config job output to work around 
+# the GitHub Actions limitation where you can't use env vars 
+# to pass to multiple reusable jobs.
+# https://github.com/community/community/discussions/17554.
+
+  config:
+    uses: ./.github/workflows/image.yaml
+    needs: test
+    with:
+      registry_uri: us-west1-docker.pkg.dev
+      project_id: cloudy-demos/
+      registry_image: artomator/artomator
+      id_provider: projects/799736955886/locations/global/workloadIdentityPools/artomator-github-pool/providers/github-provider
+      service_account: artomator-github-actions-user@cloudy-demos.iam.gserviceaccount.com
+      kms_key: projects/cloudy-demos/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer
+      
   test:
     uses: ./.github/workflows/test.yaml
+    needs: config
+    with:
+      go_version: ${{ needs.config.outputs.go_version }}
 
   image:
     uses: ./.github/workflows/image.yaml
     needs: test
     with:
-      registry: us-west1-docker.pkg.dev
-      id_provider: projects/799736955886/locations/global/workloadIdentityPools/artomator-github-pool/providers/github-provider
-      service_account: artomator-github-actions-user@cloudy-demos.iam.gserviceaccount.com
-      image: us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator
-
+      registry: ${{ needs.config.outputs.registry_uri }}
+      image: ${{ needs.config.outputs.image_uri }}
+      id_provider: ${{ needs.config.outputs.id_provider }}
+      service_account: ${{ needs.config.outputs.service_account }}
+      go_version: ${{ needs.config.outputs.go_version }}
+      
   sign:
     uses: ./.github/workflows/sign.yaml
     needs: image
     with:
-      registry: us-west1-docker.pkg.dev
-      id_provider: projects/799736955886/locations/global/workloadIdentityPools/artomator-github-pool/providers/github-provider
-      service_account: artomator-github-actions-user@cloudy-demos.iam.gserviceaccount.com
-      key: gcpkms://projects/cloudy-demos/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer/cryptoKeyVersions/1
       digest: ${{ needs.image.outputs.digest }}
-
+      registry: ${{ needs.config.outputs.registry_uri }}
+      image: ${{ needs.config.outputs.image_uri }}
+      id_provider: ${{ needs.config.outputs.id_provider }}
+      service_account: ${{ needs.config.outputs.service_account }}
+      key: ${{ needs.config.outputs.kms_key }}
+      cosign_version: ${{ needs.config.outputs.cosign_version }}
+      

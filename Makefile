@@ -86,7 +86,7 @@ lint: ## Lints the entire project
 .PHONY: lint
 
 image: ## Makes test image 
-	tools/image
+	tools/test-image
 .PHONY: image
 
 verify: ## Verifies previosly processed image

@@ -138,49 +138,75 @@ cosign verify-attestation --type=spdx --key "gcpkms://${SIGN_KEY}" $IMAGE_DIGEST
 
 ## deployment 
 
-To deploy the prebuilt `artomator` first, start by exporting the GCP `PROJECT_ID` to which you want to deploy:
+The prerequisites to deploy `artomator` include: 
+
+* [Terraform CLI](https://www.terraform.io/downloads)
+* [GCP Project](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
+* [gcloud CLI](https://cloud.google.com/sdk/gcloud)
+  
+> Good how-to on using terraform with GCP is located [here](https://cloud.google.com/community/tutorials/getting-started-on-gcp-with-terraform).
+
+To deploy the prebuilt `artomator`, first clone this repo:
 
 ```shell
-export PROJECT_ID=<your-project-id-here>
+git clone git@github.com:mchmarny/artomator.git
 ```
 
-Next, deploy the pre-built image:
+Once you've cloned the setup repo, navigate inside of that cloned directory and initialize Terraform
+
+> Make sure to authenticate to GCP using `gcloud auth application-default login` if you haven't done it already.
 
 ```shell
-make deploy
+cd deployment
+
+terraform init
 ```
 
-> Note, provisioning some service dependencies may take a few minutes
-
-When done, this will:
-
-* Enable required APIs
-* Create artifact registry (`artomator`)
-* Configure KMS key (`keyRings/artomator/cryptoKeys/artomator-signer`)
-* PubSub topic (`gcr`) and subscription to that topic (`gcr-sub`)
-* Deploy Cloud Run service (`artomator`) along with the `redis` dependency 
-* Create a GCS bucket (`$PROJECT_ID-artomator`)
+> Note, this flow uses the default, local terraform state. Make sure you do not check the state files into your source control (see `.gitignore`), or consider using persistent state provider like GCS.
 
 
-> To build your own `artomator` image and deploy everything manually, see [BUILD.md](BUILD.md). 
+When done, apply the Terraform configuration:
+
+```shell
+terraform apply
+```
+
+When promoted, provide requested variables:
+
+* `project_id` is the GCP project ID (not the name)
+* `location` is GCP region to deploy to
+
+When done, this will output:
+
+```shell
+IDENTITY_PROVIDER = "projects/799736955886/locations/global/workloadIdentityPools/artomator-github-pool/providers/github-provider"
+KMS_KEY = "gcpkms://projects/cloudy-demos/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer"
+PROJECT_ID = "cloudy-demos"
+REGISTRY_URI = "us-west1-docker.pkg.dev/cloudy-demos/artomator"
+SERVICE_ACCOUNT = "artomator-github-actions-user@cloudy-demos.iam.gserviceaccount.com"
+SERVICE_URL = "https://artomator-pdznqybsqa-uw.a.run.app"
+SERVING_IMAGE = "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator:v0.7.40"
+```
+
+> To build your own `artomator` image, see [BUILD.md](BUILD.md). 
 
 ## test deployment
 
 To test the deployed `artomator`, use the provided ["hello" Dockerfile](tests/Dockerfile). To build it with both labels (`artomator-sbom=true` and `artomator-vuln=true`) and deploy it: 
 
 ```shell
-make image
+tools/test-image
 ```
 
 ## cleanup
 
-To delete all created resources run: 
+To clean all the resources provisioned by this setup run: 
 
 ```shell
-make clean
+terraform destroy
 ```
 
-> Note, this does not remove the created KMS resources. 
+> Note, this does not remove the created KMS resources, just disables them. 
 
 ## disclaimer
 
