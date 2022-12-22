@@ -1,5 +1,5 @@
 ARG BUILD_BASE=golang:1.19.4
-ARG FINAL_BASE=alpine:3.17
+ARG FINAL_BASE=cgr.dev/chainguard/alpine-base
 ARG VERSION=v0.0.1-default
 ARG USER=artomator
 
@@ -20,6 +20,9 @@ LABEL artomator.version="${VERSION}"
 COPY --from=builder /src/server /app/
 COPY --from=builder /src/bin/ /app/bin/
 WORKDIR /app
+# packages
+RUN echo "" >> /etc/apk/repositories
+RUN echo http://dl-cdn.alpinelinux.org/alpine/v3.17/community >> /etc/apk/repositories
 RUN apk add --update bash curl jq cosign ca-certificates python3
 # gcloud
 ENV CLOUDSDK_INSTALL_DIR /gcloud/
