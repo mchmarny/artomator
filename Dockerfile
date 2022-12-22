@@ -1,5 +1,6 @@
 ARG BUILD_BASE=golang:1.19.4
-ARG FINAL_BASE=alpine:3.17
+# ARG FINAL_BASE=alpine:3.17
+ARG FINAL_BASE=cgr.dev/chainguard/alpine-base
 ARG VERSION=v0.0.1-default
 ARG USER=artomator
 

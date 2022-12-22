@@ -1,3 +1,4 @@
+# TODO: migrate to cgr.dev/chainguard/node:latest when arm supported 
 FROM node:18-alpine
 WORKDIR /app/
 COPY ./index.js .
