@@ -48,5 +48,4 @@ jobs:
       id_provider: ${{ needs.config.outputs.id_provider }}
       service_account: ${{ needs.config.outputs.service_account }}
       key: ${{ needs.config.outputs.kms_key }}
-      cosign_version: ${{ needs.config.outputs.cosign_version }}
       

@@ -176,23 +176,11 @@ When promoted, provide requested variables:
 * `project_id` is the GCP project ID (not the name)
 * `location` is GCP region to deploy to
 
-When done, this will output:
-
-```shell
-IDENTITY_PROVIDER = "projects/799736955886/locations/global/workloadIdentityPools/artomator-github-pool/providers/github-provider"
-KMS_KEY = "gcpkms://projects/cloudy-demos/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer"
-PROJECT_ID = "cloudy-demos"
-REGISTRY_URI = "us-west1-docker.pkg.dev/cloudy-demos/artomator"
-SERVICE_ACCOUNT = "artomator-github-actions-user@cloudy-demos.iam.gserviceaccount.com"
-SERVICE_URL = "https://artomator-pdznqybsqa-uw.a.run.app"
-SERVING_IMAGE = "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator:v0.7.40"
-```
-
-> To build your own `artomator` image, see [BUILD.md](BUILD.md). 
+When done, this will output the configured resource information. 
 
 ## test deployment
 
-To test the deployed `artomator`, use the provided ["hello" Dockerfile](tests/Dockerfile). To build it with both labels (`artomator-sbom=true` and `artomator-vuln=true`) and deploy it: 
+To test the deployed `artomator`, use the provided ["hello" Dockerfile](tests/Dockerfile). To build it with both labels (`artomator-sbom=true` and `artomator-vuln=true`) and deploy it, use the `test-image` tool from the root of the repo: 
 
 ```shell
 tools/test-image

@@ -23,11 +23,6 @@ on:
         description: 'Fully qualified URI of the image with its digest'
         required: true
         type: string
-      cosign_version:
-        description: 'Version of Cosign to use for signing'
-        default: v1.13.1
-        required: false
-        type: string
 
 jobs:
 
@@ -76,7 +71,7 @@ jobs:
     - name: Install Cosign
       uses: sigstore/cosign-installer@main
       with:
-        cosign-release: ${{ inputs.cosign_version }}
+        cosign-release: v1.13.1
     
     - name: Auth Cosign
       run: |
