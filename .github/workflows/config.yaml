@@ -29,7 +29,7 @@ on:
         type: string
       go_version:
         description: 'Version og Go to use for tests'
-        default: '1.19.4'
+        default: '^1.19.4'
         required: false
         type: string
       cosign_version:
