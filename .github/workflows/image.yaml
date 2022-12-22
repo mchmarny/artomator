@@ -19,11 +19,6 @@ on:
         description: 'Image URI without the label or sha'
         required: true
         type: string
-      go_version:
-        description: 'Version og Go to use for tests'
-        default: ^1.19.4
-        required: false
-        type: string
     outputs:
       digest:
         description: "Digest of the published image"
@@ -42,13 +37,12 @@ jobs:
 
     - name: Print Inputs
       run: |
-        echo "${{ inputs.go_version }}"
         echo "${{ inputs.image }}"
 
     - name: Setup Go
       uses: actions/setup-go@v3
       with:
-        go-version: ${{ inputs.go_version }}
+        go-version: ^1.19.4
     
     - run: go version
     

@@ -16,7 +16,7 @@ jobs:
     uses: ./.github/workflows/config.yaml
     with:
       registry_uri: us-west1-docker.pkg.dev
-      project_id: cloudy-demos/
+      project_id: cloudy-demos
       registry_image: artomator/artomator
       id_provider: projects/799736955886/locations/global/workloadIdentityPools/artomator-github-pool/providers/github-provider
       service_account: artomator-github-actions-user@cloudy-demos.iam.gserviceaccount.com
@@ -25,8 +25,6 @@ jobs:
   test:
     uses: ./.github/workflows/test.yaml
     needs: config
-    with:
-      go_version: ${{ needs.config.outputs.go_version }}
 
   image:
     uses: ./.github/workflows/image.yaml
