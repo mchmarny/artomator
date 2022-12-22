@@ -93,7 +93,7 @@ resource "google_cloud_run_service" "app" {
       annotations = {
         "autoscaling.knative.dev/maxScale"         = "3"
         "run.googleapis.com/vpc-access-connector"  = google_vpc_access_connector.connector.name
-        "run.googleapis.com/vpc-access-egress"     = "all-traffic"
+        "run.googleapis.com/vpc-access-egress"     = "private-ranges-only" 
         "run.googleapis.com/execution-environment" = "gen2"
       }
     }
