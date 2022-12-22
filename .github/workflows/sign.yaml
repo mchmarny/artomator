@@ -99,18 +99,14 @@ jobs:
         COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
 
     - name: Gen SBOM
-      uses: anchore/sbom-action@v0
-      with:
-        image: ${{ inputs.digest }}
-        registry-username: oauth2accesstoken
-        registry-password: ${{ steps.auth.outputs.access_token }}
-        artifact-name: sbom.spdx
-        output-file: ./sbom.spdx
-        format: spdx-json
+      run: |
+        syft -q packages -o spdx-json ${{ inputs.digest }} | jq --compact-output > sbom.spdx
+      env:
+        COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
 
     - name: Create Attestation
       run: |
-        cosign attest --predicate ./sbom.spdx --type spdx-json --key ${{ inputs.key }} ${{ inputs.digest }}
+        cosign attest --predicate sbom.spdx --type spdx-json --key ${{ inputs.key }} ${{ inputs.digest }}
       env:
         COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
       
