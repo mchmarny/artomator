@@ -32,7 +32,9 @@ jobs:
 
   image:
     uses: ./.github/workflows/image.yaml
-    needs: test
+    needs: 
+    - config
+    - test
     with:
       registry: ${{ needs.config.outputs.registry_uri }}
       image: ${{ needs.config.outputs.image_uri }}
@@ -42,7 +44,9 @@ jobs:
       
   sign:
     uses: ./.github/workflows/sign.yaml
-    needs: image
+    needs: 
+    - config
+    - image
     with:
       digest: ${{ needs.image.outputs.digest }}
       registry: ${{ needs.config.outputs.registry_uri }}
