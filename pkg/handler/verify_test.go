@@ -3,18 +3,18 @@ package handler
 import (
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestVerificationHandler(t *testing.T) {
 	req, err := http.NewRequest(http.MethodPost, "/verify", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 
 	h := getTestHandler(t)
-	if err = h.Validate(CommandNameEvent); err != nil {
-		t.Fatal(err)
-	}
+	assert.NotNil(t, h)
+	err = h.Validate(CommandNameEvent)
+	assert.NoError(t, err)
 
 	checkStatus(t, req, h.VerifyHandler, http.StatusBadRequest)
 
@@ -26,10 +26,9 @@ func TestVerificationHandler(t *testing.T) {
 }
 
 func TestPredicateParser(t *testing.T) {
-	if _, err := validateAttestation("../../tests/attestation.json"); err != nil {
-		t.Fatal(err)
-	}
-	if _, err := validateAttestation("../../tests/empty.json"); err == nil {
-		t.Fatal(err)
-	}
+	_, err := validateAttestation("../../tests/attestation.json")
+	assert.NoError(t, err)
+
+	_, err = validateAttestation("../../tests/empty.json")
+	assert.Error(t, err)
 }

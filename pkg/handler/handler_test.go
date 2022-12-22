@@ -8,27 +8,21 @@ import (
 	"github.com/mchmarny/artomator/pkg/cache"
 	"github.com/mchmarny/artomator/pkg/cmd"
 	"github.com/mchmarny/artomator/pkg/metric"
+	"github.com/stretchr/testify/assert"
 )
 
 func getTestHandler(t *testing.T) *Handler {
 	testCmd := "echo"
 	c := &metric.ConsoleCounter{}
+	assert.NotNil(t, c)
 
 	h, err := NewHandler("", cache.NewInMemoryCache(), c,
 		cmd.NewCommand(CommandNameEvent, testCmd),
 		cmd.NewCommand(CommandNameSBOM, testCmd),
 		cmd.NewCommand(CommandNameVerify, testCmd),
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 	return h
-}
-
-func checkErr(t *testing.T, err error) {
-	if err != nil {
-		t.Fatal(err)
-	}
 }
 
 func checkStatus(t *testing.T, req *http.Request, f func(http.ResponseWriter, *http.Request), status int) {
@@ -56,20 +50,12 @@ func TestRegistryInfo(t *testing.T) {
 
 func runRegistryTest(t *testing.T, uri, want string) {
 	v, err := parseRegistry(uri)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if v != want {
-		t.Fatalf("expected: %s, got: %s", want, v)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, want, v)
 }
 
 func runRegistryNameTest(t *testing.T, uri, want string) {
 	v, err := parseRegistryName(uri)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if v != want {
-		t.Fatalf("expected: %s, got: %s", want, v)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, want, v)
 }

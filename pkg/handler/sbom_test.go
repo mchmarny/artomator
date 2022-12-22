@@ -3,18 +3,19 @@ package handler
 import (
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSBOMHandler(t *testing.T) {
 	req, err := http.NewRequest(http.MethodPost, "/sbom", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 
 	h := getTestHandler(t)
-	if err = h.Validate(CommandNameEvent); err != nil {
-		t.Fatal(err)
-	}
+	assert.NotNil(t, h)
+
+	err = h.Validate(CommandNameEvent)
+	assert.NoError(t, err)
 
 	checkStatus(t, req, h.SBOMHandler, http.StatusBadRequest)
 
@@ -27,17 +28,12 @@ func TestSBOMHandler(t *testing.T) {
 
 func TestSHAParser(t *testing.T) {
 	_, err := parseSHA("us-west1-docker.pkg.dev/test/test/tester:v1.2.3")
-	if err == nil {
-		t.Errorf("no error from image with only a tag")
-	}
+	assert.Error(t, err)
+
 	_, err = parseSHA("us-west1-docker.pkg.dev/test/test/tester")
-	if err == nil {
-		t.Errorf("no error from image without tag")
-	}
+	assert.Error(t, err)
 
 	t1, err := parseSHA("us-west1-docker.pkg.dev/test/test/tester@sha256:123")
-	checkErr(t, err)
-	if t1 != "123" {
-		t.Errorf("failed to parse SHA from a valid registry URI: (got:%s, want:123)", t1)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "123", t1)
 }

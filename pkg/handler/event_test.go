@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/mchmarny/artomator/pkg/pubsub"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -45,19 +46,18 @@ func TestEventHandlerWithAttestationEvent(t *testing.T) {
 
 func runEventTest(t *testing.T, event string) {
 	b, err := json.Marshal(pubsub.GetPubSubMessage("test", event))
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
+	assert.NotNil(t, b)
 
 	req, err := http.NewRequest(http.MethodPost, "/event", bytes.NewBuffer(b))
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
+	assert.NotNil(t, req)
 
 	h := getTestHandler(t)
-	if err = h.Validate(CommandNameEvent); err != nil {
-		t.Fatal(err)
-	}
+	assert.NotNil(t, h)
+
+	err = h.Validate(CommandNameEvent)
+	assert.NoError(t, err)
 
 	checkStatus(t, req, h.EventHandler, http.StatusOK)
 }
