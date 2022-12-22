@@ -1,7 +1,25 @@
+locals {
+  # List of roles that will be assigned to the GitHub federted user
+  ci_roles = toset([
+    "roles/artifactregistry.writer",
+    "roles/cloudkms.cryptoKeyEncrypterDecrypter",
+    "roles/cloudkms.signerVerifier",
+    "roles/cloudkms.viewer",
+    "roles/viewer",
+  ])
+}
+
 # Service account to be used for federated auth to publish to GCR (existing)
 resource "google_service_account" "github_actions_user" {
   account_id   = "${var.name}-github-actions-user"
   display_name = "Service Account impersonated in ${var.git_repo} GitHub Actions"
+}
+
+resource "google_project_iam_member" "ci_role_bindings" {
+  for_each = local.ci_roles
+  project  = var.project_id
+  role     = each.value
+  member   = "serviceAccount:${google_service_account.runner_service_account.email}"
 }
 
 # Identiy pool for GitHub action based identity's access to Google Cloud resources

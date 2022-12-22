@@ -112,7 +112,7 @@ jobs:
       
     - name: Verify Image
       run: |
-        cosign verify-attestation --type spdx-json --key ${{ inputs.key }} ${{ inputs.digest }}
+        cosign verify-attestation --type spdx --key ${{ inputs.key }} ${{ inputs.digest }}
       env:
         COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
 

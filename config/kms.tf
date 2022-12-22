@@ -17,25 +17,17 @@ resource "google_kms_crypto_key" "key" {
   }
 }
 
-resource "google_project_iam_member" "project" {
-  project = var.project_id
-  role    = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
-  member  = "serviceAccount:${google_service_account.github_actions_user.email}"
-}
-
-# resource "google_service_account_iam_binding" "admin-account-iam" {
-#   service_account_id = "serviceAccount:${google_service_account.github_actions_user.email}"
-#   role               = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
-
-#   members = [
-#     "user:${google_service_account.github_actions_user.email}",
-#   ]
-# }
-
-
 resource "google_kms_crypto_key_iam_binding" "crypto_key_bindng" {
   crypto_key_id = google_kms_crypto_key.key.id
-  role          = "roles/cloudkms.admin"
+  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  members = [
+    "serviceAccount:${google_service_account.github_actions_user.email}",
+  ]
+}
+
+resource "google_kms_crypto_key_iam_binding" "crypto_key_viewer" {
+  crypto_key_id = google_kms_crypto_key.key.id
+  role          = "roles/cloudkms.viewer"
   members = [
     "serviceAccount:${google_service_account.github_actions_user.email}",
   ]
