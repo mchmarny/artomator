@@ -43,7 +43,7 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v3
       with:
-        go-version: ${{ inputs.go_version }}
+        go-version: '${{ inputs.go_version }}'
     
     - run: go version
     
@@ -62,7 +62,8 @@ jobs:
     
     - name: Tidy Modules
       run: |
-        make tidy
+        go mod tidy
+        go mod vendor
     
     - name: Capture Variables
       run: |

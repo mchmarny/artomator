@@ -21,7 +21,7 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v3
       with:
-        go-version: ${{ inputs.go_version }}
+        go-version: '${{ inputs.go_version }}'
 
     - run: go version
 
@@ -42,7 +42,8 @@ jobs:
 
     - name: Tidy Modules
       run: |
-        make tidy
+        go mod tidy
+        go mod vendor
 
     - name: Config Lint
       id: golangci_config
@@ -58,13 +59,14 @@ jobs:
 
     - name: Unit Test
       run: |
-        make test
+        go test -short -count=1 -race -covermode=atomic -coverprofile=cover.out ./...
 
     - name: Scan Repo
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: 'fs'
         ignore-unfixed: true
+        hide-progress: false
         format: 'sarif'
         output: 'trivy-results.sarif'
         severity: 'CRITICAL,HIGH'
