@@ -17,25 +17,24 @@ resource "google_service_account" "github_actions_user" {
 }
 
 resource "google_project_iam_member" "ci_role_bindings" {
-  count      = var.runtime_only ? 0 : 1
   for_each = local.ci_roles
   project  = var.project_id
-  role     = each.value
+  role     = var.runtime_only ? null : each.value
   member   = "serviceAccount:${google_service_account.runner_service_account.email}"
 }
 
 # Identiy pool for GitHub action based identity's access to Google Cloud resources
 resource "google_iam_workload_identity_pool" "github_pool" {
-  count      = var.runtime_only ? 0 : 1
+  count                     = var.runtime_only ? 0 : 1
   provider                  = google-beta
   workload_identity_pool_id = "${var.name}-github-pool"
 }
 
 # Configuration for GitHub identiy provider
 resource "google_iam_workload_identity_pool_provider" "github_provider" {
-  count      = var.runtime_only ? 0 : 1
+  count                              = var.runtime_only ? 0 : 1
   provider                           = google-beta
-  workload_identity_pool_id          = google_iam_workload_identity_pool.github_pool.workload_identity_pool_id
+  workload_identity_pool_id          = google_iam_workload_identity_pool.github_pool[count.index].workload_identity_pool_id
   workload_identity_pool_provider_id = "github-provider"
   attribute_mapping = {
     "google.subject"       = "assertion.sub"
@@ -51,9 +50,9 @@ resource "google_iam_workload_identity_pool_provider" "github_provider" {
 
 # IAM policy bindings to the service account resources created by GitHub identify
 resource "google_service_account_iam_member" "pool_impersonation" {
-  count      = var.runtime_only ? 0 : 1
+  count              = var.runtime_only ? 0 : 1
   provider           = google-beta
-  service_account_id = google_service_account.github_actions_user.id
+  service_account_id = google_service_account.github_actions_user[count.index].id
   role               = "roles/iam.workloadIdentityUser"
-  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${var.git_repo}"
+  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool[count.index].name}/attribute.repository/${var.git_repo}"
 }

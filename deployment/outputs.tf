@@ -6,8 +6,7 @@ output "PROJECT_ID" {
 }
 
 output "CI_SERVICE_ACCOUNT" {
-  count      = var.runtime_only ? 0 : 1
-  value       = google_service_account.github_actions_user.email
+  value       = var.runtime_only ? null : google_service_account.github_actions_user[0].email
   description = "Service account to use in GitHub Action for federated auth."
 }
 
@@ -17,8 +16,7 @@ output "RUN_SERVICE_ACCOUNT" {
 }
 
 output "IDENTITY_PROVIDER" {
-  count      = var.runtime_only ? 0 : 1
-  value       = google_iam_workload_identity_pool_provider.github_provider.name
+  value       = var.runtime_only ? null : google_iam_workload_identity_pool_provider.github_provider[0].name
   description = "Provider ID to use in Auth action for GCP in GitHub."
 }
 
@@ -28,14 +26,12 @@ output "KMS_KEY" {
 }
 
 output "REGISTRY_URI" {
-  count      = var.runtime_only ? 0 : 1
-  value       = "${google_artifact_registry_repository.registry.location}-docker.pkg.dev/${data.google_project.project.name}/${google_artifact_registry_repository.registry.name}"
+  value       = var.runtime_only ? null : "${google_artifact_registry_repository.registry[0].location}-docker.pkg.dev/${data.google_project.project.name}/${google_artifact_registry_repository.registry[0].name}"
   description = "Artifact Registry location."
 }
 
 output "SERVING_IMAGE" {
-  count      = var.runtime_only ? 0 : 1
-  value       = "${var.image}:${data.template_file.version.rendered}"
+  value       = var.runtime_only ? null : "${var.image}:${data.template_file.version.rendered}"
   description = "Image currently being used in Cloud Run."
 }
 
