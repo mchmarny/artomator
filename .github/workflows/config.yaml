@@ -37,6 +37,11 @@ on:
         default: v1.13.1
         required: false
         type: string
+      vuln_severity_cutoff:
+        description: 'Minimum vulnerability severity to trigger a failure'
+        default: medium
+        required: false
+        type: string
     outputs:
       registry_uri:
         value: ${{ jobs.conf.outputs.registry_uri }}
@@ -52,6 +57,8 @@ on:
         value: ${{ jobs.conf.outputs.go_version }}
       cosign_version:
         value: ${{ jobs.conf.outputs.cosign_version }}
+      vuln_severity_cutoff:
+        value: ${{ jobs.conf.outputs.vuln_severity_cutoff }}
 
 jobs:
 
@@ -68,6 +75,7 @@ jobs:
       kms_key: ${{ steps.conf.outputs.kms_key }}
       go_version: ${{ steps.conf.outputs.go_version }}
       cosign_version: ${{ steps.conf.outputs.cosign_version }}
+      vuln_severity_cutoff: ${{ steps.conf.outputs.vuln_severity_cutoff }}
     steps:
     
     - name: Export Config
@@ -80,3 +88,4 @@ jobs:
         echo "go_version=${{ inputs.go_version }}" >> $GITHUB_OUTPUT
         echo "cosign_version=${{ inputs.cosign_version }}" >> $GITHUB_OUTPUT
         echo "kms_key=gcpkms://${{ inputs.kms_key }}" >> $GITHUB_OUTPUT
+        echo "vuln_severity_cutoff=${{ inputs.vuln_severity_cutoff }}" >> $GITHUB_OUTPUT
