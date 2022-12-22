@@ -55,7 +55,7 @@ on:
 
 jobs:
 
-  image:
+  conf:
     runs-on: ubuntu-latest
     permissions:
       contents: read
