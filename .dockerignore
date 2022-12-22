@@ -1,6 +1,9 @@
 tools
 examples
+deployment
+policy
 images
+tests
 README.md
 *.json
 *.pub

@@ -9,6 +9,7 @@
 # .tfstate files
 *.tfstate
 *.tfstate.*
+*.lock.hcl
 
 # Crash log files
 crash.log
@@ -39,11 +40,11 @@ override.tf.json
 terraform.rc
 
 # config
-config/.terraform
-config/terraform.tfvars
-config/terraform.tfstate
-config/terraform.tfstate.backup
-config/.terraform.tfstate.lock.info
+deployment/.terraform
+deployment/terraform.tfvars
+deployment/terraform.tfstate
+deployment/terraform.tfstate.backup
+deployment/.terraform.tfstate.lock.info
 
 # Test binaries
 *.test
@@ -53,6 +54,9 @@ tests/hello
 # node 
 tests/app/node_modules
 tests/app/package-lock.json
+tests/app/index.js
+tests/test-digest.txt
+tests/message.json
 
 # Coverage
 *.out
@@ -66,12 +70,3 @@ cosign.*
 
 # docker 
 digest.txt
-
-# generated files
-/sbom.spdx.json
-/sbom.vuln.json
-
-tests/app/index.js
-tests/test-digest.txt
-
-tests/message.json

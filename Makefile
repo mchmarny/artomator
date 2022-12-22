@@ -119,12 +119,12 @@ deploy: ## Configures all dependancies and deploys the prebuild image
 	tools/deploy $(IMG_URI)
 .PHONY: deploy
 
-apply: ## Applies Terraform 
-	terraform -chdir=./config apply -auto-approve
-.PHONY: apply
+infra: ## Applies Terraform 
+	terraform -chdir=./deployment apply -auto-approve
+.PHONY: infra
 
 nice: ## Formats Terraform 
-	terraform -chdir=./config fmt
+	terraform -chdir=./deployment fmt
 .PHONY: nice
 
 clean: ## Deletes deployed resoruces 
