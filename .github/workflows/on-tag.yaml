@@ -13,7 +13,7 @@ jobs:
 # https://github.com/community/community/discussions/17554.
 
   config:
-    uses: ./.github/workflows/image.yaml
+    uses: ./.github/workflows/config.yaml
     with:
       registry_uri: us-west1-docker.pkg.dev
       project_id: cloudy-demos/
