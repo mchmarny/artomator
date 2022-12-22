@@ -8,7 +8,9 @@ spec:
   authorities:
   - name: artomator-signer
     key:
-      kms: projects/cloudy-demos2/locations/us-west1/keyRings/artomator/cryptoKeys/artomator-signer
+      kms: projects/cloudy-demos/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer/cryptoKeyVersions/1
+    ctlog:
+      url: https://rekor.sigstore.dev
     attestations:
     - name: must-have-spdx-sbom
       predicateType: spdx

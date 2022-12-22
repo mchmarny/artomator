@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: artomator
+  namespace: demo
+  labels:
+    app: artomator
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: artomator
+  template:
+    metadata:
+      labels:
+        app: artomator
+    spec:
+      containers:
+      - name: artomator
+        image: us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:b9323d3b903231a53ea90cac4c11d0a1e5484c3db75cc7d63236a6996c8e8e8a
+        ports:
+        - containerPort: 8080
