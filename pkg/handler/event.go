@@ -18,6 +18,7 @@ const (
 	ImageURISelf     = "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator"
 )
 
+// EventHandler is the HTTP handler for event service.
 func (h *Handler) EventHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	log.Println("processing event...")

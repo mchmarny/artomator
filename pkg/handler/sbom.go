@@ -15,16 +15,18 @@ import (
 )
 
 const (
+	// CommandNameSBOM is the SBOM command name.
+	CommandNameSBOM = "sbom"
+
 	expectedURIParts    = 2
 	actionInsert        = "INSERT"
 	sigTagSuffix        = ".sig"
 	attTagSuffix        = ".att"
 	sbomFormatParamName = "format"
 	spdxVersionKey      = "spdxVersion"
-
-	CommandNameSBOM = "sbom"
 )
 
+// SBOMHandler is the HTTP handler for SBOM service.
 func (h *Handler) SBOMHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	log.Println("processing event...")
@@ -119,8 +121,8 @@ func validateSBOM(path string) (map[string]interface{}, error) {
 }
 
 // parseSHA ensures that the image URI is actually a digest
-// shouldn't process based on labels
-// example: "us-west1-docker.pkg.dev/test/test/tester@sha256:123"
+// shouldn't process based on labels.
+// Example: "us-west1-docker.pkg.dev/test/test/tester@sha256:123".
 func parseSHA(uri string) (string, error) {
 	parts := strings.Split(uri, "@")
 	if len(parts) != expectedURIParts {

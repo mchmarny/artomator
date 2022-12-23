@@ -25,6 +25,7 @@ type Event struct {
 	Tag    string `json:"tag"`
 }
 
+// ParseEvent parses the event from the request.
 func ParseEvent(r *http.Request) (*Event, error) {
 	var m PubsubMessage
 	if err := json.NewDecoder(r.Body).Decode(&m); err != nil {

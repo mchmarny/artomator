@@ -12,12 +12,14 @@ import (
 )
 
 const (
+	// CommandNameVerify is the verify command name.
+	CommandNameVerify = "verify"
+
 	verifyPredicateTypeParamName = "type"
 	predicateTypeKey             = "predicateType"
-
-	CommandNameVerify = "verify"
 )
 
+// VerifyHandler handles verify requests.
 func (h *Handler) VerifyHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	log.Println("verifying request...")

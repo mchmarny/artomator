@@ -4,6 +4,7 @@ set -o errexit
 
 DIR=${1:-.} # target dir path for the report or current folder
 
+# list of images already scanned
 DIGESTS=()
 
 # for all active projects excluding folders

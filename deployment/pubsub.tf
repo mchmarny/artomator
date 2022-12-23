@@ -1,8 +1,12 @@
+# Description: PubSub resources for GCR
+
+# PubSub resources for GCR
 resource "google_pubsub_topic" "gcr_topic" {
   name                       = "gcr"
   message_retention_duration = "86600s"
 }
 
+# PubSub subscription for GCR
 resource "google_pubsub_subscription" "gcr_sub" {
   name                       = "${var.name}-gcr-sub"
   topic                      = google_pubsub_topic.gcr_topic.name
@@ -30,6 +34,7 @@ resource "google_pubsub_subscription" "gcr_sub" {
   }
 }
 
+# Role for PubSub token creator
 resource "google_project_iam_member" "pubsub_token_creator" {
   project = data.google_project.project.project_id
   role    = "roles/iam.serviceAccountTokenCreator"

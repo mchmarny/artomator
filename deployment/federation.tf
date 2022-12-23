@@ -1,3 +1,6 @@
+# Description: This file contains the resources required to federate a GitHub repository with a GCP project
+
+# This is a list of roles that will be assigned to the GitHub federted user
 locals {
   # List of roles that will be assigned to the GitHub federted user
   ci_roles = toset([
@@ -16,6 +19,7 @@ resource "google_service_account" "github_actions_user" {
   display_name = "Service Account impersonated in ${var.git_repo} GitHub Actions"
 }
 
+# IAM policy bindings to the service account resources created by GitHub identify
 resource "google_project_iam_member" "ci_role_bindings" {
   for_each = local.ci_roles
   project  = var.project_id

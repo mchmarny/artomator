@@ -17,8 +17,16 @@ func newDiscoReport() *DiscoReport {
 
 type DiscoReport struct {
 	Created string         `json:"created"`
+	Filter  *CVEFilter     `json:"filter,omitempty"`
 	Counts  *DiscoCounter  `json:"counts"`
 	Results []*DiscoResult `json:"results"`
+}
+
+type CVEFilter struct {
+	CVE      string          `json:"cve"`
+	Severity string          `json:"severity"`
+	URL      string          `json:"url"`
+	Services map[string]bool `json:"affectedServices"`
 }
 
 type DiscoCounter struct {

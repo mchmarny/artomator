@@ -1,3 +1,5 @@
+# Description: This file contains the Terraform code to enable the required GCP APIs for the project
+
 # List of GCP APIs to enable in this project
 locals {
   services = [
@@ -25,6 +27,7 @@ locals {
 data "google_project" "project" {}
 
 
+# Enable the required GCP APIs
 resource "google_project_service" "default" {
   for_each = toset(local.services)
 

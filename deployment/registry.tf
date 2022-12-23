@@ -1,3 +1,6 @@
+# Description: Creates a Google Artifact Registry for the project
+
+# Artifact Registry
 resource "google_artifact_registry_repository" "registry" {
   count         = var.runtime_only ? 0 : 1
   provider      = google-beta

@@ -12,9 +12,11 @@ import (
 )
 
 const (
+	// cacheExpireHrs is the cache expiration in hours.
 	cacheExpireHrs = 168 // week
 )
 
+// Cache is the cache interface.
 func NewPersistedCache(ctx context.Context, ip, port string) (Cache, error) {
 	log.Printf("connecting to redis %s:%s...\n", ip, port)
 	client := redis.NewClient(&redis.Options{
@@ -34,10 +36,12 @@ func NewPersistedCache(ctx context.Context, ip, port string) (Cache, error) {
 	return c, nil
 }
 
+// PersistedCache is the persisted cache implementation.
 type PersistedCache struct {
 	client *redis.Client
 }
 
+// HasBeenProcessed checks if the key has been processed before.
 func (c *PersistedCache) HasBeenProcessed(ctx context.Context, k, v string) (bool, error) {
 	if c.client == nil {
 		return true, nil

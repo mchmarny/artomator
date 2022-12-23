@@ -1,3 +1,5 @@
+# Description: Cloud Scheduler job to update user data
+
 # Cloud Scheduler job to update user data
 resource "google_cloud_scheduler_job" "disco_refresh_job" {
   name             = "${var.name}-disco-refresh-job"

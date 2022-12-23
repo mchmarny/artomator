@@ -1,3 +1,6 @@
+# Description: Cloud Run service
+
+# List of roles that will be assigned to the runner service account
 locals {
   # List of roles that will be assigned to the runner service account
   runner_roles = toset([
@@ -103,7 +106,7 @@ resource "google_cloud_run_service" "app" {
   }
 }
 
-
+# IAM member to grant access to the Cloud Run service
 resource "google_cloud_run_service_iam_member" "app-access" {
   location = google_cloud_run_service.app.location
   project  = google_cloud_run_service.app.project

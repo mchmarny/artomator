@@ -9,21 +9,25 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Counter is the interface for metric counter.
 type Counter interface {
 	Count(ctx context.Context, metric string, count int64, labels map[string]string) error
 	CountAll(ctx context.Context, records ...*Record) error
 }
 
+// MakeMetricType creates a metric type string.
 func MakeMetricType(v string) string {
 	return fmt.Sprintf("custom.googleapis.com/%s", strings.ToLower(v))
 }
 
+// Record is the metric record type.
 type Record struct {
 	MetricType  string
 	MetricValue int64
 	Labels      map[string]string
 }
 
+// NewRecorder creates new recorder instance.
 func NewRecorder(client Counter, labels map[string]string) *Recorder {
 	r := &Recorder{
 		client: client,
@@ -36,6 +40,7 @@ func NewRecorder(client Counter, labels map[string]string) *Recorder {
 	return r
 }
 
+// Recorder is the metric recorder type.
 type Recorder struct {
 	client Counter
 	items  map[string]*Record
@@ -47,6 +52,7 @@ const flushOnREcorderItems = 100
 
 var recorderFlushError = "error flushing metric records"
 
+// Add adds a metric record to the recorder.
 func (r *Recorder) Add(ctx context.Context, name string, labels map[string]string) error {
 	if name == "" {
 		return errors.New("name required")
@@ -83,6 +89,7 @@ func (r *Recorder) Add(ctx context.Context, name string, labels map[string]strin
 	return nil
 }
 
+// Flush flushes the recorder.
 func (r *Recorder) Flush(ctx context.Context) error {
 	r.lock.Lock()
 	defer r.lock.Unlock()

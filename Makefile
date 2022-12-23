@@ -1,4 +1,5 @@
 VERSION  =$(shell cat .version)
+COMMIT   =$(shell git rev-parse HEAD)
 IMG_URI  ="us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator:$(shell cat .version)"
 TEST_RIP =127.0.0.1
 TEST_RPT =6379
@@ -14,6 +15,7 @@ all: help
 info: ## Prints the current version and iamge
 	@echo $(VERSION)
 	@echo $(IMG_URI)
+	@echo $(COMMIT)
 .PHONY: info
 
 tidy: ## Updates the go modules and vendors all dependancies 
@@ -59,6 +61,10 @@ server: ## Runs previsouly built server binary
 disco: ## Runs disco on on local service
 	tools/run-disco $(TEST_ADD)
 .PHONY: disco
+
+disco-cve: ## Runs disco with CVE param on on local service
+	tools/run-disco $(TEST_ADD) "CVE-2022-2582"
+.PHONY: disco-cve
 
 event: ## Submits events test to local service
 	tools/run-event $(TEST_ADD)

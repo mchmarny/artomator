@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Save persists the provided content into bucket using name.
 func Save(ctx context.Context, sha, bucket, dir string) error {
 	if sha == "" || bucket == "" || dir == "" {
 		return errors.New("sha, bucket, and dir are all required")

@@ -15,6 +15,7 @@ const (
 )
 
 var (
+	// ErrObjectNotFound is returned when object does not exists.
 	ErrObjectNotFound = errors.New("object not found")
 )
 

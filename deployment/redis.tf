@@ -1,3 +1,6 @@
+# Description: Redis instance and VPC connector
+
+# Redis instance
 resource "google_redis_instance" "cache" {
   name           = var.name
   region         = var.location
@@ -6,6 +9,7 @@ resource "google_redis_instance" "cache" {
   memory_size_gb = 5
 }
 
+# VPC connector
 resource "google_vpc_access_connector" "connector" {
   name          = "${var.name}-connector"
   region        = var.location

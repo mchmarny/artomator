@@ -10,11 +10,25 @@ import (
 )
 
 func TestDiscoParser(t *testing.T) {
+	rep := runDiscoParserTest(t, "../../tests/reports", "")
+	assert.NotNil(t, rep)
+}
+
+func TestDiscoParserWithCVE(t *testing.T) {
+	cve := "CVE-2020-8912"
+	rep := runDiscoParserTest(t, "../../tests/reports", cve)
+	assert.NotNil(t, rep)
+	assert.NotNil(t, rep.Filter)
+	assert.Equal(t, rep.Filter.CVE, cve)
+	assert.Greater(t, len(rep.Filter.Services), 0)
+}
+
+func runDiscoParserTest(t *testing.T, dir, cve string) *DiscoReport {
 	c := &metric.ConsoleCounter{}
 	assert.NotNil(t, c)
 
 	ctx := context.TODO()
-	rec := newReporter(c, "../../tests/reports")
+	rec := newReporter(c, dir, cve)
 	assert.NotNil(t, rec)
 
 	rep, err := rec.create(ctx)
@@ -26,6 +40,8 @@ func TestDiscoParser(t *testing.T) {
 
 	err = rec.close(ctx)
 	assert.NoError(t, err)
+
+	return rep
 }
 
 func TestDiscoServiceParser(t *testing.T) {

@@ -1,4 +1,4 @@
-# List of outputs from each terraform apply 
+# Description: Outputs for the deployment
 
 output "PROJECT_ID" {
   value       = data.google_project.project.name

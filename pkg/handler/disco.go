@@ -19,9 +19,14 @@ import (
 )
 
 const (
+	// CommandNameDisco is the discovery command name.
 	CommandNameDisco = "disco"
+
+	// discoCVEParamName is the name of the query param for CVE filter.
+	discoCVEParamName = "cve"
 )
 
+// DiscoHandler is the HTTP handler for disco service.
 func (h *Handler) DiscoHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	log.Println("preparing discovery...")
@@ -47,7 +52,8 @@ func (h *Handler) DiscoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rec := newReporter(h.counter, dir)
+	cve := r.URL.Query().Get(discoCVEParamName)
+	rec := newReporter(h.counter, dir, cve)
 	defer func() {
 		if err = rec.close(r.Context()); err != nil {
 			log.Printf("error closing recorder: %s\n", dir)
@@ -87,10 +93,11 @@ func getDiscoReportName(prefix string) string {
 		prefix, time.Now().Format("2006-01-02"))
 }
 
-func newReporter(counter metric.Counter, dir string) *reporter {
+func newReporter(counter metric.Counter, dir, cve string) *reporter {
 	return &reporter{
 		recorder: metric.NewRecorder(counter, nil),
 		dir:      dir,
+		cve:      cve,
 	}
 }
 
@@ -98,6 +105,7 @@ type reporter struct {
 	report   *DiscoReport
 	recorder *metric.Recorder
 	dir      string
+	cve      string
 	lock     sync.Mutex
 }
 
@@ -132,6 +140,24 @@ func (r *reporter) create(ctx context.Context) (*DiscoReport, error) {
 	for _, file := range files {
 		if err := r.processFile(ctx, file.Name()); err != nil {
 			return nil, errors.Wrapf(err, "error parsing: %s/%s", r.dir, file.Name())
+		}
+	}
+
+	if r.cve != "" {
+		r.report.Filter = &CVEFilter{
+			CVE:      r.cve,
+			Services: make(map[string]bool),
+		}
+		for _, rez := range r.report.Results {
+			for _, v := range rez.Vulnerabilities {
+				if r.report.Filter.CVE == v.ID {
+					if _, ok := r.report.Filter.Services[rez.Service]; !ok {
+						r.report.Filter.Services[rez.Service] = true
+						r.report.Filter.Severity = v.Severity
+						r.report.Filter.URL = v.URL
+					}
+				}
+			}
 		}
 	}
 

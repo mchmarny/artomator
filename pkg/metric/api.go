@@ -14,6 +14,7 @@ import (
 	timestamp "google.golang.org/protobuf/types/known/timestamppb"
 )
 
+// NewAPICounter creates new API counter instance.
 func NewAPICounter(project string) (Counter, error) {
 	return &APICounter{
 		projectID: project,
@@ -23,11 +24,13 @@ func NewAPICounter(project string) (Counter, error) {
 	}, nil
 }
 
+// APICounter is the API counter type.
 type APICounter struct {
 	projectID string
 	labels    map[string]string
 }
 
+// Count records the metric to the monitoring API.
 func (r *APICounter) Count(ctx context.Context, metricType string, count int64, labels map[string]string) error {
 	items := make(map[string]int64)
 	items[metricType] = count
@@ -44,6 +47,7 @@ func (r *APICounter) Count(ctx context.Context, metricType string, count int64, 
 	return nil
 }
 
+// CountAll records multiple metrics to the monitoring API.
 func (r *APICounter) CountAll(ctx context.Context, records ...*Record) error {
 	if len(records) < 1 {
 		log.Printf("no metrics to record")

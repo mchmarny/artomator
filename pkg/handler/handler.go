@@ -18,6 +18,7 @@ const (
 	successResponseMessage    = "ok"
 )
 
+// result is the handler response type.
 type result struct {
 	Status  string `json:"status"`
 	Image   string `json:"image,omitempty"`
@@ -25,6 +26,7 @@ type result struct {
 	Error   string `json:"error,omitempty"`
 }
 
+// NewHandler creates new handler instance.
 func NewHandler(bucket string, cache cache.Cache, counter metric.Counter, commands ...*cmd.Command) (*Handler, error) {
 	if cache == nil {
 		return nil, errors.New("cache service not set")
@@ -44,6 +46,7 @@ func NewHandler(bucket string, cache cache.Cache, counter metric.Counter, comman
 	return h, nil
 }
 
+// Handler is the handler type.
 type Handler struct {
 	bucket   string
 	commands map[string]*cmd.Command
@@ -51,6 +54,7 @@ type Handler struct {
 	counter  metric.Counter
 }
 
+// HandlerDefault is the default handler.
 func (h *Handler) Validate(cmdName string) error {
 	if h.cache == nil {
 		return errors.New("cache service not set")
@@ -64,6 +68,7 @@ func (h *Handler) Validate(cmdName string) error {
 	return nil
 }
 
+// HandlerDefault is the default handler.
 func (h *Handler) HandlerDefault(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	writeMessage(w, "hello")

@@ -27,6 +27,7 @@ const (
 )
 
 var (
+	// Version is set at build time.
 	version = "v0.0.1-default"
 
 	projectID  = os.Getenv("PROJECT_ID")
@@ -93,6 +94,7 @@ func main() {
 
 var contextKey key
 
+// run starts the server and waits for termination signal.
 func run(ctx context.Context, mux *http.ServeMux, address string) {
 	server := &http.Server{
 		Addr:              address,
