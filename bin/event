@@ -46,7 +46,7 @@ trivy image \
 
 # check if image has the sbom and vuln labels 
 DO_SBOM=$(cat $TARGET_DIR/vuln.json | \
-    jq -r -e '( .Metadata.ImageConfig.config.Labels."artomator-sbom" // "false" )')
+    jq -r -e '( .Metadata.ImageConfig.config.Labels."artomator-sbom" // "" )')
 
 echo "SBOM: ${DO_SBOM}"
 

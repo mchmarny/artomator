@@ -26,5 +26,10 @@ REP: $REP
 gcloud auth configure-docker $REG --quiet
 gcloud config set project $PRJ --quiet
 
-trivy image --security-checks vuln --no-progress \
-    --timeout 10m --format json --output $REP $IMG
+trivy image \
+    --security-checks vuln \
+    --no-progress \
+    --timeout 10m \
+    --format json \
+    --output $REP \
+    $IMG
