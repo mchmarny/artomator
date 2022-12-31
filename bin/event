@@ -17,10 +17,14 @@ TARGET_DIR=$4 # full path to dir where to save results
 REGISTRY=$(echo $IMAGE_DIGEST | cut -d'/' -f 1)
 IMG_SHA=$(echo $IMAGE_DIGEST | cut -d'@' -f 2)
 
+# create cosign key format 
+# CO_KEY="gcpkms://${SIGN_KEY}"
+
 # print run variables 
 echo "
 PROJECT:  $PROJECT_ID
 KEY:      $SIGN_KEY
+ATTESTOR: $ATTESTOR
 DIGEST:   $IMAGE_DIGEST
 REGISTRY: $REGISTRY
 SHA:      $IMG_SHA
@@ -43,13 +47,11 @@ trivy image \
 # check if image has the sbom and vuln labels 
 DO_SBOM=$(cat $TARGET_DIR/vuln.json | \
     jq -r -e '( .Metadata.ImageConfig.config.Labels."artomator-sbom" // "false" )')
-DO_VULN=$(cat $TARGET_DIR/vuln.json | \
-    jq -r -e '( .Metadata.ImageConfig.config.Labels."artomator-vuln" // "false" )')
 
-echo "
-SBOM: $DO_SBOM
-VULN: $DO_VULN
-"
+echo "SBOM: ${DO_SBOM}"
+
+# exit if SBOM lable not set 
+[ -z "$DO_SBOM" ] && echo "SBOM lable not found" && exit 0
 
 # generate public key-pair from KMS if one does not exist 
 if [ ! -f cosign.pub ]; then
@@ -61,12 +63,24 @@ cosign sign --key $SIGN_KEY $IMAGE_DIGEST
 cosign verify --key $SIGN_KEY $IMAGE_DIGEST
 
 # generate SBOM from image and attach it as attestation to the image
-syft -q packages -o "${DO_SBOM}-json" $IMAGE_DIGEST | jq --compact-output > $TARGET_DIR/sbom.json
-cosign attest --predicate $TARGET_DIR/sbom.json --type $DO_SBOM --key $SIGN_KEY $IMAGE_DIGEST
+syft -q packages \
+    -o "${DO_SBOM}-json" $IMAGE_DIGEST | \
+    jq --compact-output > $TARGET_DIR/sbom.json
 
-# scan packages in SBOM for vulnerabilities and attach report as attestation to the image
-if [ "$DO_VULN" == true ] ; then
-    cosign attest --predicate $TARGET_DIR/vuln.json --type vuln --key $SIGN_KEY $IMAGE_DIGEST
+# create attestation for the SBOM
+cosign attest \
+    --predicate $TARGET_DIR/sbom.json \
+    --type $DO_SBOM \
+    --key $SIGN_KEY \
+    $IMAGE_DIGEST
+
+# create biauthz attestation attestation
+if [ ! -z "$ATTESTOR" ]
+then
+    gcloud beta container binauthz attestations sign-and-create \
+        --attestor $ATTESTOR \
+        --artifact-url $IMAGE_DIGEST \
+        --keyversion $SIGN_KEY
 fi
 
 

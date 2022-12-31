@@ -6,10 +6,10 @@
 Automates the creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom), and vulnerability scanning of container images. When deployed in your GCP project, `artomator` will automatically process any image that is pushed into [Artifact Registry (AR)](https://cloud.google.com/artifact-registry) with one of the expected [label](https://docs.docker.com/config/labels-custom-metadata/). For example:
 
 ```shell
-docker build -t $TAG --label artomator-sbom=spdx --label artomator-vuln=true .
+docker build -t $TAG --label artomator-sbom=spdx .
 ```
 
-The `artomator-sbom=spdx` label in the above `docker build` commend will tell `artomator` to add SBOM attestations in an [SPDX](https://spdx.dev/) format (the supported formats are: `cyclonedx` or `spdx`). Additionally, if you also include the `artomator-vuln=true` label, `artomator` will also generate a vulnerability report from that SBOM. 
+The `artomator-sbom=spdx` label in the above `docker build` commend will tell `artomator` to add SBOM attestations in an [SPDX](https://spdx.dev/) format (the supported formats are: `cyclonedx` or `spdx`).
 
 ![](images/flow.png)
 
@@ -21,7 +21,7 @@ The `artomator-sbom=spdx` label in the above `docker build` commend will tell `a
 2. A [registry event](https://cloud.google.com/artifact-registry/docs/configure-notifications) is automatically published if there is a [PubSub](https://cloud.google.com/pubsub/docs/overview) topic named `gcr` in the same project
 3. PubSub subscription pushes that event to `artomator` service in [Cloud Run](https://cloud.google.com/run) with the operation type (e.g. `INSERT`) and the image digest (SHA256)
 4. The `artomator` service retrieves metadata for that image from the registry and check its labels
-5. If the image includes `artomator-*` labels, signs that image using KMS key, and creates the requested artifacts (SBOM or vulnerability report)
+5. If the image includes `artomator-sbom` label, signs that image using KMS key, and creates the requested artifacts 
 6. Adds attestation on the image using the KMS key and stores it all in the registry
 7. (optional) If GCS bucket is configured, `artomator` will also persist the generated artifacts
 8. Stores the processed image digests in a Redis store to avoid re-processing the same image (technically adding attestation to an image creates yet another event, so this could cause recursion without that check)
@@ -180,7 +180,7 @@ When done, this will output the configured resource information.
 
 ## test deployment
 
-To test the deployed `artomator`, use the provided ["hello" Dockerfile](tests/Dockerfile). To build it with both labels (`artomator-sbom=true` and `artomator-vuln=true`) and deploy it, use the `test-image` tool from the root of the repo: 
+To test the deployed `artomator`, use the provided ["hello" Dockerfile](tests/Dockerfile). To build it with both labels (`artomator-sbom=true`) and deploy it, use the `test-image` tool from the root of the repo: 
 
 ```shell
 tools/test-image

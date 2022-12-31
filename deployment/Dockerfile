@@ -27,6 +27,7 @@ RUN apk add --update bash curl jq cosign ca-certificates python3
 ENV CLOUDSDK_INSTALL_DIR /gcloud/
 RUN curl -sSL https://sdk.cloud.google.com | bash
 ENV PATH $PATH:/gcloud/google-cloud-sdk/bin/:/app/bin/
+RUN gcloud components install beta --quiet
 # anchore tools 
 RUN curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh \
     | sh -s -- -b /usr/local/bin
