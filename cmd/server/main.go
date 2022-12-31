@@ -35,6 +35,7 @@ var (
 	redisIP    = os.Getenv("REDIS_IP")
 	redisPort  = os.Getenv("REDIS_PORT")
 	bucketName = os.Getenv("GCS_BUCKET")
+	attestorID = os.Getenv("ATTESTOR_ID")
 )
 
 type key int
@@ -68,8 +69,8 @@ func main() {
 	}
 
 	h, err := handler.NewHandler(bucketName, c, m,
-		cmd.NewBashCommand(handler.CommandNameEvent, "event", projectID, signingKey),
-		cmd.NewBashCommand(handler.CommandNameSBOM, "sbom", projectID, signingKey),
+		cmd.NewBashCommand(handler.CommandNameEvent, "event", projectID, signingKey, attestorID),
+		cmd.NewBashCommand(handler.CommandNameSBOM, "sbom", projectID),
 		cmd.NewBashCommand(handler.CommandNameVerify, "verify", projectID, signingKey),
 		cmd.NewBashCommand(handler.CommandNameDisco, "disco"),
 	)

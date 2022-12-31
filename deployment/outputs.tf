@@ -45,5 +45,7 @@ output "ARTIFACT_BUCKET" {
   description = "GCS Bucket where exported artifacts will be saved"
 }
 
-
-
+output "ATTESTOR_ID" {
+  value       = google_binary_authorization_attestor.attestor.id
+  description = "Binary Authorization attestor name."
+}

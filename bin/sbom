@@ -3,14 +3,12 @@
 set -o errexit
 
 PROJECT_ID=$1
-SIGN_KEY=$2
-IMAGE_DIGEST=$3 # image (registry/image@sha:*** or ar/registry/image@sha:***)
-TARGET=$4 # full path to file to save results
+IMAGE_DIGEST=$2 # image (registry/image@sha:*** or ar/registry/image@sha:***)
+TARGET=$3 # full path to file to save results
 
 # check required input parameters
 [ -z "$IMAGE_DIGEST" ] && echo "arg IMAGE_DIGEST not set\n" && exit 1
 [ -z "$PROJECT_ID" ] && echo "arg PROJECT_ID not set\n" && exit 1
-[ -z "$SIGN_KEY" ] && echo "arg SIGN_KEY not set\n" && exit 1
 [ -z "$TARGET" ] && echo "arg TARGET not set\n" && exit 1
 
 # parse registry from image 
@@ -20,7 +18,6 @@ IMG_SHA=$(echo $IMAGE_DIGEST | cut -d'@' -f 2)
 # print run variables 
 echo "
 PROJECT:  $PROJECT_ID
-KEY:      $SIGN_KEY
 DIGEST:   $IMAGE_DIGEST
 REGISTRY: $REGISTRY
 SHA:      $IMG_SHA

@@ -5,9 +5,12 @@ locals {
   # List of roles that will be assigned to the runner service account
   runner_roles = toset([
     "roles/artifactregistry.writer",
+    "roles/binaryauthorization.attestorsViewer",
     "roles/browser",
+    "roles/cloudkms.cryptoKeyDecrypter",
     "roles/cloudkms.signerVerifier",
     "roles/cloudkms.viewer",
+    "roles/containeranalysis.notes.attacher",
     "roles/iam.serviceAccountTokenCreator",
     "roles/monitoring.metricWriter",
     "roles/run.viewer",
@@ -70,7 +73,7 @@ resource "google_cloud_run_service" "app" {
         }
         env {
           name  = "SIGN_KEY"
-          value = "gcpkms://${google_kms_crypto_key.key.id}"
+          value = google_kms_crypto_key.key.id
         }
         env {
           name  = "REDIS_IP"
@@ -83,6 +86,10 @@ resource "google_cloud_run_service" "app" {
         env {
           name  = "GCS_BUCKET"
           value = google_storage_bucket.artifact_store.name
+        }
+        env {
+          name  = "ATTESTOR_ID"
+          value = google_binary_authorization_attestor.attestor.id
         }
       }
 

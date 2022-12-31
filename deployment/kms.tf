@@ -21,6 +21,10 @@ resource "google_kms_crypto_key" "key" {
   }
 }
 
+data "google_kms_crypto_key_version" "version" {
+  crypto_key = google_kms_crypto_key.key.id
+}
+
 # Binds the runner service account to the key with key encrypter/decrypter permissions
 resource "google_kms_crypto_key_iam_binding" "crypto_key_bindng" {
   count         = var.runtime_only ? 0 : 1

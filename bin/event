@@ -4,27 +4,29 @@ set -o errexit
 
 PROJECT_ID=$1
 SIGN_KEY=$2
-IMAGE_DIGEST=$3 # image (registry/image@sha:*** or ar/registry/image@sha:***)
-TARGET_DIR=$4 # full path to dir where to save results
+ATTESTOR_ID=$3 # projects/PROJECT_ID/attestors/ATTESTOR_NAME
+IMAGE_DIGEST=$4 # image (registry/image@sha:*** or ar/registry/image@sha:***)
+TARGET_DIR=$5 # full path to dir where to save results
 
 # check required input parameters
 [ -z "$IMAGE_DIGEST" ] && echo "arg IMAGE_DIGEST not set\n" && exit 1
 [ -z "$PROJECT_ID" ] && echo "arg PROJECT_ID not set\n" && exit 1
 [ -z "$SIGN_KEY" ] && echo "arg SIGN_KEY not set\n" && exit 1
+[ -z "$ATTESTOR_ID" ] && echo "arg ATTESTOR_ID not set\n" && exit 1
 [ -z "$TARGET_DIR" ] && echo "arg TARGET_DIR not set\n" && exit 1
 
 # parse registry from image 
 REGISTRY=$(echo $IMAGE_DIGEST | cut -d'/' -f 1)
 IMG_SHA=$(echo $IMAGE_DIGEST | cut -d'@' -f 2)
 
-# create cosign key format 
-# CO_KEY="gcpkms://${SIGN_KEY}"
+# format KMS key for cosign
+CO_KEY="gcpkms://${SIGN_KEY}"
 
 # print run variables 
 echo "
 PROJECT:  $PROJECT_ID
 KEY:      $SIGN_KEY
-ATTESTOR: $ATTESTOR
+ATTESTOR: $ATTESTOR_ID
 DIGEST:   $IMAGE_DIGEST
 REGISTRY: $REGISTRY
 SHA:      $IMG_SHA
@@ -55,12 +57,12 @@ echo "SBOM: ${DO_SBOM}"
 
 # generate public key-pair from KMS if one does not exist 
 if [ ! -f cosign.pub ]; then
-    cosign generate-key-pair --kms $SIGN_KEY
+    cosign generate-key-pair --kms $CO_KEY
 fi
 
 # sign and verify image
-cosign sign --key $SIGN_KEY $IMAGE_DIGEST
-cosign verify --key $SIGN_KEY $IMAGE_DIGEST
+cosign sign --key $CO_KEY $IMAGE_DIGEST
+cosign verify --key $CO_KEY $IMAGE_DIGEST
 
 # generate SBOM from image and attach it as attestation to the image
 syft -q packages \
@@ -71,16 +73,12 @@ syft -q packages \
 cosign attest \
     --predicate $TARGET_DIR/sbom.json \
     --type $DO_SBOM \
-    --key $SIGN_KEY \
+    --key $CO_KEY \
     $IMAGE_DIGEST
 
-# create biauthz attestation attestation
-if [ ! -z "$ATTESTOR" ]
-then
-    gcloud beta container binauthz attestations sign-and-create \
-        --attestor $ATTESTOR \
-        --artifact-url $IMAGE_DIGEST \
-        --keyversion $SIGN_KEY
-fi
+gcloud beta container binauthz attestations sign-and-create \
+    --attestor $ATTESTOR_ID \
+    --artifact-url $IMAGE_DIGEST \
+    --keyversion $SIGN_KEY
 
 
