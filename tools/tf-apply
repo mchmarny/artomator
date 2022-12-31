@@ -10,16 +10,13 @@ TAG=$(cat .version)
 
 echo "Checking for image $TAG in registry..."
 
-REP_TAG=$(gcloud container images list-tags $IMAGE_REG \
-			--filter "tags:$TAG" --format json  | jq -r '.[].digest')
+REP_TAG=$(gcloud container images list-tags "${IMAGE_REG}/${ROOT_NAME}" \
+			--filter "tags:$TAG" --format "value(tags)" --limit 1)
 
-if [ "$REP_TAG" != "$REP_TAG" ]; then
-  echo "Tag $TAG not found in registry, aborting\n"
+if [ "$REP_TAG" != "$TAG" ]; then
+  echo "Want $TAG, got $REP_TAG. Aborting apply."
   exit 1
 fi
 
 printf "\nApplying terraform..."
 terraform -chdir=./deployment apply -auto-approve
-
-
-

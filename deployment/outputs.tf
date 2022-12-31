@@ -21,7 +21,7 @@ output "IDENTITY_PROVIDER" {
 }
 
 output "KMS_KEY" {
-  value       = google_kms_crypto_key.key.id
+  value       = data.google_kms_crypto_key_version.version.name
   description = "Cosign-formated URI to the signing key."
 }
 
