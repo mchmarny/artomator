@@ -11,7 +11,7 @@ docker build -t $TAG --label artomator-sbom=spdx .
 
 The `artomator-sbom=spdx` label in the above `docker build` commend will tell `artomator` to add SBOM attestations in an [SPDX](https://spdx.dev/) format (the supported formats are: `cyclonedx` or `spdx`).
 
-![](images/flow2.png)
+![](images/flow.png)
 
 > `artomator` also exposes an attestation verification and runtime vulnerability discovery APIs. See API section for details
 
