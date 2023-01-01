@@ -37,15 +37,15 @@ To processes images, `artomator` uses a few open source projects:
 
 ## api 
 
-`artomator` also exposes APIs for image attestation verification and runtime vulnerability discovery. 
+`artomator` also exposes APIs for image attestation verification and runtime vulnerability discovery: 
 
-### image vulnerability discovery
+#### image vulnerability discovery
 
 The `artomator` service exposes (POST `/disco`) API which can be combined with [Cloud Scheduler](https://cloud.google.com/scheduler) to discover images used in GCP containerized runtimes (e.g. [Cloud Run](https://cloud.google.com/scheduler)) and scan them for vulnerabilities. The report with each run are saved in GCS bucket (e.g. [tests/disco.json](tests/disco.json)), and custom metrics for total and service level counts are published to [Cloud Monitoring](https://cloud.google.com/monitoring) service. These metrics can be then used for exploration or to create alerts.
 
 ![](images/metric.png)
 
-### image attestation verification api
+#### image attestation verification api
 
 The `artomator` service exposes (GET `/verify`) API which you can query with the image digest to verify the expected attestations on the image.
 
