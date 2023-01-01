@@ -19,7 +19,6 @@ func getTestHandler(t *testing.T) *Handler {
 	h, err := NewHandler("", cache.NewInMemoryCache(), c,
 		cmd.NewCommand(CommandNameEvent, testCmd),
 		cmd.NewCommand(CommandNameSBOM, testCmd),
-		cmd.NewCommand(CommandNameVerify, testCmd),
 	)
 	assert.NoError(t, err)
 	return h

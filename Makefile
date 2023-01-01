@@ -58,25 +58,9 @@ server: ## Runs previsouly built server binary
 	./server 
 .PHONY: server
 
-disco: ## Runs disco on on local service
-	tools/run-disco $(TEST_ADD)
-.PHONY: disco
-
-disco-cve: ## Runs disco with CVE param on on local service
-	tools/run-disco $(TEST_ADD) "CVE-2022-2582"
-.PHONY: disco-cve
-
 event: ## Submits events test to local service
 	tools/run-event $(TEST_ADD)
 .PHONY: event-test
-
-verify-spdx: ## Submits verify spdx attestation test to local service
-	tools/run-verify $(TEST_ADD) spdx
-.PHONY: verify-test
-
-verify-vuln: ## Submits verify vuln attestation test to local service
-	tools/run-verify $(TEST_ADD) vuln
-.PHONY: verify-vuln
 
 sbom: image ## Submits SBOM process request test to local service
 	tools/run-sbom $(TEST_ADD)

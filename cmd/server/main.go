@@ -71,8 +71,6 @@ func main() {
 	h, err := handler.NewHandler(bucketName, c, m,
 		cmd.NewBashCommand(handler.CommandNameEvent, "event", projectID, signingKey, attestorID),
 		cmd.NewBashCommand(handler.CommandNameSBOM, "sbom", projectID),
-		cmd.NewBashCommand(handler.CommandNameVerify, "verify", projectID, signingKey),
-		cmd.NewBashCommand(handler.CommandNameDisco, "disco"),
 	)
 	if err != nil {
 		log.Fatalf("error while creating event handler: %v", err)
@@ -82,8 +80,6 @@ func main() {
 	mux.HandleFunc("/", h.HandlerDefault)
 	mux.HandleFunc("/event", h.EventHandler)
 	mux.HandleFunc("/sbom", h.SBOMHandler)
-	mux.HandleFunc("/verify", h.VerifyHandler)
-	mux.HandleFunc("/disco", h.DiscoHandler)
 
 	address := addressDefault
 	if val, ok := os.LookupEnv("PORT"); ok {
