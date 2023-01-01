@@ -11,7 +11,7 @@ docker build -t $TAG --label artomator-sbom=spdx .
 
 The `artomator-sbom=spdx` label in the above `docker build` commend will tell `artomator` to add SBOM attestations in an [SPDX](https://spdx.dev/) format (the supported formats are: `cyclonedx` or `spdx`).
 
-![](images/flow.png)
+![](images/flow2.png)
 
 > `artomator` also exposes an attestation verification and runtime vulnerability discovery APIs. See API section for details
 
@@ -19,12 +19,13 @@ The `artomator-sbom=spdx` label in the above `docker build` commend will tell `a
 
 1. Whenever an image is published to the Artifact Registry 
 2. A [registry event](https://cloud.google.com/artifact-registry/docs/configure-notifications) is automatically published if there is a [PubSub](https://cloud.google.com/pubsub/docs/overview) topic named `gcr` in the same project
-3. PubSub subscription pushes that event to `artomator` service in [Cloud Run](https://cloud.google.com/run) with the operation type (e.g. `INSERT`) and the image digest (SHA256)
+3. PubSub subscription pushes that event to `artomator` service in [Cloud Run](https://cloud.google.com/run) with the operation type (e.g. `INSERT`) and the image digest
 4. The `artomator` service retrieves metadata for that image from the registry and check its labels
-5. If the image includes `artomator-sbom` label, signs that image using KMS key, and creates the requested artifacts 
-6. Adds attestation on the image using the KMS key and stores it all in the registry
+5. If the image includes `artomator-sbom` label, the service signs that image using KMS key
+6. A new attestation (type `spdx`) is being added to the image in the registry
 7. (optional) If GCS bucket is configured, `artomator` will also persist the generated artifacts
-8. Stores the processed image digests in a Redis store to avoid re-processing the same image (technically adding attestation to an image creates yet another event, so this could cause recursion without that check)
+8. Binary Authorization attestation is then created using the `artomator-attestor` (for optional BinAuthZ policy)
+9. Stores the processed image digests in a Redis store to avoid re-processing the same image (technically adding attestation to an image creates yet another event, so this could cause recursion without that check)
 
 To processes images, `artomator` uses:
 
@@ -82,7 +83,6 @@ curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
 ```
 
 If the required attestation for SPDX formatted SBOM (`https://spdx.dev/Document`) is found, `artomator` will return the entire attestation.
-
 
 ## verify processed image using cosign
 
