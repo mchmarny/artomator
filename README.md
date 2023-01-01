@@ -34,41 +34,6 @@ To processes images, `artomator` uses a few open source projects:
 * [trivy](https://github.com/aquasecurity/trivy) for vulnerability scans 
 * [jq](https://stedolan.github.io/jq/) for JSON operations 
 
-
-## api 
-
-`artomator` also exposes APIs for image attestation verification and runtime vulnerability discovery: 
-
-#### image vulnerability discovery
-
-The `artomator` service exposes (POST `/disco`) API which can be combined with [Cloud Scheduler](https://cloud.google.com/scheduler) to discover images used in GCP containerized runtimes (e.g. [Cloud Run](https://cloud.google.com/scheduler)) and scan them for vulnerabilities. The report with each run are saved in GCS bucket (e.g. [tests/disco.json](tests/disco.json)), and custom metrics for total and service level counts are published to [Cloud Monitoring](https://cloud.google.com/monitoring) service. These metrics can be then used for exploration or to create alerts.
-
-![](images/metrics.png)
-
-#### image attestation verification api
-
-The `artomator` service exposes (GET `/verify`) API which you can query with the image digest to verify the expected attestations on the image.
-
-> Note, access to the `artomator` service requires `roles/run.invoker` IAM role
-
-First, start by exporting the `artomator` service URL:
-
-```shell
-export SERVICE_URL=$(gcloud run services describe artomator \
-  --region $REGION --format="value(status.url)")
-```
-
-Then, to query the verify endpoint:
-
-```shell
-curl -i -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
-     -H "Content-Type: application/json" \
-     -H "X-Goog-User-Project: ${PROJECT_ID}" \
-     "${SERVICE_URL}/verify?type=spdx&digest=${IMAGE_DIGEST}"
-```
-
-If the required attestation for SPDX formatted SBOM (`https://spdx.dev/Document`) is found, `artomator` will return the entire attestation.
-
 ## artifacts 
 
 In addition to attaching attestations to image in Artifact Registry and the Binary Authorization note, `artomator` also saves all the generated reports in GCS bucket (for example [sbom.json](tests/sbom.json)). To make these names predictable, `artomator` prefixes them with the image SHA. For example, if the image digest is:
