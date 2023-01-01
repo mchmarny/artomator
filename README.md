@@ -3,13 +3,13 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/mchmarny/artomator)](https://goreportcard.com/report/github.com/mchmarny/artomator) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/mchmarny/artomator) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/gojp/goreportcard/blob/master/LICENSE)
 
 
-`artomator` (aka Artifact Registry Automator) automates the creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom) with Binary Authorization attestation for container images in [Artifact Registry (AR)](https://cloud.google.com/artifact-registry). 
+`artomator` (aka Artifact Registry Automator) automates the creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom) with Binary Authorization attestation for container images in [Artifact Registry (AR)](https://cloud.google.com/artifact-registry). `artomator` will automatically add SBOM attestations to any image pushed to registry with the `artomator-sbom` [label](https://docs.docker.com/config/labels-custom-metadata/).
 
 ```shell
 docker build -t $TAG --label artomator-sbom=spdx .
 ```
 
-`artomator` will automatically add SBOM attestations to any image pushed to registry with the `artomator-sbom` [label](https://docs.docker.com/config/labels-custom-metadata/). The value of the label dictates SBOM format. The two supported formats are `cyclonedx` and `spdx`). `artomator` also creates [Binary Authorization](https://cloud.google.com/binary-authorization) attestation to support project or cluster levels policies.
+ The value of the label dictates SBOM format. The two supported formats are `cyclonedx` and `spdx`). `artomator` also creates [Binary Authorization](https://cloud.google.com/binary-authorization) attestation to support project or cluster levels policies.
 
 ![](images/flow.png)
 
