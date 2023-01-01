@@ -2,7 +2,8 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/mchmarny/artomator)](https://goreportcard.com/report/github.com/mchmarny/artomator) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/mchmarny/artomator) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/gojp/goreportcard/blob/master/LICENSE)
 
-Automates the creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom) for container images in [Artifact Registry (AR)](https://cloud.google.com/artifact-registry). 
+
+`artomator` (aka Artifact Registry Automator) automates the creation of [Software Bill of Materials (SBOM)](https://www.cisa.gov/sbom) for container images in [Artifact Registry (AR)](https://cloud.google.com/artifact-registry). 
 
 ```shell
 docker build -t $TAG --label artomator-sbom=spdx .
