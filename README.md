@@ -45,13 +45,11 @@ us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:acaccb6c8f975ee7df7
 then the list of artifacts in the registry for that image will be: 
 
 * acaccb6c8f975ee7df7f46468fae28fb5014cf02c2835d2dc37bf6961e648838-sbom.json
-* acaccb6c8f975ee7df7f46468fae28fb5014cf02c2835d2dc37bf6961e648838-vuln.json
 * acaccb6c8f975ee7df7f46468fae28fb5014cf02c2835d2dc37bf6961e648838-meta.json
 
 where:
 
 * `-sbom.json` is SPDX 2.3 formatted SBOM file
-* `-vuln.json` is the vulnerability report based on the SBOM based on `trivy` DB
 * `-meta.json` is the image metadata in the registry as it was when the image was processed
 
 ## deployment 
