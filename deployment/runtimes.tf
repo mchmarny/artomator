@@ -6,17 +6,15 @@ locals {
   runner_roles = toset([
     "roles/artifactregistry.writer",
     "roles/binaryauthorization.attestorsViewer",
-    "roles/browser",
     "roles/cloudkms.cryptoKeyDecrypter",
     "roles/cloudkms.signerVerifier",
     "roles/cloudkms.viewer",
     "roles/containeranalysis.notes.attacher",
     "roles/iam.serviceAccountTokenCreator",
     "roles/monitoring.metricWriter",
-    "roles/run.viewer",
+    "roles/run.invoker",
     "roles/storage.objectCreator",
     "roles/storage.objectViewer",
-    "roles/viewer",
   ])
 }
 
