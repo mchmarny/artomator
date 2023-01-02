@@ -10,6 +10,7 @@ locals {
     "roles/cloudkms.signerVerifier",
     "roles/cloudkms.viewer",
     "roles/containeranalysis.notes.attacher",
+    "roles/containeranalysis.occurrences.editor",
     "roles/iam.serviceAccountTokenCreator",
     "roles/monitoring.metricWriter",
     "roles/run.invoker",

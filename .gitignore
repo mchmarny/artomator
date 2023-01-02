@@ -70,3 +70,6 @@ cosign.*
 
 # docker 
 digest.txt
+
+# demo 
+demo-script.md

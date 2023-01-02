@@ -1,0 +1,12 @@
+# Project-wide policy for Container Analysis Attestations
+name: projects/cloudy-demos/policy
+defaultAdmissionRule:
+  enforcementMode: ENFORCED_BLOCK_AND_AUDIT_LOG
+  evaluationMode: REQUIRE_ATTESTATION
+  requireAttestationsBy:
+    - projects/cloudy-demos/attestors/sbom-attestor
+admissionWhitelistPatterns:
+- namePattern: us.gcr.io/google-containers/**
+- namePattern: gcr.io/google_containers/**
+- namePattern: gcr.io/stackdriver-agents/**
+- namePattern: gke.gcr.io/**

@@ -1,0 +1,11 @@
+apiVersion: kritis.grafeas.io/v1beta1
+kind: VulnzSigningPolicy
+metadata:
+  name: demo-vsp
+spec:
+  imageVulnerabilityRequirements:
+    maximumFixableSeverity: LOW
+    maximumUnfixableSeverity: MEDIUM
+    allowlistCVEs:
+    - projects/goog-vulnz/notes/CVE-2020-29511  # encoding/xml element namespace prefixes during tokenization
+    - projects/goog-vulnz/notes/CVE-2020-29509  # encoding/xml attribute namespace prefixes during tokenization
