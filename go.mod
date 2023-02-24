@@ -1,6 +1,6 @@
 module github.com/mchmarny/artomator
 
-go 1.19
+go 1.20
 
 require (
 	cloud.google.com/go/monitoring v1.12.0
@@ -9,7 +9,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.1
 	google.golang.org/api v0.110.0
-	google.golang.org/genproto v0.0.0-20230216225411-c8e22ba71e44
+	google.golang.org/genproto v0.0.0-20230223222841-637eb2293923
 	google.golang.org/protobuf v1.28.1
 )
 

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+DIR="$(dirname "$0")"
+. "${DIR}/config"
+
+set -o errexit
+set -o pipefail
+
+# gcloud pubsub subscriptions create notes-sub --topic container-analysis-notes-v1 --ack-deadline 600
+# gcloud pubsub subscriptions create occur-sub --topic container-analysis-occurrences-v1 --ack-deadline 600
+
+
+gcloud pubsub subscriptions pull notes-sub --auto-ack --limit 10 \
+     --format="json(message.attributes, message.data.decode(\"base64\").decode(\"utf-8\"), message.messageId, message.publishTime)"
+
+gcloud pubsub subscriptions pull occur-sub --auto-ack --limit 10 \
+     --format="json(message.attributes, message.data.decode(\"base64\").decode(\"utf-8\"), message.messageId, message.publishTime)"
+
+# gcloud pubsub subscriptions delete notes-sub
+# gcloud pubsub subscriptions delete occur-sub
