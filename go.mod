@@ -3,7 +3,7 @@ module github.com/mchmarny/artomator
 go 1.20
 
 require (
-	cloud.google.com/go/monitoring v1.12.0
+	cloud.google.com/go/monitoring v1.13.0
 	cloud.google.com/go/storage v1.29.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/pkg/errors v0.9.1
