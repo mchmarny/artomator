@@ -1,11 +1,11 @@
 # Registry Events
 
-Both Google Container Registry (GCR) and Artifact Registry (GAR) provide Pub/Sub notifications for events:
+Both Google Container Registry (GCR) and Artifact Registry (GAR) provide Pub/Sub notifications in form of Pub/Sub events:
 
-* [Artifact life-cycle](#container-image-life-cycle) (uploads, tag added, deletion) - GCR & GAR
-* [Artifact vulnerability](#artifact-vulnerabilities) (note or occurrence created or updated) - GAR Only
+* [Artifact Life-cycle](#container-life-cycle) (upload, tag, deletion) - GCR & GAR
+* [Artifact Vulnerability](#artifact-vulnerabilities) (note, occurrence create or update) - GAR Only
 
-## Container image life-cycle
+## Container Life-cycle
 
 > This event will fire regardless if you route images to GCR or AR as long as there is a topic name `gcr` in your project
 
@@ -25,7 +25,7 @@ gcloud pubsub subscriptions create gcr-sub --project $PROJECT_ID --topic gcr
 
 Now you can trigger the event: 
 
-> Easiest way is to copy existing image using `crane`. Make sure to substitute the below tags. 
+> Easiest way is to copy existing image using [crane](https://github.com/michaelsauter/crane). Make sure to substitute the below image tags. 
 
 ```shell
 crane cp \
@@ -35,7 +35,7 @@ crane cp \
 
 Finally, list the events that were published about that artifact:
 
-> Note, the content of events on the Pub/Sub topic is Base64 encoded hence the use of `format`
+> Note, the content of events on the Pub/Sub topic is Base64 encoded so you will have to decode it using the `format` flag.
 
 ```shell
 gcloud pubsub subscriptions pull gcr-sub --project $PROJECT_ID --auto-ack --limit 3 \
@@ -65,11 +65,11 @@ gcloud pubsub subscriptions delete gcr-sub --project $PROJECT_ID
 gcloud pubsub topics delete gcr --project $PROJECT_ID
 ```
 
-## Artifact vulnerabilities
+## Artifact Vulnerabilities
 
-If enabled, Artifact Analysis (aka Container Analysis) will create Pub/Sub events for each vulnerability found by automated AR scanning (TBD: does it fire for notes and occurrence created via Grafeas API?).
+If enabled, Artifact Analysis (aka Container Analysis) will create Pub/Sub events for each vulnerability found by automated AR scanning. For the most part, you can think of a `note` as data about vulnerability (e.g. `CVE`), and `occurrence` as the data that connects that `note` to a particular artifact (i.e. `digest`). 
 
-> For the most part, you can think of AA `note` as data about vulnerability (e.g. `CVE`), and AA `occurrence` as the data that connects that `note` to a particular artifact (i.e. `digest`). 
+> Note: these events do not fire for notes and occurrence created via Artifact Analysis API.
 
 If you haven't already done so, start by enabling the Artifact Analysis and Container Scanning API 
 
@@ -91,15 +91,19 @@ name: projects/$PROJECT/topics/container-analysis-occurrences-v1
 name: projects/$PROJECT/topics/container-analysis-notes-v1
 ```
 
+> If these topics do not exist, you can create them yourself using the `gcloud pubsub topics create` command
+
 Next create subscription on the `occurrences` topic:
 
-> The name doesn't matter
+> The name doesn't matter. If you want, you can also create one for the notes topic.
 
 ```shell
 gcloud pubsub subscriptions create vulns --project $PROJECT_ID --topic container-analysis-occurrences-v1
 ```
 
-Now you can trigger the event: 
+Now you will need to trigger the AA event:
+
+> Again, simplest way to do that is to push an existing image using [crane](https://github.com/michaelsauter/crane).
 
 ```shell
 crane cp \
@@ -107,14 +111,16 @@ crane cp \
      $REGION-docker.pkg.dev/$PROJECT/repo2/image
 ```
 
-Finally, list the vulnerabilities that were discovered:
+Finally list the vulnerabilities that were discovered:
 
 ```shell
 gcloud pubsub subscriptions pull vulns --project $PROJECT_ID --auto-ack --limit 3 \
     --format="json(message.attributes, message.data.decode(\"base64\").decode(\"utf-8\"), message.messageId, message.publishTime)"
 ```
 
-The content of each one of the events will look something like this: 
+> If the above command returns an empty array (`[]`), give it a few seconds and rerun it. The length of the delay will depend on the size of your image and the number of vulnerabilities.
+
+Each one of the vulnerabilities discovered by AA in your image will look something like this: 
 
 ```json
 {
@@ -130,7 +136,7 @@ The content of each one of the events will look something like this:
 }
 ```
 
-Then you can use the Container Analysis REST API to get the details for that vulnerability (i.e. occurrence):
+Once you have the id of the occurrence, you can use the Container Analysis REST API to get the details:
 
 ```shell
 curl -Ss -H "Content-Type: application/json; charset=utf-8" \
@@ -138,7 +144,7 @@ curl -Ss -H "Content-Type: application/json; charset=utf-8" \
      https://containeranalysis.googleapis.com/v1/projects/$PROJECT/occurrences/d2342144-8a7e-4f3c-b3ba-87ebbe3ac72d
 ```
 
-The abbreviated response will look something like this:
+The response will look something like this:
 
 ```json
 {
