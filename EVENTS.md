@@ -7,6 +7,8 @@ Both Google Container Registry (GCR) and Artifact Registry (GAR) provide Pub/Sub
 
 ## Container Life-cycle
 
+These notifications apply to any artifact stored in the GCR or GAR repository, including Helm 3 charts packaged in OCI format ([more info](https://cloud.google.com/artifact-registry/docs/configure-notifications)).
+
 > This event will fire regardless if you route images to GCR or AR as long as there is a topic name `gcr` in your project
 
 Start by crating the `gcr` topic:
@@ -67,7 +69,7 @@ gcloud pubsub topics delete gcr --project $PROJECT_ID
 
 ## Artifact Vulnerabilities
 
-If enabled, Artifact Analysis (aka Container Analysis) will create Pub/Sub events for each vulnerability found by automated AR scanning. For the most part, you can think of a `note` as data about vulnerability (e.g. `CVE`), and `occurrence` as the data that connects that `note` to a particular artifact (i.e. `digest`). 
+If enabled, Artifact Analysis (aka Container Analysis) will create Pub/Sub events for each vulnerability found by automated AR scanning ([additional info](https://cloud.google.com/container-analysis/docs/pub-sub-notifications#container-analysis-pubsub-gcloud)). For the most part, you can think of a `note` as data about vulnerability (e.g. `CVE`), and `occurrence` as the data that connects that `note` to a particular artifact (i.e. `digest`). 
 
 > Note: these events do not fire for notes and occurrence created via Artifact Analysis API.
 
