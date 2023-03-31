@@ -144,7 +144,15 @@ curl -Ss -H "Content-Type: application/json; charset=utf-8" \
      https://containeranalysis.googleapis.com/v1/projects/$PROJECT/occurrences/d2342144-8a7e-4f3c-b3ba-87ebbe3ac72d
 ```
 
-The response will look something like this:
+Alternativly, if you know the repo and image you can use `gcloud`:
+
+```shell
+gcloud artifacts docker images list $REGION-docker.pkg.dev/$PROJECT/$REPO/$IMAGE \
+    --occurrence-filter "occurrenceId=\"d2342144-8a7e-4f3c-b3ba-87ebbe3ac72d\"" \
+    --format=json
+```
+
+Either way, the response will look something like this:
 
 ```json
 {
