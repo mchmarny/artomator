@@ -202,15 +202,12 @@ The response will look something like this:
 }
 ```
 
+Here is the really cool part. AR supports [remote repositories](https://cloud.google.com/artifact-registry/docs/repositories/remote-repo) (preview). These repos are basically a proxy to upstream repo that acts as a caching proxy for an external public artifact repository. You can create them for Docker Hub, Helm, dev language package like Maven or PiPI, or OS packages like Debian or RPM. 
+
+Any artifact you pull via the remote repository in AR will also benefit from the vulnerability scanning. And, events from the discovered vulnerabilities will be published to the topic just like we've demonstrated in the above example. This allows you to have aggregated notifications of artifact vulnerabilities whether they reside in AR or in a remote repo. 
+
 To clean up, you can delete the created subscription and topic:
 
 ```shell
 gcloud pubsub subscriptions delete vulns --project $PROJECT_ID
 ```
-
-
-
-
-
-
-
