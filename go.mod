@@ -7,7 +7,7 @@ require (
 	cloud.google.com/go/storage v1.30.1
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/pkg/errors v0.9.1
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.3
 	google.golang.org/api v0.118.0
 	google.golang.org/genproto v0.0.0-20230403163135-c38d8f061ccd
 	google.golang.org/protobuf v1.30.0
