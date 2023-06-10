@@ -19,13 +19,19 @@
 package s2a
 
 import (
+<<<<<<< HEAD
 	"context"
+=======
+>>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 	"crypto/tls"
 	"errors"
 	"sync"
 
 	"github.com/google/s2a-go/fallback"
+<<<<<<< HEAD
 	"github.com/google/s2a-go/stream"
+=======
+>>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 
 	s2apb "github.com/google/s2a-go/internal/proto/common_go_proto"
 )
@@ -127,12 +133,15 @@ type ClientOptions struct {
 
 	// Optional fallback after dialing with S2A fails.
 	FallbackOpts *FallbackOptions
+<<<<<<< HEAD
 
 	// Generates an S2AStream interface for talking to the S2A server.
 	getS2AStream func(ctx context.Context, s2av2Address string) (stream.S2AStream, error)
 
 	// Serialized user specified policy for server authorization.
 	serverAuthorizationPolicy []byte
+=======
+>>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 }
 
 // FallbackOptions prescribes the fallback logic that should be taken if the application fails to connect with S2A.
@@ -178,9 +187,12 @@ type ServerOptions struct {
 	// VerificationMode specifies the mode that S2A must use to verify the
 	// peer certificate chain.
 	VerificationMode VerificationModeType
+<<<<<<< HEAD
 
 	// Generates an S2AStream interface for talking to the S2A server.
 	getS2AStream func(ctx context.Context, s2av2Address string) (stream.S2AStream, error)
+=======
+>>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 }
 
 // DefaultServerOptions returns the default server options.

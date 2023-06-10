@@ -21,9 +21,14 @@ package service
 
 import (
 	"context"
+<<<<<<< HEAD
 	"net"
 	"os"
 	"strings"
+=======
+	"flag"
+	"net"
+>>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 	"sync"
 	"time"
 
@@ -33,10 +38,17 @@ import (
 	"google.golang.org/grpc/grpclog"
 )
 
+<<<<<<< HEAD
 // An environment variable, if true, opportunistically use AppEngine-specific dialer to call S2A.
 const enableAppEngineDialerEnv = "S2A_ENABLE_APP_ENGINE_DIALER"
 
 var (
+=======
+var (
+	// enableAppEngineDialer indicates whether an AppEngine-specific dial option
+	// should be used.
+	enableAppEngineDialer bool
+>>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 	// appEngineDialerHook is an AppEngine-specific dial option that is set
 	// during init time. If nil, then the application is not running on Google
 	// AppEngine.
@@ -51,6 +63,10 @@ var (
 )
 
 func init() {
+<<<<<<< HEAD
+=======
+	flag.BoolVar(&enableAppEngineDialer, "s2a_enable_appengine_dialer", false, "If true, opportunistically use AppEngine-specific dialer to call S2A.")
+>>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 	if !appengine.IsAppEngine() && !appengine.IsDevAppServer() {
 		return
 	}
@@ -75,7 +91,11 @@ func Dial(handshakerServiceAddress string) (*grpc.ClientConn, error) {
 		grpcOpts := []grpc.DialOption{
 			grpc.WithInsecure(),
 		}
+<<<<<<< HEAD
 		if enableAppEngineDialer() && appEngineDialerHook != nil {
+=======
+		if enableAppEngineDialer && appEngineDialerHook != nil {
+>>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 			if grpclog.V(1) {
 				grpclog.Info("Using AppEngine-specific dialer to talk to S2A.")
 			}
@@ -90,6 +110,7 @@ func Dial(handshakerServiceAddress string) (*grpc.ClientConn, error) {
 	}
 	return hsConn, nil
 }
+<<<<<<< HEAD
 
 func enableAppEngineDialer() bool {
 	if strings.ToLower(os.Getenv(enableAppEngineDialerEnv)) == "true" {
@@ -97,3 +118,5 @@ func enableAppEngineDialer() bool {
 	}
 	return false
 }
+=======
+>>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276

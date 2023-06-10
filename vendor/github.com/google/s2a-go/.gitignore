@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+bazel-*
+
+>>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 # Ignore binaries without extension
 //example/client/client
 //example/server/server

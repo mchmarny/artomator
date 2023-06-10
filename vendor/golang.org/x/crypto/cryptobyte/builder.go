@@ -303,9 +303,15 @@ func (b *Builder) add(bytes ...byte) {
 	b.result = append(b.result, bytes...)
 }
 
+<<<<<<< HEAD
 // Unwrite rolls back non-negative n bytes written directly to the Builder.
 // An attempt by a child builder passed to a continuation to unwrite bytes
 // from its parent will panic.
+=======
+// Unwrite rolls back n bytes written directly to the Builder. An attempt by a
+// child builder passed to a continuation to unwrite bytes from its parent will
+// panic.
+>>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 func (b *Builder) Unwrite(n int) {
 	if b.err != nil {
 		return
@@ -317,9 +323,12 @@ func (b *Builder) Unwrite(n int) {
 	if length < 0 {
 		panic("cryptobyte: internal error")
 	}
+<<<<<<< HEAD
 	if n < 0 {
 		panic("cryptobyte: attempted to unwrite negative number of bytes")
 	}
+=======
+>>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 	if n > length {
 		panic("cryptobyte: attempted to unwrite more than was written")
 	}
