@@ -23,10 +23,7 @@ import (
 	"crypto/x509"
 	"fmt"
 
-<<<<<<< HEAD
 	"github.com/google/s2a-go/stream"
-=======
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
 
@@ -35,21 +32,13 @@ import (
 
 // VerifyClientCertificateChain builds a SessionReq, sends it to S2Av2 and
 // receives a SessionResp.
-<<<<<<< HEAD
 func VerifyClientCertificateChain(verificationMode s2av2pb.ValidatePeerCertificateChainReq_VerificationMode, s2AStream stream.S2AStream) func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-=======
-func VerifyClientCertificateChain(verificationMode s2av2pb.ValidatePeerCertificateChainReq_VerificationMode, cstream s2av2pb.S2AService_SetUpSessionClient) func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 	return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
 		// Offload verification to S2Av2.
 		if grpclog.V(1) {
 			grpclog.Infof("Sending request to S2Av2 for client peer cert chain validation.")
 		}
-<<<<<<< HEAD
 		if err := s2AStream.Send(&s2av2pb.SessionReq{
-=======
-		if err := cstream.Send(&s2av2pb.SessionReq{
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 			ReqOneof: &s2av2pb.SessionReq_ValidatePeerCertificateChainReq{
 				ValidatePeerCertificateChainReq: &s2av2pb.ValidatePeerCertificateChainReq{
 					Mode: verificationMode,
@@ -66,11 +55,7 @@ func VerifyClientCertificateChain(verificationMode s2av2pb.ValidatePeerCertifica
 		}
 
 		// Get the response from S2Av2.
-<<<<<<< HEAD
 		resp, err := s2AStream.Recv()
-=======
-		resp, err := cstream.Recv()
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 		if err != nil {
 			grpclog.Infof("Failed to receive client peer cert chain validation response from S2Av2.")
 			return err
@@ -92,34 +77,21 @@ func VerifyClientCertificateChain(verificationMode s2av2pb.ValidatePeerCertifica
 
 // VerifyServerCertificateChain builds a SessionReq, sends it to S2Av2 and
 // receives a SessionResp.
-<<<<<<< HEAD
 func VerifyServerCertificateChain(hostname string, verificationMode s2av2pb.ValidatePeerCertificateChainReq_VerificationMode, s2AStream stream.S2AStream, serverAuthorizationPolicy []byte) func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-=======
-func VerifyServerCertificateChain(hostname string, verificationMode s2av2pb.ValidatePeerCertificateChainReq_VerificationMode, cstream s2av2pb.S2AService_SetUpSessionClient) func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 	return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
 		// Offload verification to S2Av2.
 		if grpclog.V(1) {
 			grpclog.Infof("Sending request to S2Av2 for server peer cert chain validation.")
 		}
-<<<<<<< HEAD
 		if err := s2AStream.Send(&s2av2pb.SessionReq{
-=======
-		if err := cstream.Send(&s2av2pb.SessionReq{
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 			ReqOneof: &s2av2pb.SessionReq_ValidatePeerCertificateChainReq{
 				ValidatePeerCertificateChainReq: &s2av2pb.ValidatePeerCertificateChainReq{
 					Mode: verificationMode,
 					PeerOneof: &s2av2pb.ValidatePeerCertificateChainReq_ServerPeer_{
 						ServerPeer: &s2av2pb.ValidatePeerCertificateChainReq_ServerPeer{
-<<<<<<< HEAD
 							CertificateChain:                   rawCerts,
 							ServerHostname:                     hostname,
 							SerializedUnrestrictedClientPolicy: serverAuthorizationPolicy,
-=======
-							CertificateChain: rawCerts,
-							ServerHostname:   hostname,
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 						},
 					},
 				},
@@ -130,11 +102,7 @@ func VerifyServerCertificateChain(hostname string, verificationMode s2av2pb.Vali
 		}
 
 		// Get the response from S2Av2.
-<<<<<<< HEAD
 		resp, err := s2AStream.Recv()
-=======
-		resp, err := cstream.Recv()
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 		if err != nil {
 			grpclog.Infof("Failed to receive server peer cert chain validation response from S2Av2.")
 			return err

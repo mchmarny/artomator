@@ -26,10 +26,7 @@ import (
 	"fmt"
 	"io"
 
-<<<<<<< HEAD
 	"github.com/google/s2a-go/stream"
-=======
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
 
@@ -38,24 +35,14 @@ import (
 
 // remoteSigner implementes the crypto.Signer interface.
 type remoteSigner struct {
-<<<<<<< HEAD
 	leafCert  *x509.Certificate
 	s2AStream stream.S2AStream
-=======
-	leafCert *x509.Certificate
-	cstream  s2av2pb.S2AService_SetUpSessionClient
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 }
 
 // New returns an instance of RemoteSigner, an implementation of the
 // crypto.Signer interface.
-<<<<<<< HEAD
 func New(leafCert *x509.Certificate, s2AStream stream.S2AStream) crypto.Signer {
 	return &remoteSigner{leafCert, s2AStream}
-=======
-func New(leafCert *x509.Certificate, cstream s2av2pb.S2AService_SetUpSessionClient) crypto.Signer {
-	return &remoteSigner{leafCert, cstream}
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 }
 
 func (s *remoteSigner) Public() crypto.PublicKey {
@@ -75,11 +62,7 @@ func (s *remoteSigner) Sign(rand io.Reader, digest []byte, opts crypto.SignerOpt
 	if grpclog.V(1) {
 		grpclog.Infof("Sending request to S2Av2 for signing operation.")
 	}
-<<<<<<< HEAD
 	if err := s.s2AStream.Send(&s2av2pb.SessionReq{
-=======
-	if err := s.cstream.Send(&s2av2pb.SessionReq{
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 		ReqOneof: &s2av2pb.SessionReq_OffloadPrivateKeyOperationReq{
 			OffloadPrivateKeyOperationReq: req,
 		},
@@ -88,11 +71,7 @@ func (s *remoteSigner) Sign(rand io.Reader, digest []byte, opts crypto.SignerOpt
 		return nil, err
 	}
 
-<<<<<<< HEAD
 	resp, err := s.s2AStream.Recv()
-=======
-	resp, err := s.cstream.Recv()
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 	if err != nil {
 		grpclog.Infof("Failed to receive signing operation response from S2Av2.")
 		return nil, err
@@ -110,15 +89,9 @@ func (s *remoteSigner) getCert() *x509.Certificate {
 	return s.leafCert
 }
 
-<<<<<<< HEAD
 // getStream returns the s2AStream field in s.
 func (s *remoteSigner) getStream() stream.S2AStream {
 	return s.s2AStream
-=======
-// getStream returns the cstream field in s.
-func (s *remoteSigner) getStream() s2av2pb.S2AService_SetUpSessionClient {
-	return s.cstream
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 }
 
 func getSignReq(signatureAlgorithm s2av2pb.SignatureAlgorithm, digest []byte) (*s2av2pb.OffloadPrivateKeyOperationReq, error) {

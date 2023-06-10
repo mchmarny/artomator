@@ -111,11 +111,7 @@ func NewClientCreds(opts *ClientOptions) (credentials.TransportCredentials, erro
 	if opts.FallbackOpts != nil && opts.FallbackOpts.FallbackClientHandshakeFunc != nil {
 		fallbackFunc = opts.FallbackOpts.FallbackClientHandshakeFunc
 	}
-<<<<<<< HEAD
 	return v2.NewClientCreds(opts.S2AAddress, localIdentity, verificationMode, fallbackFunc, opts.getS2AStream, opts.serverAuthorizationPolicy)
-=======
-	return v2.NewClientCreds(opts.S2AAddress, localIdentity, verificationMode, fallbackFunc)
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 }
 
 // NewServerCreds returns a server-side transport credentials object that uses
@@ -150,11 +146,7 @@ func NewServerCreds(opts *ServerOptions) (credentials.TransportCredentials, erro
 		}, nil
 	}
 	verificationMode := getVerificationMode(opts.VerificationMode)
-<<<<<<< HEAD
 	return v2.NewServerCreds(opts.S2AAddress, localIdentities, verificationMode, opts.getS2AStream)
-=======
-	return v2.NewServerCreds(opts.S2AAddress, localIdentities, verificationMode)
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 }
 
 // ClientHandshake initiates a client-side TLS handshake using the S2A.
@@ -319,7 +311,6 @@ func NewTLSClientConfigFactory(opts *ClientOptions) (TLSClientConfigFactory, err
 		// which is okay in environments other than serverless.
 		grpclog.Infof("Access token manager not initialized: %v", err)
 		return &s2aTLSClientConfigFactory{
-<<<<<<< HEAD
 			s2av2Address:              opts.S2AAddress,
 			tokenManager:              nil,
 			verificationMode:          getVerificationMode(opts.VerificationMode),
@@ -331,31 +322,14 @@ func NewTLSClientConfigFactory(opts *ClientOptions) (TLSClientConfigFactory, err
 		tokenManager:              tokenManager,
 		verificationMode:          getVerificationMode(opts.VerificationMode),
 		serverAuthorizationPolicy: opts.serverAuthorizationPolicy,
-=======
-			s2av2Address:     opts.S2AAddress,
-			tokenManager:     nil,
-			verificationMode: getVerificationMode(opts.VerificationMode),
-		}, nil
-	}
-	return &s2aTLSClientConfigFactory{
-		s2av2Address:     opts.S2AAddress,
-		tokenManager:     tokenManager,
-		verificationMode: getVerificationMode(opts.VerificationMode),
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 	}, nil
 }
 
 type s2aTLSClientConfigFactory struct {
-<<<<<<< HEAD
 	s2av2Address              string
 	tokenManager              tokenmanager.AccessTokenManager
 	verificationMode          s2av2pb.ValidatePeerCertificateChainReq_VerificationMode
 	serverAuthorizationPolicy []byte
-=======
-	s2av2Address     string
-	tokenManager     tokenmanager.AccessTokenManager
-	verificationMode s2av2pb.ValidatePeerCertificateChainReq_VerificationMode
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 }
 
 func (f *s2aTLSClientConfigFactory) Build(
@@ -364,11 +338,7 @@ func (f *s2aTLSClientConfigFactory) Build(
 	if opts != nil && opts.ServerName != "" {
 		serverName = opts.ServerName
 	}
-<<<<<<< HEAD
 	return v2.NewClientTLSConfig(ctx, f.s2av2Address, f.tokenManager, f.verificationMode, serverName, f.serverAuthorizationPolicy)
-=======
-	return v2.NewClientTLSConfig(ctx, f.s2av2Address, f.tokenManager, f.verificationMode, serverName)
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 }
 
 func getVerificationMode(verificationMode VerificationModeType) s2av2pb.ValidatePeerCertificateChainReq_VerificationMode {
@@ -418,11 +388,7 @@ func NewS2ADialTLSContextFunc(opts *ClientOptions) func(ctx context.Context, net
 		if err != nil {
 			serverName = addr
 		}
-<<<<<<< HEAD
 		timeoutCtx, cancel := context.WithTimeout(ctx, v2.GetS2ATimeout())
-=======
-		timeoutCtx, cancel := context.WithTimeout(ctx, *v2.S2ATimeout)
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 		defer cancel()
 		s2aTLSConfig, err := factory.Build(timeoutCtx, &TLSClientConfigOptions{
 			ServerName: serverName,

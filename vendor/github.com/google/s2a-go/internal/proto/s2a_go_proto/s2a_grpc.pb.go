@@ -16,11 +16,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v3.21.12
-<<<<<<< HEAD
 // source: internal/proto/s2a/s2a.proto
-=======
-// source: internal/proto/s2a.proto
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 
 package s2a_go_proto
 
@@ -173,9 +169,5 @@ var S2AService_ServiceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 	},
-<<<<<<< HEAD
 	Metadata: "internal/proto/s2a/s2a.proto",
-=======
-	Metadata: "internal/proto/s2a.proto",
->>>>>>> 7efbb82b89cd2e7053d7227badb0fe4320485276
 }
