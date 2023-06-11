@@ -45,3 +45,13 @@ resource "google_kms_crypto_key_iam_binding" "crypto_key_viewer" {
   ]
 }
 
+
+# Binds the runner service account to the key with key operator permissions
+resource "google_kms_crypto_key_iam_binding" "crypto_key_operator" {
+  count         = var.runtime_only ? 0 : 1
+  crypto_key_id = google_kms_crypto_key.key.id
+  role          = "roles/cloudkms.cryptoOperator"
+  members = [
+    "serviceAccount:${google_service_account.github_actions_user[count.index].email}",
+  ]
+}
