@@ -26,17 +26,17 @@ data "google_kms_crypto_key_version" "version" {
 }
 
 # Binds the runner service account to the key with key encrypter/decrypter permissions
-resource "google_kms_crypto_key_iam_binding" "crypto_key_bindng" {
+resource "google_kms_crypto_key_iam_binding" "crypto_signer_verifier" {
   count         = var.runtime_only ? 0 : 1
   crypto_key_id = google_kms_crypto_key.key.id
-  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  role          = "roles/cloudkms.signerVerifier"
   members = [
     "serviceAccount:${google_service_account.github_actions_user[count.index].email}",
   ]
 }
 
 # Binds the runner service account to the key with key viewer permissions
-resource "google_kms_crypto_key_iam_binding" "crypto_key_viewer" {
+resource "google_kms_crypto_key_iam_binding" "crypto_viewer" {
   count         = var.runtime_only ? 0 : 1
   crypto_key_id = google_kms_crypto_key.key.id
   role          = "roles/cloudkms.viewer"
@@ -47,7 +47,7 @@ resource "google_kms_crypto_key_iam_binding" "crypto_key_viewer" {
 
 
 # Binds the runner service account to the key with key operator permissions
-resource "google_kms_crypto_key_iam_binding" "crypto_key_operator" {
+resource "google_kms_crypto_key_iam_binding" "crypto_crypto_Operator" {
   count         = var.runtime_only ? 0 : 1
   crypto_key_id = google_kms_crypto_key.key.id
   role          = "roles/cloudkms.cryptoOperator"
