@@ -40,13 +40,6 @@ resource "google_cloud_run_service" "app" {
   project                    = var.project_id
   autogenerate_revision_name = true
 
-  metadata {
-    annotations = {
-      "run.googleapis.com/ingress"     = "all"
-      "run.googleapis.com/client-name" = "terraform"
-    }
-  }
-
   template {
     spec {
       containers {
@@ -103,12 +96,28 @@ resource "google_cloud_run_service" "app" {
         "run.googleapis.com/vpc-access-egress"     = "private-ranges-only"
         "run.googleapis.com/execution-environment" = "gen2"
       }
+      labels = {
+        "run.googleapis.com/startupProbeType"      = "Default"
+      }
+    }
+  }
+
+  metadata {
+    annotations = {
+      "run.googleapis.com/ingress"     = "all"
+      "run.googleapis.com/client-name" = "terraform"
     }
   }
 
   traffic {
     percent         = 100
     latest_revision = true
+  }
+
+  lifecycle {
+    ignore_changes = [
+      metadata.0.annotations["run.googleapis.com/operation-id"],
+    ]
   }
 }
 
