@@ -8,7 +8,7 @@ spec:
   authorities:
   - name: artomator-signer
     key:
-      kms: projects/cloudy-demos/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer/cryptoKeyVersions/1
+      kms: projects/s3cme1/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer/cryptoKeyVersions/1
     ctlog:
       url: https://rekor.sigstore.dev
     attestations:

@@ -39,7 +39,7 @@ To processes images, `artomator` uses a few open source projects:
 In addition to attaching attestations to image in Artifact Registry and the Binary Authorization note, `artomator` also saves all the generated reports in GCS bucket (for example [sbom.json](tests/sbom.json)). To make these names predictable, `artomator` prefixes them with the image SHA. For example, if the image digest is:
 
 ```shell
-us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:acaccb6c8f975ee7df7f46468fae28fb5014cf02c2835d2dc37bf6961e648838
+us-west1-docker.pkg.dev/s3cme1/artomator/tester@sha256:acaccb6c8f975ee7df7f46468fae28fb5014cf02c2835d2dc37bf6961e648838
 ```
 
 then the list of artifacts in the registry for that image will be: 

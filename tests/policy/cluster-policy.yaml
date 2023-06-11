@@ -14,5 +14,5 @@ spec:
           kinds:
             - Pod
       verifyImages:
-      - image: "us-west1-docker.pkg.dev/cloudy-demos/**"
-        key: "gcpkms://projects/cloudy-demos/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer/cryptoKeyVersions/1"
+      - image: "us-west1-docker.pkg.dev/s3cme1/**"
+        key: "gcpkms://projects/s3cme1/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer/cryptoKeyVersions/1"

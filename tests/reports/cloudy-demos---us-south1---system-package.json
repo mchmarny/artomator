@@ -1,6 +1,6 @@
 {
   "SchemaVersion": 2,
-  "ArtifactName": "gcr.io/cloudy-demos/system-package",
+  "ArtifactName": "gcr.io/s3cme1/system-package",
   "ArtifactType": "container_image",
   "Metadata": {
     "OS": {
@@ -25,10 +25,10 @@
       "sha256:f56aebb6f945145797f5373d98ddd61d89fe07e6e868e697b359f36d16b87bb1"
     ],
     "RepoTags": [
-      "gcr.io/cloudy-demos/system-package:latest"
+      "gcr.io/s3cme1/system-package:latest"
     ],
     "RepoDigests": [
-      "gcr.io/cloudy-demos/system-package@sha256:92464e03ea61e922c46040359b32f55b7f38bb20eaa25b9679338fa07e5a71d7"
+      "gcr.io/s3cme1/system-package@sha256:92464e03ea61e922c46040359b32f55b7f38bb20eaa25b9679338fa07e5a71d7"
     ],
     "ImageConfig": {
       "architecture": "amd64",
@@ -203,7 +203,7 @@
   },
   "Results": [
     {
-      "Target": "gcr.io/cloudy-demos/system-package (debian 11.5)",
+      "Target": "gcr.io/s3cme1/system-package (debian 11.5)",
       "Class": "os-pkgs",
       "Type": "debian",
       "Vulnerabilities": [

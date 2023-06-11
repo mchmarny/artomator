@@ -1,6 +1,6 @@
 {
     "SchemaVersion": 2,
-    "ArtifactName": "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:1c8fc799cb6a2e1aeb9913d2aa33de1fd8d23f7b00a175508fce87c32c2bc432",
+    "ArtifactName": "us-west1-docker.pkg.dev/s3cme1/artomator/artomator@sha256:1c8fc799cb6a2e1aeb9913d2aa33de1fd8d23f7b00a175508fce87c32c2bc432",
     "ArtifactType": "container_image",
     "Metadata": {
         "OS": {
@@ -22,10 +22,10 @@
             "sha256:a55f92771b642cc0f881afa6b9f271da03f25867fd18a50d6ff6704e92f9f2b8"
         ],
         "RepoTags": [
-            "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator:v0.8.0-dirty"
+            "us-west1-docker.pkg.dev/s3cme1/artomator/artomator:v0.8.0-dirty"
         ],
         "RepoDigests": [
-            "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:1c8fc799cb6a2e1aeb9913d2aa33de1fd8d23f7b00a175508fce87c32c2bc432"
+            "us-west1-docker.pkg.dev/s3cme1/artomator/artomator@sha256:1c8fc799cb6a2e1aeb9913d2aa33de1fd8d23f7b00a175508fce87c32c2bc432"
         ],
         "ImageConfig": {
             "architecture": "amd64",
@@ -153,7 +153,7 @@
     },
     "Results": [
         {
-            "Target": "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:1c8fc799cb6a2e1aeb9913d2aa33de1fd8d23f7b00a175508fce87c32c2bc432 (alpine 3.17.0)",
+            "Target": "us-west1-docker.pkg.dev/s3cme1/artomator/artomator@sha256:1c8fc799cb6a2e1aeb9913d2aa33de1fd8d23f7b00a175508fce87c32c2bc432 (alpine 3.17.0)",
             "Class": "os-pkgs",
             "Type": "alpine"
         },

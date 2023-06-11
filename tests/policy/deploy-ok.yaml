@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: artomator
-        image: us-west1-docker.pkg.dev/cloudy-demos/artomator/tester@sha256:b9323d3b903231a53ea90cac4c11d0a1e5484c3db75cc7d63236a6996c8e8e8a
+        image: us-west1-docker.pkg.dev/s3cme1/artomator/tester@sha256:b9323d3b903231a53ea90cac4c11d0a1e5484c3db75cc7d63236a6996c8e8e8a
         ports:
         - containerPort: 8080

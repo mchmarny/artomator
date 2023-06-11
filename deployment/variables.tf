@@ -28,7 +28,7 @@ variable "git_repo" {
 
 variable "image" {
   description = "Image URI"
-  default     = "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator"
+  default     = "us-west1-docker.pkg.dev/s3cme1/artomator/artomator"
   type        = string
   nullable    = false
 }

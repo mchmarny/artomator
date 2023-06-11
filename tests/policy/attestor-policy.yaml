@@ -1,10 +1,10 @@
 # Project-wide policy for Container Analysis Attestations
-name: projects/cloudy-demos/policy
+name: projects/s3cme1/policy
 defaultAdmissionRule:
   enforcementMode: ENFORCED_BLOCK_AND_AUDIT_LOG
   evaluationMode: REQUIRE_ATTESTATION
   requireAttestationsBy:
-    - projects/cloudy-demos/attestors/sbom-attestor
+    - projects/s3cme1/attestors/sbom-attestor
 admissionWhitelistPatterns:
 - namePattern: us.gcr.io/google-containers/**
 - namePattern: gcr.io/google_containers/**

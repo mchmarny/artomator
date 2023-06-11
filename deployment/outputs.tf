@@ -26,7 +26,7 @@ output "KMS_KEY" {
 }
 
 output "REGISTRY_URI" {
-  value       = var.runtime_only ? null : "${google_artifact_registry_repository.registry[0].location}-docker.pkg.dev/${data.google_project.project.name}/${google_artifact_registry_repository.registry[0].name}"
+  value       = var.runtime_only ? null : "${google_artifact_registry_repository.registry[0].location}-docker.pkg.dev"
   description = "Artifact Registry location."
 }
 

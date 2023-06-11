@@ -1,6 +1,6 @@
 {
   "SchemaVersion": 2,
-  "ArtifactName": "gcr.io/cloudy-demos/hello-broken",
+  "ArtifactName": "gcr.io/s3cme1/hello-broken",
   "ArtifactType": "container_image",
   "Metadata": {
     "OS": {
@@ -19,10 +19,10 @@
       "sha256:94fff791d5819b823210715556977296cfd7ad3aa55c64a779d85a725061d978"
     ],
     "RepoTags": [
-      "gcr.io/cloudy-demos/hello-broken:latest"
+      "gcr.io/s3cme1/hello-broken:latest"
     ],
     "RepoDigests": [
-      "gcr.io/cloudy-demos/hello-broken@sha256:0900c08e7d40f9485c8497c035de07391ba3c274a1035f504f8602531b2314e6"
+      "gcr.io/s3cme1/hello-broken@sha256:0900c08e7d40f9485c8497c035de07391ba3c274a1035f504f8602531b2314e6"
     ],
     "ImageConfig": {
       "architecture": "amd64",
@@ -128,7 +128,7 @@
   },
   "Results": [
     {
-      "Target": "gcr.io/cloudy-demos/hello-broken (ubuntu 22.04)",
+      "Target": "gcr.io/s3cme1/hello-broken (ubuntu 22.04)",
       "Class": "os-pkgs",
       "Type": "ubuntu",
       "Vulnerabilities": [

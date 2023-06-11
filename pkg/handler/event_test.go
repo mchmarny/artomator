@@ -22,12 +22,12 @@ const (
 	sigEvent = `{
 		"action": "INSERT",
 		"digest": "us-east1-docker.pkg.dev/my-project/my-repo/hello-world@sha256:6ec128e26cd5",
-		"tag": "us-west1-docker.pkg.dev/cloudy-demos/artomator/tester:sha256-59d78.sig"
+		"tag": "us-west1-docker.pkg.dev/s3cme1/artomator/tester:sha256-59d78.sig"
 	}`
 	attEvent = `{
 		"action": "INSERT",
 		"digest": "us-east1-docker.pkg.dev/my-project/my-repo/hello-world@sha256:6ec128e26cd5",
-		"tag": "us-west1-docker.pkg.dev/cloudy-demos/artomator/tester:sha256-59d78.att"
+		"tag": "us-west1-docker.pkg.dev/s3cme1/artomator/tester:sha256-59d78.att"
 	}`
 )
 

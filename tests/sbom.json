@@ -2,8 +2,8 @@
     "spdxVersion": "SPDX-2.3",
     "dataLicense": "CC0-1.0",
     "SPDXID": "SPDXRef-DOCUMENT",
-    "name": "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256:1c8fc799cb6a2e1aeb9913d2aa33de1fd8d23f7b00a175508fce87c32c2bc432",
-    "documentNamespace": "https://anchore.com/syft/image/us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator@sha256-1c8fc799cb6a2e1aeb9913d2aa33de1fd8d23f7b00a175508fce87c32c2bc432-8eb1fc2b-8420-459d-a2b5-e8552eac7970",
+    "name": "us-west1-docker.pkg.dev/s3cme1/artomator/artomator@sha256:1c8fc799cb6a2e1aeb9913d2aa33de1fd8d23f7b00a175508fce87c32c2bc432",
+    "documentNamespace": "https://anchore.com/syft/image/us-west1-docker.pkg.dev/s3cme1/artomator/artomator@sha256-1c8fc799cb6a2e1aeb9913d2aa33de1fd8d23f7b00a175508fce87c32c2bc432-8eb1fc2b-8420-459d-a2b5-e8552eac7970",
     "creationInfo": {
         "licenseListVersion": "3.19",
         "creators": [

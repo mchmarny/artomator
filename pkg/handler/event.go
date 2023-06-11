@@ -15,7 +15,7 @@ import (
 
 const (
 	CommandNameEvent = "event"
-	ImageURISelf     = "us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator"
+	ImageURISelf     = "us-west1-docker.pkg.dev/s3cme1/artomator/artomator"
 )
 
 // EventHandler is the HTTP handler for event service.

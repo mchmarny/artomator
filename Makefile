@@ -1,11 +1,11 @@
 VERSION  =$(shell cat .version)
 COMMIT   =$(shell git rev-parse HEAD)
-IMG_URI  ="us-west1-docker.pkg.dev/cloudy-demos/artomator/artomator:$(shell cat .version)"
+IMG_URI  ="us-west1-docker.pkg.dev/s3cme1/artomator/artomator:$(shell cat .version)"
 TEST_RIP =127.0.0.1
 TEST_RPT =6379
-TEST_PRJ =cloudy-demos
-TEST_KEY =gcpkms://projects/cloudy-demos/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer
-TEST_BCT =artomator-cloudy-demos
+TEST_PRJ =s3cme1
+TEST_KEY =gcpkms://projects/s3cme1/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer
+TEST_BCT =artomator-s3cme1
 TEST_ADD =http://127.0.0.1:8080
 
 export PATH := bin:$(PATH)
