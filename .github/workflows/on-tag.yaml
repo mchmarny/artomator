@@ -27,6 +27,7 @@ jobs:
       image: ${{ needs.config.outputs.image_uri }}
       id_provider: ${{ needs.config.outputs.id_provider }}
       service_account: ${{ needs.config.outputs.service_account }}
+      go_version: ${{ needs.config.outputs.go_version }}
       
   sign:
     uses: ./.github/workflows/sign.yaml
