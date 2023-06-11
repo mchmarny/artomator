@@ -6,11 +6,11 @@ DIR="$(dirname "$0")"
 set -o errexit
 set -o pipefail
 
-DIRTY_IMG="$IMAGE_URI-dirty"
+DIRTY_IMG="$IMAGE_URI"
 
 # Build and push image
 docker build -f deployment/Dockerfile \
-             --build-arg VERSION="${VERSION}-dirty" \
+             --build-arg VERSION="${VERSION}" \
              --platform linux/amd64 \
              -t $DIRTY_IMG \
              .

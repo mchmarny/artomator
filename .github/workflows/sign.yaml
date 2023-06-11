@@ -23,6 +23,14 @@ on:
         description: 'Fully qualified URI of the image with its digest'
         required: true
         type: string
+      max_vuln_severity:
+        description: 'Maximum vulnerability severity to allow'
+        type: string
+        required: true
+      cosign_version:
+        description: 'Cosign version to use'
+        type: string
+        required: true
 
 jobs:
 
@@ -57,7 +65,7 @@ jobs:
         hide-progress: true
         timeout: '10m'
         exit-code: '1'
-        severity: 'CRITICAL'
+        severity: ${{ inputs.max_vuln_severity }}
       env:
         GOOGLE_APPLICATION_CREDENTIAL: ${{ steps.auth.outputs.access_token }}
 
@@ -71,7 +79,7 @@ jobs:
     - name: Install Cosign
       uses: sigstore/cosign-installer@main
       with:
-        cosign-release: v1.13.1
+        cosign-release: ${{ inputs.cosign_version }}
     
     - name: Auth Cosign
       run: |

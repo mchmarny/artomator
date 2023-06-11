@@ -3,6 +3,10 @@ name: image
 on:
   workflow_call:
     inputs:
+      go_version:
+        description: 'Go version to use'
+        type: string
+        required: true
       registry:
         description: 'Artifact Registry URI'
         required: true
@@ -42,7 +46,7 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v4
       with:
-        go-version: ^1.20
+        go-version: ${{ inputs.go_version }}
     
     - run: go version
     

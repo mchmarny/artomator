@@ -7,24 +7,15 @@ on:
 
 jobs:
 
-# Note, these jobs are using config job output to work around 
-# the GitHub Actions limitation where you can't use env vars 
-# to pass to multiple reusable jobs.
-# https://github.com/community/community/discussions/17554.
-
   config:
     uses: ./.github/workflows/config.yaml
-    with:
-      registry_uri: us-west1-docker.pkg.dev
-      project_id: cloudy-demos
-      registry_image: artomator/artomator
-      id_provider: projects/799736955886/locations/global/workloadIdentityPools/artomator-github-pool/providers/github-provider
-      service_account: artomator-github-actions-user@cloudy-demos.iam.gserviceaccount.com
-      kms_key: projects/cloudy-demos/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer
       
   test:
     uses: ./.github/workflows/test.yaml
     needs: config
+    with:
+      go_version: ${{ needs.config.outputs.go_version }}
+      max_vuln_severity: ${{ needs.config.outputs.max_vuln_severity }}
 
   image:
     uses: ./.github/workflows/image.yaml
@@ -48,4 +39,6 @@ jobs:
       id_provider: ${{ needs.config.outputs.id_provider }}
       service_account: ${{ needs.config.outputs.service_account }}
       key: ${{ needs.config.outputs.kms_key }}
+      max_vuln_severity: ${{ needs.config.outputs.max_vuln_severity }}
+      cosign_version: ${{ needs.config.outputs.cosign_version }}
       
