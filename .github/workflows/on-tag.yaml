@@ -35,11 +35,21 @@ jobs:
     - config
     - image
     with:
-      digest: ${{ needs.image.outputs.digest }}
-      registry: ${{ needs.config.outputs.registry_uri }}
-      id_provider: ${{ needs.config.outputs.id_provider }}
-      service_account: ${{ needs.config.outputs.service_account }}
-      key: ${{ needs.config.outputs.kms_key }}
-      max_vuln_severity: ${{ needs.config.outputs.max_vuln_severity }}
+      registry: ${{ needs.config.outputs.registry_uri }}     
+      image_digest: ${{ needs.image.outputs.digest }}
+      auth_provider: ${{ needs.config.outputs.id_provider }}
+      auth_user: ${{ needs.config.outputs.service_account }}
       cosign_version: ${{ needs.config.outputs.cosign_version }}
-      
+      max_vuln_severity: ${{ needs.config.outputs.max_vuln_severity }}
+      key: ${{ needs.config.outputs.kms_key }}
+
+  slsa:
+    uses: ./.github/workflows/slsa.yaml
+    needs: 
+    - config
+    - image
+    with:
+      image_digest: ${{ needs.image.outputs.digest }}
+      auth_provider: ${{ needs.config.outputs.id_provider }}
+      auth_user: ${{ needs.config.outputs.service_account }}
+      cosign_version: ${{ needs.config.outputs.cosign_version }}

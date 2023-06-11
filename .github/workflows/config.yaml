@@ -29,7 +29,7 @@ jobs:
       id-token: write
     env:
       GO_VERSION: ^1.20
-      COSIGN_VERSION: v1.13.1
+      COSIGN_VERSION: v2.0.2
       MAX_VULN_SEVERITY: 'CRITICAL,HIGH'
       REGISTRY_URI: us-west1-docker.pkg.dev
       IMAGE_URI: us-west1-docker.pkg.dev/s3cme1/artomator/artomator
