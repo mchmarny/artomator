@@ -35,7 +35,7 @@ jobs:
       IMAGE_URI: us-west1-docker.pkg.dev/s3cme1/artomator/artomator
       ID_PROVIDER: projects/595203407878/locations/global/workloadIdentityPools/artomator-github-pool/providers/github-provider
       SERVICE_ACCOUNT: artomator-github-actions-user@s3cme1.iam.gserviceaccount.com
-      KMS_KEY: projects/s3cme1/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer/cryptoKeyVersions/1
+      KMS_KEY: gcpkms://projects/s3cme1/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer/cryptoKeyVersions/1
 
     outputs:
       go_version: ${{ steps.conf.outputs.go_version }}
