@@ -86,10 +86,6 @@ jobs:
         cosign version
         cosign login ${{ inputs.registry }} --username=oauth2accesstoken --password=${{ steps.auth.outputs.access_token }}
     
-    # - name: Get KMS Key
-    #   run: |
-    #     cosign generate-key-pair --kms ${{ inputs.key }}
-    
     - name: Sign Image
       run: |
         cosign sign --force --key ${{ inputs.key }} ${{ inputs.digest }}
