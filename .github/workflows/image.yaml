@@ -7,6 +7,14 @@ on:
         description: 'Go version to use'
         type: string
         required: true
+      syft_version:
+        description: 'The version of syft to use'
+        required: true
+        type: string
+      cosign_version:
+        description: 'The version of cosign to use'
+        required: true
+        type: string
       registry:
         description: 'Artifact Registry URI'
         required: true
@@ -27,17 +35,9 @@ on:
         description: 'Maximum vulnerability severity to allow'
         type: string
         required: true
-      cosign_version:
-        description: 'The version of cosign to use'
-        required: true
-        type: string
       key:
         required: true
         description: 'KMS key path'
-        type: string
-      syft_version:
-        description: 'The version of syft to use'
-        required: true
         type: string
     outputs:
       digest:
@@ -127,6 +127,7 @@ jobs:
       id: digest
       run: |
         echo "IMAGE_DIGEST=${{ inputs.image }}@${{ steps.push.outputs.digest }}" >> $GITHUB_ENV
+        echo "DIGEST_TAG=$(echo ${{ steps.push.outputs.digest }} | tr : -)" >> $GITHUB_ENV
 
     - name: Scan Image
       uses: aquasecurity/trivy-action@master
@@ -175,8 +176,6 @@ jobs:
           --password=${{ steps.auth.outputs.access_token }}
 
     - name: Upload SBOM
-      env: 
-        DIGEST_TAG: "$(echo ${{ steps.push.outputs.digest }} | tr : -)"
       run: |
         cosign upload blob \
           -f sbom.spdx \
@@ -184,7 +183,7 @@ jobs:
           -a run_id=${{ github.run_id }} \
           -a run_attempt=${{ github.run_attempt }} \
           -a version=${{ env.RELEASE_VERSION }} \
-          "${{ inputs.image }}:${DIGEST_TAG}.sbom"
+          "${{ inputs.image }}:${{ env.DIGEST_TAG }}.sbom"
 
     - name: Sign Image
       run: |
