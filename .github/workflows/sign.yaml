@@ -60,22 +60,17 @@ jobs:
           --username=oauth2accesstoken \
           --password=${{ steps.auth.outputs.access_token }}
 
-    - name: Gen Signature
-      env:
-        COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
-      run: |
-        cosign generate-key-pair --key ${{ inputs.key }}
-
     - name: Sign Image
       env:
         COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
+        COSIGN_YES: true
       run: |
-        cosign sign ${{ inputs.image_digest }} \
+        cosign sign \
             --key ${{ inputs.key }} \
             -a sha=${{ github.sha }} \
             -a run_id=${{ github.run_id }} \
             -a run_attempt=${{ github.run_attempt }} \
-            --yes
+            ${{ inputs.image_digest }}
 
     - name: Verify Signature
       env:
