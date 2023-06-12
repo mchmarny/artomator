@@ -37,8 +37,9 @@ jobs:
   image:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
+      security-events: write
     outputs:
       digest: ${{ steps.image.outputs.digest }}
     steps:

@@ -38,8 +38,6 @@ jobs:
     permissions:
       actions: read
       id-token: write
-      contents: write
-      security-events: write
     steps:
 
     - id: auth
