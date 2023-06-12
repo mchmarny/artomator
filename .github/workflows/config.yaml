@@ -30,6 +30,7 @@ jobs:
     env:
       GO_VERSION: ^1.20
       COSIGN_VERSION: v2.0.2
+      SYFT_VERSION: v0.83.0
       MAX_VULN_SEVERITY: 'CRITICAL,HIGH'
       REGISTRY_URI: us-west1-docker.pkg.dev
       IMAGE_URI: us-west1-docker.pkg.dev/s3cme1/artomator/artomator
@@ -46,6 +47,7 @@ jobs:
       id_provider: ${{ steps.conf.outputs.id_provider }}
       service_account: ${{ steps.conf.outputs.service_account }}
       kms_key: ${{ steps.conf.outputs.kms_key }}
+      syft_version: ${{ steps.conf.outputs.syft_version }}
     steps:
     
     - name: Export Config
@@ -59,3 +61,4 @@ jobs:
         echo "id_provider=${{ env.ID_PROVIDER }}" >> $GITHUB_OUTPUT
         echo "service_account=${{ env.SERVICE_ACCOUNT }}" >> $GITHUB_OUTPUT
         echo "kms_key=${{ env.KMS_KEY }}" >> $GITHUB_OUTPUT
+        echo "syft_version=${{ env.SYFT_VERSION }}" >> $GITHUB_OUTPUT

@@ -31,6 +31,7 @@ jobs:
       max_vuln_severity: ${{ needs.config.outputs.max_vuln_severity }}
       cosign_version: ${{ needs.config.outputs.cosign_version }}
       key: ${{ needs.config.outputs.kms_key }}
+      syft_version: ${{ needs.config.outputs.syft_version }}
       
   slsa:
     uses: ./.github/workflows/slsa.yaml

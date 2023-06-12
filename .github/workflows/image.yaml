@@ -35,6 +35,10 @@ on:
         required: true
         description: 'KMS key path'
         type: string
+      syft_version:
+        description: 'The version of syft to use'
+        required: true
+        type: string
     outputs:
       digest:
         description: "Digest of the published image"
@@ -144,10 +148,10 @@ jobs:
       with:
         sarif_file: trivy-results.sarif
 
-    - name: Install Cosign
-      uses: sigstore/cosign-installer@dd6b2e2b610a11fd73dd187a43d57cc1394e35f9  # v3.0.5
+    - name: Install Syft
+      uses: anchore/sbom-action/download-syft@4d571ad1038a9cc29d676154ef265ab8f9027042  # v0.14.2
       with:
-        cosign-release: ${{ inputs.cosign_version }}
+        syft-version: ${{ inputs.syft_version }}
 
     - name: Gen SBOM
       run: |
@@ -157,6 +161,11 @@ jobs:
         syft -q packages \
           -o spdx-json ${{ env.IMAGE_DIGEST }} | \
           jq --compact-output > sbom.spdx
+
+    - name: Install Cosign
+      uses: sigstore/cosign-installer@dd6b2e2b610a11fd73dd187a43d57cc1394e35f9  # v3.0.5
+      with:
+        cosign-release: ${{ inputs.cosign_version }}
 
     - name: Auth Cosign
       run: |
