@@ -34,8 +34,12 @@ RUN curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh \
 # aquasecurity
 RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
     | sh -s -- -b /usr/local/bin
-# debug 
-RUN echo $PATH 
-RUN ls -al 
+# upgrade
+RUN apk update && apk upgrade
+# cleanup 
+RUN rm -rf /var/cache/apk/* /tmp/* /var/tmp/* /root/.cache /root/.config && \
+    rm -rf /gcloud/google-cloud-sdk/.install/.backup \
+    rm -rf /gcloud/google-cloud-sdk/bin/anthoscli \
+    rm -rf /gcloud/google-cloud-sdk/bin/bq
 # automator
 ENTRYPOINT ["./server"]
