@@ -63,6 +63,12 @@ jobs:
     - name: Sign Image
       run: |
         cosign sign --yes \
+            --annotations sha=${{ github.sha }} \
+            --annotations run_id=${{ github.run_id }} \
+            --annotations run_attempt=${{ github.run_attempt }} \
+            --annotations version=${GITHUB_REF#refs/*/} \
+            ${{ inputs.image_digest }}
+        cosign sign --yes \
             --tlog-upload false \
             --key ${{ inputs.key }} \
             --annotations sha=${{ github.sha }} \
@@ -70,7 +76,3 @@ jobs:
             --annotations run_attempt=${{ github.run_attempt }} \
             --annotations version=${GITHUB_REF#refs/*/} \
             ${{ inputs.image_digest }}
-
-    - name: Verify Signature
-      run: |
-        cosign verify --key ${{ inputs.key }} ${{ inputs.image_digest }}
