@@ -42,4 +42,3 @@ jobs:
       image_digest: ${{ needs.image.outputs.digest }}
       auth_provider: ${{ needs.config.outputs.id_provider }}
       auth_user: ${{ needs.config.outputs.service_account }}
-      cosign_version: ${{ needs.config.outputs.cosign_version }}

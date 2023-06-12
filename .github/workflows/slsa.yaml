@@ -15,41 +15,37 @@ on:
         description: 'OIDC user ID'
         required: true
         type: string
-      cosign_version:
-        description: 'The version of cosign to use'
-        required: true
-        type: string
 
 permissions:
   contents: read
 
 jobs:
 
-  conf:
+  config:
     runs-on: ubuntu-latest
     permissions:
       contents: read
     outputs:
-      image: ${{ steps.conf.outputs.image }}
-      digest: ${{ steps.conf.outputs.digest }}
+      image: ${{ steps.split.outputs.image }}
+      digest: ${{ steps.split.outputs.digest }}
     steps:
     - name: Export Config
-      id: conf
+      id: split
       run: |
         echo "image=$(echo ${{ inputs.image_digest }} | cut -d@ -f1)" >> $GITHUB_OUTPUT
         echo "digest=$(echo ${{ inputs.image_digest }} | cut -d@ -f2)" >> $GITHUB_OUTPUT
 
   provenance:
     needs:
-    - conf
+    - config
     permissions:
       actions: read
       id-token: write
       packages: write
     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v1.7.0
     with:
-      image: ${{ needs.conf.outputs.image }}
-      digest: ${{ needs.conf.outputs.digest }}
+      image: ${{ needs.config.outputs.image }}
+      digest: ${{ needs.config.outputs.digest }}
       registry-username: ${{ github.actor }}
       gcp-workload-identity-provider: ${{ inputs.auth_provider }}
       gcp-service-account: ${{ inputs.auth_user }}
@@ -63,9 +59,6 @@ jobs:
       id-token: write
     steps:
 
-    - name: Checkout Code
-      uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v3.5.2
-
     - id: auth
       name: Auth GCP
       uses: google-github-actions/auth@35b0e87d162680511bf346c299f71c9c5c379033  # v1.1.1
@@ -74,12 +67,10 @@ jobs:
         workload_identity_provider: ${{ inputs.auth_provider }}
         service_account: ${{ inputs.auth_user }}
 
-    - uses: slsa-framework/slsa-verifier/actions/installer@c9abffe4d2ab2ffa0b2ea9b2582b84164f390adc  # v2.0.1
+    - uses: slsa-framework/slsa-verifier/actions/installer@c9abffe4d2ab2ffa0b2ea9b2582b84164f390adc  # v2.3.0
 
-    # SLSA provenance verification using slsa-verifier.
     - name: Verify SLSA Provenance
       run: |-
-        slsa-verifier version
         slsa-verifier verify-image ${{ inputs.image_digest }} \
           --source-uri "github.com/$GITHUB_REPOSITORY" \
           --source-tag "$GITHUB_REF_NAME"

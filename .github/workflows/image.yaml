@@ -56,16 +56,10 @@ jobs:
       digest: ${{ steps.image.outputs.digest }}
     steps:
 
-    - name: Print Inputs
-      run: |
-        echo "${{ inputs.image }}"
-
     - name: Setup Go
       uses: actions/setup-go@v4
       with:
         go-version: ${{ inputs.go_version }}
-    
-    - run: go version
     
     - name: Cache Modules
       uses: actions/cache@v3
@@ -85,7 +79,7 @@ jobs:
         go mod tidy
         go mod vendor
     
-    - name: Capture Variables
+    - name: Capture Version
       run: |
         echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
     
@@ -114,7 +108,7 @@ jobs:
         username: oauth2accesstoken
         password: ${{ steps.auth.outputs.access_token }}
     
-    - name: Image Push
+    - name: Push Image
       id: push
       uses: docker/build-push-action@v4
       with:
@@ -154,7 +148,7 @@ jobs:
       with:
         syft-version: ${{ inputs.syft_version }}
 
-    - name: Gen SBOM
+    - name: Create SBOM
       run: |
         syft login ${{ inputs.registry }} \
           -u oauth2accesstoken \
