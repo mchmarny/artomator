@@ -67,6 +67,7 @@ jobs:
     - name: Sign Image
       run: |
         cosign sign --yes \
+            --tlog-upload=false \
             --key ${{ inputs.key }} \
             -a sha=${{ github.sha }} \
             -a run_id=${{ github.run_id }} \
