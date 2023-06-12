@@ -61,19 +61,16 @@ jobs:
           --password=${{ steps.auth.outputs.access_token }}
 
     - name: Sign Image
-      env:
-        COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
-        COSIGN_YES: true
       run: |
-        cosign sign \
+        cosign sign --yes \
+            --tlog-upload false \
             --key ${{ inputs.key }} \
-            -a sha=${{ github.sha }} \
-            -a run_id=${{ github.run_id }} \
-            -a run_attempt=${{ github.run_attempt }} \
+            --annotations sha=${{ github.sha }} \
+            --annotations run_id=${{ github.run_id }} \
+            --annotations run_attempt=${{ github.run_attempt }} \
+            --annotations version=${GITHUB_REF#refs/*/} \
             ${{ inputs.image_digest }}
 
     - name: Verify Signature
-      env:
-        COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
       run: |
         cosign verify --key ${{ inputs.key }} ${{ inputs.image_digest }}
