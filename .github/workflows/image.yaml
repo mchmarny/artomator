@@ -111,18 +111,23 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
 
+    - name: Export Digest
+      id: digest
+      run: |
+        echo "IMAGE_DIGEST=${{ inputs.image }}@${{ steps.push.outputs.digest }}" >> $GITHUB_ENV
+
     - name: Scan Image
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: image
-        image-ref: "${{ inputs.image }}@${{ steps.push.outputs.digest }}"
+        image-ref: ${{ env.IMAGE_DIGEST }}
         vuln-type: 'os,library'
         format: sarif
         output: trivy-results.sarif
         hide-progress: true
         timeout: '10m'
         exit-code: '1'
-        severity: ${{ inputs.max_vuln_severity }}
+        severity: "${{ inputs.max_vuln_severity }}"
       env:
         GOOGLE_APPLICATION_CREDENTIAL: ${{ steps.auth.outputs.access_token }}
 
@@ -134,4 +139,4 @@ jobs:
     - name: Export Digest
       id: image
       run: |
-        echo "digest=${{ inputs.image }}@${{ steps.push.outputs.digest }}" >> $GITHUB_OUTPUT
+        echo "digest=${{ env.IMAGE_DIGEST }}" >> $GITHUB_OUTPUT
