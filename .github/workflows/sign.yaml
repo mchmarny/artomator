@@ -58,8 +58,8 @@ jobs:
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: image
-        security-checks: vuln
         image-ref: ${{ inputs.digest }}
+        vuln-type: 'os,library'
         format: sarif
         output: trivy-results.sarif
         hide-progress: true
@@ -73,7 +73,6 @@ jobs:
       uses: github/codeql-action/upload-sarif@v2
       with:
         sarif_file: trivy-results.sarif
-        category: trivy-report
 
     - name: Install Cosign
       uses: sigstore/cosign-installer@dd6b2e2b610a11fd73dd187a43d57cc1394e35f9  # v3.0.5
