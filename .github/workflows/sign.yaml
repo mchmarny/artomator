@@ -62,15 +62,17 @@ jobs:
 
     - name: Sign Image
       env:
-        COSIGN_YES: true
+        COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
       run: |
         cosign sign ${{ inputs.image_digest }} \
             --key ${{ inputs.key }} \
             -a sha=${{ github.sha }} \
             -a run_id=${{ github.run_id }} \
             -a run_attempt=${{ github.run_attempt }} \
-            -a tag=${{ env.GITHUB_REF_NAME }}
+            --yes
 
     - name: Verify Signature
+      env:
+        COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
       run: |
         cosign verify --key ${{ inputs.key }} ${{ inputs.image_digest }}
