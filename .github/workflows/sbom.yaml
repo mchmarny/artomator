@@ -51,9 +51,28 @@ jobs:
         service_account: ${{ inputs.auth_user }}
 
     - name: Gen SBOM
-      uses: anchore/sbom-action@v0
-      with:
-        image: ${{ inputs.digest }}
-        format: spdx-json
-        registry-username: oauth2accesstoken
-        registry-password: ${{ steps.auth.outputs.access_token }}
+      run: |
+        syft -q packages \
+          -o spdx-json ${{ inputs.image_digest }} | \
+          jq --compact-output > sbom.spdx
+      env:
+        COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
+
+    - name: Create Attestation
+      run: |
+        cosign attest \
+          --predicate sbom.spdx \
+          --type spdx \
+          --key ${{ inputs.key }} \
+          ${{ inputs.image_digest }}
+      env:
+        COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
+      
+    - name: Verify Image
+      run: |
+        cosign verify-attestation \
+          --type spdx \
+          --key ${{ inputs.key }} \
+          ${{ inputs.image_digest }}
+      env:
+        COSIGN_PASSWORD: ${{ steps.auth.outputs.access_token }}
