@@ -23,6 +23,10 @@ on:
         description: 'Image URI without the label or sha'
         required: true
         type: string
+      max_vuln_severity:
+        description: 'Maximum vulnerability severity to allow'
+        type: string
+        required: true
     outputs:
       digest:
         description: "Digest of the published image"
