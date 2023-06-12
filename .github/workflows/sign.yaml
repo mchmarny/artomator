@@ -64,7 +64,7 @@ jobs:
       env:
         COSIGN_YES: true
       run: |
-        cosign sign ${{ inputs.digest }} \
+        cosign sign ${{ inputs.image_digest }} \
             --key ${{ inputs.key }} \
             -a sha=${{ github.sha }} \
             -a run_id=${{ github.run_id }} \
