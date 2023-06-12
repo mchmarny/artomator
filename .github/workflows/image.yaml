@@ -136,6 +136,27 @@ jobs:
       with:
         sarif_file: trivy-results.sarif
 
+    - name: Gen SBOM
+      run: |
+        syft login ${{ inputs.registry }} \
+          -u oauth2accesstoken \
+          -p ${{ steps.auth.outputs.access_token }}
+        syft -q packages \
+          -o spdx-json  | \
+          jq --compact-output > sbom.spdx
+
+    - name: Upload SBOM
+      env: 
+        DIGEST_TAG: "$(echo ${{ steps.push.outputs.digest }} | tr : -)"
+      run: |
+        cosign upload blob \
+          -f sbom.spdx \
+          -a sha=${{ github.sha }} \
+          -a run_id=${{ github.run_id }} \
+          -a run_attempt=${{ github.run_attempt }} \
+          -a version=${{ env.RELEASE_VERSION }} \
+          "${{ inputs.image }}:${DIGEST_TAG}.sbom"
+
     - name: Export Digest
       id: image
       run: |
