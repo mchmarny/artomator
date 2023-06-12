@@ -106,6 +106,26 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
 
+    - name: Scan Image
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: image
+        image-ref: ${{ inputs.image_digest }}
+        vuln-type: 'os,library'
+        format: sarif
+        output: trivy-results.sarif
+        hide-progress: true
+        timeout: '10m'
+        exit-code: '1'
+        severity: ${{ inputs.max_vuln_severity }}
+      env:
+        GOOGLE_APPLICATION_CREDENTIAL: ${{ steps.auth.outputs.access_token }}
+
+    - name: Upload Results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: trivy-results.sarif
+
     - name: Export Digest
       id: image
       run: |

@@ -28,6 +28,7 @@ jobs:
       id_provider: ${{ needs.config.outputs.id_provider }}
       service_account: ${{ needs.config.outputs.service_account }}
       go_version: ${{ needs.config.outputs.go_version }}
+      max_vuln_severity: ${{ needs.config.outputs.max_vuln_severity }}
       
   sign:
     uses: ./.github/workflows/sign.yaml
@@ -40,7 +41,6 @@ jobs:
       auth_provider: ${{ needs.config.outputs.id_provider }}
       auth_user: ${{ needs.config.outputs.service_account }}
       cosign_version: ${{ needs.config.outputs.cosign_version }}
-      max_vuln_severity: ${{ needs.config.outputs.max_vuln_severity }}
       key: ${{ needs.config.outputs.kms_key }}
 
   slsa:
