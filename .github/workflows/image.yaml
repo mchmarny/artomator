@@ -27,6 +27,14 @@ on:
         description: 'Maximum vulnerability severity to allow'
         type: string
         required: true
+      cosign_version:
+        description: 'The version of cosign to use'
+        required: true
+        type: string
+      key:
+        required: true
+        description: 'KMS key path'
+        type: string
     outputs:
       digest:
         description: "Digest of the published image"
@@ -136,14 +144,26 @@ jobs:
       with:
         sarif_file: trivy-results.sarif
 
+    - name: Install Cosign
+      uses: sigstore/cosign-installer@dd6b2e2b610a11fd73dd187a43d57cc1394e35f9  # v3.0.5
+      with:
+        cosign-release: ${{ inputs.cosign_version }}
+
     - name: Gen SBOM
       run: |
         syft login ${{ inputs.registry }} \
           -u oauth2accesstoken \
           -p ${{ steps.auth.outputs.access_token }}
         syft -q packages \
-          -o spdx-json  | \
+          -o spdx-json ${{ env.IMAGE_DIGEST }} | \
           jq --compact-output > sbom.spdx
+
+    - name: Auth Cosign
+      run: |
+        cosign version
+        cosign login ${{ inputs.registry }} \
+          --username=oauth2accesstoken \
+          --password=${{ steps.auth.outputs.access_token }}
 
     - name: Upload SBOM
       env: 
@@ -156,6 +176,17 @@ jobs:
           -a run_attempt=${{ github.run_attempt }} \
           -a version=${{ env.RELEASE_VERSION }} \
           "${{ inputs.image }}:${DIGEST_TAG}.sbom"
+
+    - name: Sign Image
+      run: |
+        cosign sign --yes \
+            --tlog-upload=false \
+            --key ${{ inputs.key }} \
+            -a sha=${{ github.sha }} \
+            -a run_id=${{ github.run_id }} \
+            -a run_attempt=${{ github.run_attempt }} \
+            -a version=${{ env.RELEASE_VERSION }} \
+            ${{ env.IMAGE_DIGEST }}
 
     - name: Export Digest
       id: image
