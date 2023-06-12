@@ -58,7 +58,7 @@ jobs:
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: image
-        image-ref: ${{ inputs.digest }}
+        image-ref: ${{ inputs.image_digest }}
         vuln-type: 'os,library'
         format: sarif
         output: trivy-results.sarif
