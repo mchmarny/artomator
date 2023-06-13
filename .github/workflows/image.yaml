@@ -44,6 +44,9 @@ on:
         description: "Digest of the published image"
         value: ${{ jobs.image.outputs.digest }}
 
+permissions:
+  contents: read
+
 jobs:
 
   image:

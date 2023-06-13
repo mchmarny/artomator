@@ -9,10 +9,15 @@ jobs:
 
   config:
     uses: ./.github/workflows/config.yaml
+    permissions:
+      contents: read
       
   test:
     uses: ./.github/workflows/test.yaml
     needs: config
+    permissions:
+      contents: read
+      security-events: write
     with:
       go_version: ${{ needs.config.outputs.go_version }}
       max_vuln_severity: ${{ needs.config.outputs.max_vuln_severity }}
@@ -22,6 +27,10 @@ jobs:
     needs: 
     - config
     - test
+    permissions:
+      contents: read
+      id-token: write
+      security-events: write
     with:
       registry: ${{ needs.config.outputs.registry_uri }}
       image: ${{ needs.config.outputs.image_uri }}
@@ -38,6 +47,11 @@ jobs:
     needs: 
     - config
     - image
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      security-events: write
     with:
       image_digest: ${{ needs.image.outputs.digest }}
       auth_provider: ${{ needs.config.outputs.id_provider }}
