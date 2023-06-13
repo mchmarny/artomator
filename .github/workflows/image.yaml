@@ -56,13 +56,16 @@ jobs:
       digest: ${{ steps.image.outputs.digest }}
     steps:
 
+    - name: Checkout Code
+      uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9  # v3.5.3
+
     - name: Setup Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@fac708d6674e30b6ba41289acaab6d4b75aa0753  # v4.0.1
       with:
         go-version: ${{ inputs.go_version }}
     
     - name: Cache Modules
-      uses: actions/cache@v3
+      uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8  # v3.3.1
       with:
         path: |
           ~/.cache/go-build
@@ -70,9 +73,6 @@ jobs:
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-
-    
-    - name: Checkout Code
-      uses: actions/checkout@v3
     
     - name: Tidy Modules
       run: |
@@ -85,7 +85,7 @@ jobs:
     
     - id: auth
       name: Get GCP token
-      uses: google-github-actions/auth@v1
+      uses: google-github-actions/auth@35b0e87d162680511bf346c299f71c9c5c379033  # v1.1.1
       with:
           token_format: "access_token"
           workload_identity_provider: ${{ inputs.id_provider }}
@@ -93,7 +93,7 @@ jobs:
     
     - name: Define Metadata
       id: meta
-      uses: docker/metadata-action@v4
+      uses: docker/metadata-action@818d4b7b91585d195f67373fd9cb0332e31a7175  # v4.6.0
       with:
         images: |
           ${{ inputs.image }}
@@ -102,7 +102,7 @@ jobs:
           type=raw,enable=true,value=${{ env.GITHUB_SHA }}
     
     - name: Registry Auth
-      uses: docker/login-action@v2
+      uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc  # v2.2.0
       with:
         registry: ${{ inputs.registry }}
         username: oauth2accesstoken
@@ -110,7 +110,7 @@ jobs:
     
     - name: Push Image
       id: push
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@2eb1c1961a95fc15694676618e422e8ba1d63825  # v4.1.1
       with:
         file: deployment/Dockerfile
         push: true
@@ -124,7 +124,7 @@ jobs:
         echo "DIGEST_TAG=$(echo ${{ steps.push.outputs.digest }} | tr : -)" >> $GITHUB_ENV
 
     - name: Scan Image
-      uses: aquasecurity/trivy-action@master
+      uses: aquasecurity/trivy-action@41f05d9ecffa2ed3f1580af306000f734b733e54  # v0.11.2
       with:
         scan-type: image
         image-ref: ${{ env.IMAGE_DIGEST }}
@@ -139,7 +139,7 @@ jobs:
         GOOGLE_APPLICATION_CREDENTIAL: ${{ steps.auth.outputs.access_token }}
 
     - name: Upload Results
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@1245696032ecf7d39f87d54daa406e22ddf769a8  # v.2.13.3
       with:
         sarif_file: trivy-results.sarif
 
