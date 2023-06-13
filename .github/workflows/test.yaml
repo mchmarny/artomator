@@ -66,11 +66,15 @@ jobs:
     - name: Scan Repo
       uses: aquasecurity/trivy-action@41f05d9ecffa2ed3f1580af306000f734b733e54  # v0.11.2
       with:
-        scan-type: 'fs'
+        scan-type: fs
         ignore-unfixed: true
-        hide-progress: false
-        format: 'sarif'
-        output: 'trivy-results.sarif'
+        vuln-type: 'os,library'
         severity: ${{ github.event.inputs.max_vuln_severity }}
-        exit-code: '1'
+        format: sarif
+        output: trivy-results.sarif
+        timeout: '10m'
 
+    - name: Upload Results
+      uses: github/codeql-action/upload-sarif@1245696032ecf7d39f87d54daa406e22ddf769a8  # v.2.13.3
+      with:
+        sarif_file: trivy-results.sarif
