@@ -145,6 +145,7 @@ jobs:
       uses: github/codeql-action/upload-sarif@1245696032ecf7d39f87d54daa406e22ddf769a8  # v.2.13.3
       with:
         sarif_file: trivy-results.sarif
+        category: image
 
     - name: Install Syft
       uses: anchore/sbom-action/download-syft@4d571ad1038a9cc29d676154ef265ab8f9027042  # v0.14.2
