@@ -8,14 +8,22 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
 
   config:
     uses: ./.github/workflows/config.yaml
+    permissions:
+      contents: read
 
   test:
     uses: ./.github/workflows/test.yaml
     needs: config
+    permissions:
+      contents: read
+      security-events: write
     with:
       go_version: ${{ needs.config.outputs.go_version }}
       max_vuln_severity: ${{ needs.config.outputs.max_vuln_severity }}

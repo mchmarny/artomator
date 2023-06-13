@@ -31,6 +31,9 @@ env:
   SERVICE_ACCOUNT: artomator-github-actions-user@s3cme1.iam.gserviceaccount.com
   KMS_KEY: gcpkms://projects/s3cme1/locations/global/keyRings/artomator-signer-ring/cryptoKeys/artomator-signer/cryptoKeyVersions/1
 
+permissions:
+  contents: read
+
 jobs:
 
   conf:

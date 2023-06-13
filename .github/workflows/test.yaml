@@ -11,6 +11,11 @@ on:
         description: 'Maximum vulnerability severity to allow'
         type: string
         required: true
+
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
 
   test:
