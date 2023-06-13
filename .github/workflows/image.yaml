@@ -129,13 +129,14 @@ jobs:
     - name: Scan Image
       uses: aquasecurity/trivy-action@41f05d9ecffa2ed3f1580af306000f734b733e54  # v0.11.2
       with:
+        scan-type: image
         image-ref: ${{ env.IMAGE_DIGEST }}
         vuln-type: 'os,library'
         format: sarif
         output: trivy-results.sarif
-        hide-progress: true
         timeout: '10m'
         exit-code: '1'
+        scanners: 'vuln,secret,config'
         severity: "${{ inputs.max_vuln_severity }}"
       env:
         GOOGLE_APPLICATION_CREDENTIAL: ${{ steps.auth.outputs.access_token }}

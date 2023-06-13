@@ -24,7 +24,7 @@ env:
   GO_VERSION: ^1.20
   COSIGN_VERSION: v2.0.2
   SYFT_VERSION: v0.83.0
-  MAX_VULN_SEVERITY: 'CRITICAL,HIGH'
+  MAX_VULN_SEVERITY: 'MEDIUM,HIGH,CRITICAL'
   REGISTRY_URI: us-west1-docker.pkg.dev
   IMAGE_URI: us-west1-docker.pkg.dev/s3cme1/artomator/artomator
   ID_PROVIDER: projects/595203407878/locations/global/workloadIdentityPools/artomator-github-pool/providers/github-provider
