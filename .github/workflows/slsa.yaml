@@ -1,4 +1,4 @@
-name: slsa-provenance-create
+name: provenance
 
 on:
   workflow_call:
