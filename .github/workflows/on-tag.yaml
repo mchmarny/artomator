@@ -51,6 +51,7 @@ jobs:
       actions: read
       contents: read
       id-token: write
+      packages: write
       security-events: write
     with:
       image_digest: ${{ needs.image.outputs.digest }}
