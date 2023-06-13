@@ -52,7 +52,7 @@ jobs:
   image:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       id-token: write
       security-events: write
     outputs:
