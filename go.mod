@@ -3,7 +3,7 @@ module github.com/mchmarny/artomator
 go 1.20
 
 require (
-	cloud.google.com/go/monitoring v1.15.0
+	cloud.google.com/go/monitoring v1.15.1
 	cloud.google.com/go/storage v1.30.1
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/pkg/errors v0.9.1
@@ -27,7 +27,7 @@ require (
 	github.com/google/s2a-go v0.1.4 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.4 // indirect
-	github.com/googleapis/gax-go/v2 v2.10.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.11.0 // indirect
 	github.com/onsi/gomega v1.24.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
